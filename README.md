@@ -32,7 +32,9 @@ Also, different pieces of these libraries and tools were written by different pe
 
 So...
 ======================
-With all of that out of the way, if you are still reading this document, there are INSTALL instructions in the doc/ folder, and with your mighty internet detective skills please feel free to track me down on linkedin or drop me an email asking questions about it: >your favorite routing protocol< >AT< SecureObscure.com 
+I know that an uninitiated user will likely be unable to build something really meaningful out of these tinker toys on your own. There are chunks intentionally removed from this repository to protect some of the networks it supports. Other pieces are not included due to licensing concerns. If you are serious about committing time to developing your own tools using this code, you will likely have to work with one of the existing authors to get a functional solution.
+
+With all of that out of the way, if you are still reading this document, there are some incomplete INSTALL instructions in the doc/ folder to explain the environment this code expects to live in, and with your mighty internet detective skills please feel free to track me down on linkedin or drop me an email asking questions about it: >your favorite routing protocol< >AT< SecureObscure.com 
 
 
 Thanks for reading!
