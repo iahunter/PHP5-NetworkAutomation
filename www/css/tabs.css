@@ -1,0 +1,55 @@
+#tabs li button {
+	margin-top: 7px;
+	margin-right: 5px;
+	font-size: 45%;
+}
+		#tabs {
+			border: none;
+			padding: 0px 0px 0px 0px;
+		}
+		.ui-widget-content a { color: blue; }
+		ul.ui-tabs-nav {
+			border-top: 0px;
+			border-left: 0px;
+			border-right: 0px;
+			background: transparent;
+		}
+		.ui-tabs .ui-tabs-nav {
+			padding: 2px 9px 0;
+		}
+		.ui-tabs .ui-tabs-panel {
+			padding: 10px 5px 5px 10px;
+		}
+
+		.ui-autocomplete-loading {
+			background: white url('/images/ui-anim_basic_16x16.gif') right center no-repeat;
+		}
+		.ui-menu-item {
+			list-style: none;
+		}
+
+		#tabs-min {
+			background: transparent;
+			border: none;
+		}
+		#tabs-min .ui-widget-header {
+			background: transparent;
+			border: none;
+			border-bottom: 1px solid #c0c0c0;
+			-moz-border-radius: 0px;
+			-webkit-border-radius: 0px;
+			border-radius: 0px;
+		}
+		#tabs-min .ui-state-default {
+			background: transparent;
+			border: none;
+		}
+		#tabs-min .ui-state-active {
+			border: none;
+		}
+		#tabs-min .ui-state-default a {
+			color: #c0c0c0;
+		}
+		#tabs-min .ui-state-active a {
+			color: #459e00;
+		}

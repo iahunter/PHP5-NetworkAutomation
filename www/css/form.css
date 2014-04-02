@@ -1,0 +1,50 @@
+/* FORM DEFAULTS */
+input, textarea, select, .form-row p {
+    margin: 2px 0;
+    padding: 2px 3px;
+    vertical-align: middle;
+    font-family: "Lucida Grande", Verdana, Arial, sans-serif;
+    font-weight: normal;
+    font-size: 11px;
+}
+textarea {
+    vertical-align: top !important;
+	font-family: "Lucida Console", fixed, monospace;
+	font-size: 14px;
+}
+input[type=text], input[type=password], textarea, select, .vTextField {
+    border: 1px solid #ccc;
+}
+/* FORM BUTTONS */
+.button, input[type=submit], input[type=button], .submit-row input {
+    background: white url(/images/nav-bg.gif) bottom repeat-x;
+    padding: 3px 5px;
+    color: black;
+    border: 1px solid #bbb;
+    border-color: #ddd #aaa #aaa #ddd;
+}
+.button:active, input[type=submit]:active, input[type=button]:active {
+    background-image: url(/images/nav-bg-reverse.gif);
+    background-position: top;
+}
+.button[disabled], input[type=submit][disabled], input[type=button][disabled] {
+        background-image: url(/images/nav-bg.gif);
+        background-position: bottom;
+        opacity: 0.4;
+}
+.button.default, input[type=submit].default, .submit-row input.default {
+    border: 2px solid #5b80b2;
+    background: #7CA0C7 url(/images/default-bg.gif) bottom repeat-x;
+    font-weight: bold;
+    color: white;
+    float: right;
+}
+.button.default:active, input[type=submit].default:active {
+    background-image: url(/images/default-bg-reverse.gif);
+    background-position: top;
+}
+.button[disabled].default, input[type=submit][disabled].default, input[type=button][disabled].default {
+        background-image: url(/images/default-bg.gif);
+        background-position: bottom;
+        opacity: 0.4;
+}

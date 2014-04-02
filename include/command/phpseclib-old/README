@@ -1,0 +1,8 @@
+This is a clone of phpseclib.
+
+It was included as a tested good known-working version of the library to avoid any stability variations in releases.
+
+PHPSECLIB is (C) its individual authors.
+https://github.com/phpseclib/phpseclib
+http://phpseclib.sourceforge.net/
+

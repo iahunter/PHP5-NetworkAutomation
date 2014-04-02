@@ -1,0 +1,57 @@
+/* Generic Table Formatting */
+table {
+	font: 11px/24px Verdana, Arial, Helvetica, sans-serif;
+}
+th {
+	text-align: center;
+}
+
+/* Template Tool Table Formatting */
+table.template {
+	font: 12px Lucida
+}
+
+/* Generic Table Sub-class Formatting
+ *   These are for alternating row colors light/dark. */
+.row1 {
+	background: #EDF3FE;
+}
+.row2 {
+	background: white;
+}
+
+/* Generic Table Sub-class Formatting
+ *   These are for specific color variations */
+.black {
+	font-weight: bold;
+	color: black;
+}
+.green {
+	font-weight: bold;
+	color: green;
+	background-image: url(/images/green_trans.png);
+}
+.purple {
+	font-weight: bold;
+	color: purple;
+	background-image: url(/images/purple_trans.png);
+}
+.orange {
+	font-weight: bold;
+	color: orange;
+	background-image: url(/images/orange_trans.png);
+}
+.red {
+	font-weight: bold;
+	color: red;
+	background-image: url(/images/red_trans.png);
+}
+.blue {
+	font-weight: bold;
+	color: blue;
+	background-image: url(/images/blue_trans.png);
+}
+.silver {
+	font-weight: bold;
+	color: silver;
+}

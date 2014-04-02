@@ -1,0 +1,15 @@
+/* Link Formatting */
+a:link, a:visited {
+    color: blue;
+    text-decoration: none;
+}
+.bluelink {
+	color: blue !important;
+}
+a:hover {
+    color: #036;
+}
+a img {
+    border: none;
+}
+

@@ -1,0 +1,269 @@
+!TEMPLATE: MPLS QOS VERSION 1.1
+##################################################
+#
+#Variable definitions:
+#$PLATFORM "Router Type" "Router Platform (ASR, etc?)" select "ASR9006"
+#$SPEED "Link Speed" "Circuit Speed in Mbps" text ""
+#$PROFILE "Traffic Profile" "Percentages for queues" select "P1"
+#
+###
+#
+#IF $PROFILE "P1"
+Profile 1 is for P LSR MPLS use. It guarantees 80% of link bandwidth for VOIP MPLS TC5 marked traffic.
+
+#$PERCENTVOIP "" "" static "80"
+#$Q1PERCENT "" "" static "4"
+#$Q2PERCENT "" "" static "20"
+#$Q3PERCENT "" "" static "25"
+#$Q4PERCENT "" "" static "1"
+#$Q5PERCENT "" "" static "50"
+#ENDIF
+#
+###
+#IF $SPEED < "1"
+There is no parent service policy defined for links slower than 1mbps.
+#ENDIF
+#
+#IF $SPEED > "10000"
+There is no parent service policy defined for links faster than 10gbps.
+#ENDIF
+#
+###
+#
+#IF $SPEED >=<= "1 10000"
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!Define global traffic classes !!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+class-map match-any MPLS_TC0
+  match mpls experimental topmost 0 
+  match precedence 0 
+ end-class-map
+class-map match-any MPLS_TC1
+  match mpls experimental topmost 1 
+  match precedence 1 
+ end-class-map
+class-map match-any MPLS_TC2
+  match mpls experimental topmost 2 
+  match precedence 2 
+ end-class-map
+class-map match-any MPLS_TC3_TC6_TC7
+  match mpls experimental topmost 3 6 7 
+  match precedence 3 6 7 
+ end-class-map
+class-map match-any MPLS_TC4
+  match mpls experimental topmost 4 
+  match precedence 4 
+ end-class-map
+class-map match-any MPLS_TC5
+  match mpls experimental topmost 5 
+  match precedence 5 
+  match dscp ef 
+ end-class-map
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!Define parent policy map !!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#ENDIF
+#
+###
+#
+#IF $SPEED >=<= "1 120"
+policy-map MPLS_1M_TO_120M_$PERCENTVOIPTC5_$PROFILE_6Q
+  class MPLS_TC5
+    priority level 1 
+    police rate percent $PERCENTVOIP
+      conform-action transmit
+      exceed-action transmit
+      violate-action drop
+     exit
+   exit
+  class MPLS_TC4
+    bandwidth remaining percent $Q1PERCENT
+    queue-limit 1024 packets 
+    random-detect exp 4 171 packets 512 packets 
+   exit
+  class MPLS_TC3_TC6_TC7
+    bandwidth remaining percent $Q2PERCENT
+    queue-limit 2048 packets 
+    random-detect exp 3 171 packets 512 packets 
+    random-detect exp 6,7 511 packets 512 packets 
+   exit
+  class MPLS_TC2
+    bandwidth remaining percent $Q3PERCENT
+    queue-limit 1024 packets 
+    random-detect exp 2 171 packets 512 packets 
+   exit
+  class MPLS_TC1
+    bandwidth remaining percent $Q4PERCENT
+    queue-limit 1024 packets 
+    random-detect exp 1 52 packets 171 packets 
+   exit
+  class MPLS_TC0
+    bandwidth remaining percent $Q5PERCENT
+    queue-limit 512 packets 
+    random-detect exp 0 52 packets 171 packets 
+  exit
+ end-policy-map
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!Define child policy map !!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+policy-map SHAPE_$SPEEDM_$PERCENTVOIPEF_$PROFILE_6Q
+  class class-default
+    shape average $SPEED000000 bps
+      service-policy MPLS_1M_TO_120M_$PERCENTVOIPTC5_$PROFILE_6Q
+
+#ENDIF
+#
+###
+#
+#IF $SPEED >=<= "121 500"
+policy-map MPLS_120M_TO_500M_$PERCENTVOIPTC5_$PROFILE_6Q
+  class MPLS_TC5
+    priority level 1
+    police rate percent $PERCENTVOIP  
+      conform-action transmit  
+      exceed-action transmit  
+      violate-action drop  
+     exit
+   exit
+  class MPLS_TC4
+    bandwidth remaining percent $Q1PERCENT
+    queue-limit 4096 packets
+    random-detect exp 4 646 packets 1292 packets
+   exit
+  class MPLS_TC3_TC6_TC7
+    bandwidth remaining percent $Q2PERCENT
+    queue-limit 4096 packets
+    random-detect exp 3 646 packets 1292 packets
+    random-detect exp 6,7 1291 packets 1292 packets
+   exit
+  class MPLS_TC2 
+    bandwidth remaining percent $Q3PERCENT
+    queue-limit 4096 packets
+    random-detect exp 2 646 packets 1292 packets
+   exit
+  class MPLS_TC1
+    bandwidth remaining percent $Q4PERCENT
+    queue-limit 4096 packets
+    random-detect exp 1 194 packets 581 packets
+   exit
+  class MPLS_TC0
+    bandwidth remaining percent $Q5PERCENT
+    queue-limit 2048 packets
+    random-detect exp 0 194 packets 581 packets
+  exit
+ end-policy-map
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!Define child policy map !!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+policy-map SHAPE_$SPEEDM_$PERCENTVOIPEF_$PROFILE_6Q
+  class class-default
+    shape average $SPEED000000 bps
+      service-policy MPLS_120M_TO_500M_$PERCENTVOIPTC5_$PROFILE_6Q
+
+#ENDIF
+#
+###
+#
+#IF $SPEED >=<= "501 1000"
+policy-map MPLS_500M_TO_1000M_$PERCENTVOIPTC5_$PROFILE_6Q
+  class MPLS_TC5
+    priority level 1
+    police rate percent $PERCENTVOIP  
+      conform-action transmit  
+      exceed-action transmit  
+      violate-action drop  
+     exit
+   exit
+  class MPLS_TC4
+    bandwidth remaining percent $Q1PERCENT
+    queue-limit 8192 packets
+    random-detect exp 4 2592 packets 5184 packets
+   exit
+  class MPLS_TC3_TC6_TC7
+    bandwidth remaining percent $Q2PERCENT
+    queue-limit 16384 packets
+    random-detect exp 3 2592 packets 5184 packets
+    random-detect exp 6,7 5183 packets 5184 packets
+   exit
+  class MPLS_TC2 
+    bandwidth remaining percent $Q3PERCENT
+    queue-limit 8192 packets
+    random-detect exp 2 2592 packets 5184 packets
+   exit
+  class MPLS_TC1
+    bandwidth remaining percent $Q4PERCENT
+    queue-limit 4096 packets
+    random-detect exp 1 777 packets 2333 packets
+   exit
+  class MPLS_TC0
+    bandwidth remaining percent $Q5PERCENT
+    queue-limit 4096 packets
+    random-detect exp 0 777 packets 2333 packets
+  exit
+ end-policy-map
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!Define child policy map !!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+policy-map SHAPE_$SPEEDM_$PERCENTVOIPEF_$PROFILE_6Q
+  class class-default
+    shape average $SPEED000000 bps
+      service-policy MPLS_500M_TO_1000M_$PERCENTVOIPTC5_$PROFILE_6Q
+
+#ENDIF
+#
+###
+#
+#IF $SPEED >=<= "1001 10000"
+policy-map MPLS_1000M_TO_10000M_$PERCENTVOIPTC5_$PROFILE_6Q
+  class MPLS_TC5
+    priority level 1
+    police rate percent $PERCENTVOIP  
+      conform-action transmit  
+      exceed-action transmit  
+      violate-action drop  
+     exit
+   exit
+  class MPLS_TC4
+    bandwidth remaining percent $Q1PERCENT
+    queue-limit 16384 packets
+    random-detect exp 4 4845 packets 9600 packets
+   exit
+  class MPLS_TC3_TC6_TC7
+    bandwidth remaining percent $Q2PERCENT
+    queue-limit 32768 packets
+    random-detect exp 3 4845 packets 9600 packets
+    random-detect exp 6,7 9600 packets 9600 packets
+   exit
+  class MPLS_TC2 
+    bandwidth remaining percent $Q3PERCENT
+    queue-limit 16384 packets
+    random-detect exp 2 4845 packets 9600 packets
+   exit
+  class MPLS_TC1
+    bandwidth remaining percent $Q4PERCENT
+    queue-limit 16384 packets
+    random-detect exp 1 1498 packets 4358 packets
+   exit
+  class MPLS_TC0
+    bandwidth remaining percent $Q5PERCENT
+    queue-limit 8192 packets
+    random-detect exp 0 1498 packets 4358 packets
+  exit
+ end-policy-map
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!Define child policy map !!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+policy-map SHAPE_$SPEEDM_$PERCENTVOIPEF_$PROFILE_6Q
+  class class-default
+    shape average $SPEED000000 bps
+      service-policy MPLS_1000M_TO_10000M_$PERCENTVOIPTC5_$PROFILE_6Q
+
+#ENDIF
+#
+#############
+

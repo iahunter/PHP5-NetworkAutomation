@@ -1,0 +1,5 @@
+/* tooltip styling. by default the element to be styled is .tooltip */
+.tooltips {
+	font-size:12px;
+	border: 1px solid blue !important;
+}

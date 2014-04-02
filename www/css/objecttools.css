@@ -1,0 +1,73 @@
+/* Object Tool Formatting */
+.object-tools {       
+    font-size: 10px;
+    font-weight: bold;
+    font-family: Arial,Helvetica,sans-serif;
+    margin: 4px 2px;
+    float: right;
+    display: inline;
+    padding-left: 0px;
+}
+.object-tools li {
+    display: block;
+    float: left;
+    background: #999 url(/images/tool-left.gif) 0 0 no-repeat;
+    padding: 0 0 0 8px;
+    margin-left: 2px;
+    height: 16px;
+}
+.object-tools li:hover {
+    background: #5b80b2 url(/images/tool-left_over.gif) 0 0 no-repeat;
+}
+.object-tools a:link, .object-tools a:visited {
+    display: block;
+    float: left;
+    color: white;
+    padding: .1em 14px .1em 8px;
+    height: 14px;
+    background: #999 url(/images/tool-right.gif) 100% 0 no-repeat;
+}
+.object-tools a:hover {
+    background: #5b80b2 url(/images/tool-right_over.gif) 100% 0 no-repeat;
+}
+.object-tools a.viewsitelink, .object-tools a.golink, .object-tools a.viewsitelink:visited, .object-tools a.golink:visited{
+    background: #999 url(/images/tooltag-arrowright.gif) top right no-repeat;
+    padding-right: 28px;
+}
+.object-tools a.viewsitelink:hover, .object-tools a.golink:hover {
+    background: #5b80b2 url(/images/tooltag-arrowright_over.gif) top right no-repeat;
+}
+.object-tools a.addlink, .object-tools a.addlink:visited {
+    background: #999 url(/images/tooltag-add.gif) top right no-repeat;
+    padding-right: 28px;
+}
+.object-tools a.addlink:hover {
+    background: #5b80b2 url(/images/tooltag-add_over.gif) top right no-repeat;
+}
+.object-tools a.dellink, .object-tools a.dellink:visited {
+    background: #999 url(/images/tooltag-del.gif) top right no-repeat;
+    padding-right: 28px;
+}
+.object-tools a.dellink:hover {
+    background: #5b80b2 url(/images/tooltag-del_over.gif) top right no-repeat;
+}
+
+/* ACTION ICONS */
+.addlink {
+    padding-left: 12px;
+    background: url(/images/icon_addlink.gif) 0 .2em no-repeat;
+}
+.changelink {
+    padding-left: 12px;
+    background: url(/images/icon_changelink.gif) 0 .2em no-repeat;
+}
+.deletelink {
+    padding-left: 12px;
+    background: url(/images/icon_deletelink.gif) 0 .25em no-repeat;
+}
+a.deletelink:link, a.deletelink:visited {
+    color: #CC3434;
+}
+a.deletelink:hover {
+    color: #993333;
+}

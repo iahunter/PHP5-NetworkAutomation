@@ -1,0 +1,235 @@
+!************************************************************************
+!TEMPLATE: IOS UPDATE STANDARDS
+!************************************************************************
+#Variable definitions:
+#
+#$MANAGEMENT_INTERFACE "MGMT Interface" "MGMT INTERFACE" select "Vlan100 Vlan110 Vlan150 Gi0/0 Gi0/0.100 Lo0 BVI1"
+
+parser config cache interface
+
+aaa authentication login default local
+
+no aaa authorization config-commands
+no aaa authorization exec default group ACS local none 
+no aaa authorization commands 0 default group ACS local 
+no aaa authorization commands 1 default group ACS local 
+no aaa authorization commands 15 default group ACS local 
+no aaa accounting exec default start-stop group ACS
+no aaa accounting commands 0 default start-stop group ACS
+no aaa accounting commands 1 default start-stop group ACS
+no aaa accounting commands 15 default start-stop group ACS
+no aaa accounting connection default start-stop group ACS
+
+no aaa group server tacacs+ ACS
+
+no tacacs-server host 172.30.9.98
+no tacacs-server host 172.30.9.97
+
+
+
+
+
+banner motd ^
+
+    __  PKS OneIM
+   //\\  _______
+  //  \\//~//.--|
+  Y   /\\~~//_  |
+ _L  |_((_|___L_|
+(/\)(____(_______)
+
+$(hostname)
+
+I understand that this system is to be used by authorized personnel only,
+and that system usage is monitored.  By continuing, I represent that
+I am an authorized user, and expressly consent to such monitoring;
+if this monitoring reveals possible criminal activity, system personnel
+may provide the evidence gathered to law enforcement officials.
+
+^
+
+
+
+
+
+logging buffered 100000 informational
+no logging console
+logging 10.0.192.130
+logging source-interface $MANAGEMENT_INTERFACE
+archive
+ log config
+  logging enable
+  logging size 200
+  hidekeys
+
+ip access-list standard ACL_SNMP_RW
+  permit 172.30.0.246   
+  permit 10.123.0.0 0.0.255.255
+ exit
+ip access-list standard ACL_SNMP_RO
+  permit 74.126.50.12   
+  permit 74.126.50.129   
+  permit 10.0.112.0 0.0.15.255   
+  permit 10.0.210.0 0.0.1.255   
+  permit 10.202.0.0 0.0.255.255   
+  permit 10.250.224.0 0.0.15.255   
+  permit 172.17.251.0 0.0.0.255   
+  permit 172.30.0.0 0.0.255.255
+ip access-list standard ACL_REMOTE_MGMT
+  permit 74.126.50.0 0.0.0.255
+  permit 192.174.72.0 0.0.7.255
+  permit 10.0.0.0 0.255.255.255   
+  permit 172.16.0.0 0.15.255.255   
+  permit 192.168.0.0 0.0.255.255
+
+
+snmp-server contact Network Operations
+snmp-server community NetworkRO RO ACL_SNMP_RO
+snmp-server community NetworkRW RW ACL_SNMP_RW
+snmp-server trap-source $MANAGEMENT_INTERFACE
+snmp-server source-interface informs $MANAGEMENT_INTERFACE
+no snmp-server enable traps
+snmp-server enable traps config
+snmp-server host 10.0.192.130 public
+snmp-server ifindex persist
+
+
+service timestamps debug datetime msec
+service timestamps log   datetime msec
+service tcp-keepalives-in
+service tcp-keepalives-out
+service password-encryption
+no ip http server
+no ip http secure-server
+no service finger
+no service pad
+no service udp-small-servers
+no service tcp-small-servers
+no service config
+!BOOTP SERVER MAY ERROR OUT ON SWITCHES.  IGNORE.
+no ip bootp server
+ip tcp path-mtu-discovery
+
+
+#IF $MANAGEMENT_INTERFACE "BVI1"
+no clock timezone
+no clock summer-time
+no sntp server 10.216.1.103
+no sntp server 172.30.0.225
+no sntp server 172.30.0.3
+no sntp server 172.30.0.4
+no sntp server 172.30.0.5
+sntp server 10.123.1.123
+sntp server 10.123.2.123
+sntp server 10.123.3.123
+sntp source $MANAGEMENT_INTERFACE
+#ELSEIF
+no clock timezone
+no clock summer-time
+no ntp server 10.216.1.103
+no ntp server 172.30.0.225
+no ntp server 172.30.0.3
+no ntp server 172.30.0.4
+no ntp server 172.30.0.5
+ntp server 10.123.1.123
+ntp server 10.123.2.123
+ntp server 10.123.3.123
+ntp source $MANAGEMENT_INTERFACE
+#ENDIF
+
+ip domain-lookup
+ip domain retry 0
+ip domain timeout 1
+no ip name-server 10.216.1.103
+no ip name-server 172.30.0.225
+no ip name-server 172.30.0.3
+no ip name-server 172.30.0.4
+no ip name-server 172.30.0.5
+ip name-server 10.252.26.4
+ip name-server 10.252.26.5
+
+
+aaa new-model
+username console privilege 15 secret changeme
+username telecom privilege 15 secret changeme
+enable secret changeme
+no enable password
+
+aaa group server tacacs+ AAA_GROUP_ADMIN
+  server-private 10.252.12.108 timeout 3 key changeme
+  server-private 10.252.12.109 timeout 3 key changeme
+  ip tacacs source-interface $MANAGEMENT_INTERFACE
+
+aaa authentication login AAA_AUTH_ADMIN group AAA_GROUP_ADMIN local
+
+!Authorization
+aaa authorization exec default group AAA_GROUP_ADMIN local if-authenticated
+aaa authorization commands 1 default group AAA_GROUP_ADMIN none
+aaa authorization commands 15 default group AAA_GROUP_ADMIN none
+
+!aaa authorization config-commands
+aaa authorization network default none 
+
+!Accounting
+aaa accounting exec default start-stop group AAA_GROUP_ADMIN
+aaa accounting commands 1 default start-stop group AAA_GROUP_ADMIN
+aaa accounting commands 15 default start-stop group AAA_GROUP_ADMIN
+aaa accounting network default start-stop group AAA_GROUP_ADMIN
+aaa accounting connection default start-stop group AAA_GROUP_ADMIN
+aaa accounting system default start-stop group AAA_GROUP_ADMIN
+no aaa accounting system guarantee-first
+
+login on-failure log
+no login on-success log
+
+line con 0
+ login authentication AAA_AUTH_ADMIN
+ logging synchronous
+ privilege level 15
+ exec-timeout 60 0
+ transport preferred none
+
+line vty 0 4
+ no access-class in
+ no access-class ACL_REMOTE_ACCESS in
+ no access-class 23 in
+ access-class ACL_REMOTE_MGMT in vrf-also
+ login authentication AAA_AUTH_ADMIN 
+ logging synchronous
+ privilege level 15
+ exec-timeout 60 0     
+ transport input ssh
+ transport preferred none
+
+line vty 5 15
+ no access-class in
+ no access-class ACL_REMOTE_ACCESS in
+ no access-class 23 in
+ access-class ACL_REMOTE_MGMT in vrf-also
+ login authentication AAA_AUTH_ADMIN 
+ logging synchronous
+ privilege level 15
+ exec-timeout 60 0     
+ transport input ssh
+ transport preferred none
+
+no ip http server
+no ip http secure-server
+
+ip ssh version 2
+ip scp server enable
+
+ip domain-name net.company.com
+crypto key generate rsa general modulus 1024
+
+ip ftp source-interface $MANAGEMENT_INTERFACE
+
+ip tftp source-interface $MANAGEMENT_INTERFACE
+
+no ip access-list standard ACL_REMOTE_ACCESS
+no access-list 23
+
+end
+
+copy run start
+

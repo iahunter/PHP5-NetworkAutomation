@@ -1,0 +1,25 @@
+/* BREADCRUMBS */
+div.breadcrumbs {
+    background: white url(/images/nav-bg.gif) 0 repeat-x;
+    padding: 2px 8px 3px 5px;
+    font-size: 11px;
+    color: #999;
+/*
+    border-top: 1px solid #ddd;
+*/
+    border-bottom: 1px solid #ccc;
+    text-align: left;
+}
+div.breadcrumbs ul, div.breadcrumbs ul li {
+    margin: 0;
+    padding: 0;
+    display: inline;
+    list-style: none;
+}
+div.breadcrumbs ul li:before {
+    content: "\00a0";
+}
+div.breadcrumbs ul li:after {
+    content: "\00a0\203a";
+}
+

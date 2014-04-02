@@ -1,0 +1,48 @@
+/* TEXT STYLES & MODIFIERS */
+.small {
+    font-size: 11px;
+}
+.tiny {
+    font-size: 10px;
+}
+p.tiny {
+    margin-top: -2px;
+}
+.mini {
+    font-size: 9px;
+}
+p.mini {
+    margin-top: -3px;
+}
+.help, p.help {
+    font-size: 10px !important;
+    color: #999;
+}
+p img, h1 img, h2 img, h3 img, h4 img, td img {
+    vertical-align: middle;
+}
+.quiet, a.quiet:link, a.quiet:visited {
+    color: #999 !important;
+    font-weight: normal !important;
+}
+.quiet strong {
+    font-weight: bold !important;
+}
+.float-right {
+    float: right;
+}
+.float-left {
+    float: left;
+}
+.clear {
+    clear: both;
+}
+.align-left {
+    text-align: left;
+}
+.align-right {
+    text-align: right;
+}
+.nowrap {
+    white-space: nowrap;
+}

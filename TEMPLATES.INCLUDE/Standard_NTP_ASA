@@ -1,0 +1,8 @@
+!TEMPLATE: Standard_NTP_ASA VERSION 1.0
+!
+! Standard NTP Template For Cisco ASA 
+!
+ntp server 10.123.1.123 source management 
+ntp server 10.123.2.123 source management
+ntp server 10.123.3.123 source management
+!

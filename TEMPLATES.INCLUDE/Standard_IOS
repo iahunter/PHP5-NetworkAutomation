@@ -1,0 +1,15 @@
+#INCLUDE "Standard_Services_IOS"
+!
+#INCLUDE "Standard_Logging_IOS"
+!
+#INCLUDE "Standard_SNMP_IOS"
+!
+#INCLUDE "Standard_Banner_IOS"
+!
+#INCLUDE "Standard_AAA_IOS"
+!
+#INCLUDE "Standard_NTP_IOS"
+!
+#INCLUDE "Standard_Netflow_IOS"
+!
+#INCLUDE "Standard_DNS_IOS"

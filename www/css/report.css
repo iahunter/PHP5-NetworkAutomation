@@ -1,0 +1,42 @@
+/* Report Tool Table Formatting */
+table.report{
+	font-size: 11px;
+	text-align: left;
+	border-collapse: collapse;
+	border-color: #ccc;
+	border: 1px solid #ccc;
+}
+.report table{
+	font-size: 11px;
+	text-align: left;
+	border-collapse: collapse;
+	border-color: #ccc;
+	border: 1px solid #ccc;
+}
+.report caption {
+	margin: 0;
+	font-size: 13px;
+	line-height: 19px;
+	text-align: center;
+	font-weight: bold;
+	background: #7CA0C7 url(/images/default-bg.gif) top left repeat-x;
+	color: white;
+}
+.report th {
+	font-weight: bold;
+	line-height: 17px;
+	text-align: center;
+	background: #e1e1e1 url(/images/nav-bg.gif) top left repeat-x;
+	border-left: 1px solid #ddd;
+	border-bottom: 1px solid #ddd;
+}
+.report td {
+	vertical-align: top;
+	line-height: 15px;
+	padding-left:5px;
+}
+.report tfoot td {
+	font-size: 11px;
+	background: #e1e1e1 url(/images/nav-bg-reverse.gif) top left repeat-x;
+	padding-left:5px;
+}

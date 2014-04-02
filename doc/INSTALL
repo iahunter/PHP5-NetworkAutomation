@@ -1,0 +1,122 @@
+##################################################
+# New tools install
+##################################################
+# Load ubuntu-13.10-server-amd64.iso 64bit into a VM recommend 4 proc and 4 gb ram on a 50gb HDD thin provisioned
+
+##################################################
+# Stuff to make my life easier
+##################################################
+apt-get install open-vm-tools tcsh subversion ntp sshpass traceroute ftpd 
+scp .tcshrc and .nanorc from another box
+setup %sudo nopass fix, dont lock urself out of the box
+edit ntp.conf for our ntp servers
+
+##################################################
+# Stuff required to make the tools work
+##################################################
+
+# IF this is a LARGE network install (>1500 devices) you can experience web interface 
+# performance issues during polling events (depending on frequency/aggressiveness)
+# SO, this install can be broken into 3 completely separate VM's! web/poller/db.
+
+# If this is a DB only host
+apt-get install mysql-server
+
+# If this is a WEB only host
+apt-get install apache2 libapache2-mod-php5 php5-gd php5-json php5-curl php5-ldap php5-mysql php5-snmp php-pear snmp-mibs-downloader adminer
+
+#If this is a POLLER/APP only host
+apt-get install php5 php5-gd php5-json php5-ldap php5-mysql php5-snmp php-pear snmp-mibs-downloader snmptt tftpd-hpa
+
+#If it is ALL of the 3 roles on ONE host, install all of them!
+
+#While the tools do not require nullmailer explicitly, they work best with a mail transfer agent installed on the server to send email alerts
+apt-get install nullmailer
+
+#Customize our MTA settings
+cp /opt/networkautomation/etc/nullmailer/* /etc/nullmailer/
+
+##################################################
+# On with the install
+##################################################
+
+# Setup TFTP file recieve from routers if ur grabbing config that way
+mkdir /tftpboot
+mkdir /tftpboot/config
+chown -R root:root /tftpboot
+chmod -R 755 /tftpboot
+
+# Setup SNMP if we are using that for grabbing configs
+download-mibs
+
+#### For autodiscovery of devices via snmp config trap:
+
+Poller Autodiscovery - Installation:
+
+apt-get install snmp snmpd snmptt
+
+Poller Autodiscovery - Configuration:
+
+Edit /etc/snmp/snmptrapd.conf:
+
+# To accept all traps
+disableAuthorization yes
+# To handle traps with snmptt
+traphandle default /usr/sbin/snmptt
+Edit /etc/default/snmpd:
+
+change
+
+TRAPDRUN=no
+to
+TRAPDRUN=yes
+
+and change
+
+TRAPDOPTS='-Lsd -p /var/run/snmptrapd.pid'
+to
+TRAPDOPTS='-On -Lsd -p /var/run/snmptrapd.pid'
+
+The ‘-On’ parameter tells snmptrapd to log OID numbers. This is needed for snmptt to recognize the incoming traps.
+
+Next edit /etc/snmp/snmptt.ini and change
+
+unknown_trap_log_enable = 0
+to
+unknown_trap_log_enable = 1
+
+This enables logging all incoming traps to /var/log/snmptt/snmpttunknown.log.
+
+####
+
+# Install the dependant pear libraries
+pear install Net_IPv4 Net_IPv6
+
+# For production, need to edit:
+pico /etc/mysql/my.cnf # to boost connections and usually permit listening on all sockets - comment out the bind-address line!
+
+# create the mysql database and import the data from wherever (blank schema or clone from prod etc)
+service mysql restart
+
+# Fix one php5 default setting
+pico /etc/php5/cli/php.ini # remove the function disabled line to = blank
+
+# Create our file structure for the tools package
+cd /opt/
+
+# Get the latest copy from subversion
+svn checkout http://subversion.repository.url
+
+# Copy our sample config from the base package
+mkdir /etc/networkautomation
+cp /opt/networkautomation/etc/networkautomation/*.php /etc/networkautomation/
+
+# Edit the settings for this specific install
+pico /etc/networkautomation/config.inc.php
+
+# Get the apache config files linked and restart it
+ln -s /opt/networkautomation/etc/apache2/sites-available/netman-prod-ssl.conf /etc/apache2/sites-enabled/netman-prod-ssl.conf
+ln -s /opt/networkautomation/etc/apache2/sites-available/redirect80-443.conf /etc/apache2/sites-enabled/redirect80-443.conf
+ln -s /etc/adminer/apache.conf /etc/apache2/sites-enabled/adminer.conf
+service apache2 restart
+

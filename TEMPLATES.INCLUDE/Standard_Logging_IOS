@@ -1,0 +1,23 @@
+#!TEMPLATE: Standard_Logging_IOS VERSION 1.0
+#
+#$MANAGEMENT_INTERFACE "Management Interface Name" "The name of the interface used for management" text ""
+#
+!*********************************************
+! Standard Logging Template For Cisco IOS
+!*********************************************
+
+logging buffered 1000000 informational
+no logging console
+! This is InfoSec's Logrythm via the lancope flow replicator
+logging 10.0.123.123
+logging source-interface $MANAGEMENT_INTERFACE
+archive
+ log config
+  logging enable
+  logging size 200
+  hidekeys
+line con 0
+ logging synchronous
+line vty 0 15
+ logging synchronous
+
