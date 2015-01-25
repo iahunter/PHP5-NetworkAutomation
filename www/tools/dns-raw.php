@@ -1,10 +1,7 @@
 <?php
+define("NO_AUTHENTICATION",1);    // Do not authenticate requests against this tool
+header('Content-Type: text/plain');
 require_once "/etc/networkautomation/networkautomation.inc.php";
-
-$HTML->breadcrumb("Home","/");
-$HTML->breadcrumb("Tools","/tools");
-$HTML->breadcrumb("DNS Record Generator",$HTML->thispage);
-print $HTML->header("DNS Record Tool");
 
 $SEARCH = array(
 				"category"      => "management",
@@ -18,7 +15,7 @@ foreach ($RESULTS as $DEVICEID)
 {
 	$DEVICE = Information::retrieve($DEVICEID);
 
-	if ($i++) { print "<hr size=1>\n"; }
+	$i++;
 
 	$SERVER = "knedcxiwp005";	// Our DNS server target
 	$DEVICE->data["name"] = preg_replace("/\//","-",$DEVICE->data['name']); // Replace slashes in device names with hyphens!
@@ -34,11 +31,11 @@ foreach ($RESULTS as $DEVICEID)
 	$INTERFACES = $CISCO->config('interface');
 
 	if (!$INTERFACES) {
-		print "<p>Cannot get interfaces from device: {$HOSTNAME}</p>\n";
+		print "REM Cannot get interfaces from device: {$HOSTNAME}\n";
 		continue;
 	}
 
-	print "<pre>rem $HOSTNAME.$DOMAINNAME ID $DEVICEID\n";
+	print "REM $HOSTNAME.$DOMAINNAME ID $DEVICEID\n";
 	$FIRSTINT = "";
 	foreach ($INTERFACES as $iname => $idata)
 	{
@@ -70,11 +67,9 @@ foreach ($RESULTS as $DEVICEID)
 	print "rem $HOSTNAME.$DOMAINNAME Management Interface May Be $MGMTINT\n";
 	print $MGMTDEL;
 	print $MGMTADD;
-	print "</pre>\n";
+	print "\n";
 
 	john_flush();
 	unset($DEVICE); // save memory!
 }
-print $HTML->footer();
-
 ?>

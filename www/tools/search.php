@@ -5,7 +5,7 @@ $STEPSIZE = 50;
 
 $HTML->breadcrumb("Home","/");
 $HTML->breadcrumb("Tools","/tools");
-$HTML->breadcrumb("Search",$THISPAGE);
+$HTML->breadcrumb("Search",$HTML->thispage);
 print $HTML->header("Search");
 
 print <<<END

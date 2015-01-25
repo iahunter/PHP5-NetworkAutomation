@@ -3,7 +3,7 @@ require_once "/etc/networkautomation/networkautomation.inc.php";
 
 $HTML->breadcrumb("Home","/");
 $HTML->breadcrumb("Tools","/tools");
-$HTML->breadcrumb("IPv6 Address Plan",$THISPAGE);
+$HTML->breadcrumb("IPv6 Address Plan",$HTML->thispage);
 print $HTML->header("IPv6 Subnet Tool");
 
 
@@ -53,6 +53,12 @@ print "</select><br>\n";
 print "<input type=\"submit\" value=\"Generate Subnets\">
 	</form><br><hr style=\"border: 0; color: #ccc; background-color: #aaa; height: 1px;\"><br>\n";
 
+
+if( !filter_var($PREFIX, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) )
+{
+	print "Error: {$PREFIX} is not a valid IPv6 address.";
+	$PREFIX = "";	// Important, dont run exec on invalid IPs
+}
 
 // Check to see if we were passed input.
 if ($PREFIX)

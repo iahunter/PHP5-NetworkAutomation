@@ -3,7 +3,7 @@ require_once "/etc/networkautomation/networkautomation.inc.php";
 
 $HTML->breadcrumb("Home","/");
 $HTML->breadcrumb("Tools","");
-$HTML->breadcrumb("Switch Viewer",$THISPAGE);
+$HTML->breadcrumb("Switch Viewer",$HTML->thispage);
 
 $HEAD_EXTRA = <<<EOT
 	<style>

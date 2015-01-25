@@ -30,11 +30,15 @@ require_once "/etc/networkautomation/networkautomation.inc.php";
 
 $HTML->breadcrumb("Home","/");
 //$HTML->breadcrumb("Tools","/tools");
-$HTML->breadcrumb("Template Tool",$THISPAGE);
+$HTML->breadcrumb("Template Tool",$HTML->thispage);
 print $HTML->header("Template Tool");
 $BASE_DIRECTORY = BASEDIR."/TEMPLATES";
 $debug = $_SESSION["DEBUG"];
 $PAGE_SELF = $_SERVER['PHP_SELF'];
+
+// Get a list of templates to consider...
+$HANDLE = opendir($BASE_DIRECTORY); $FILES = array(); while ($FILES[] = readdir($HANDLE)); closedir($HANDLE); sort($FILES);
+$TEMPLATES = array(); foreach ($FILES as $FILE) { if ($FILE[0] != "." && $FILE != "") { array_push($TEMPLATES,$FILE); } }
 
 /******************************************************************************************/
 /******************************************************************************************/
@@ -59,13 +63,7 @@ $PAGE_SELF = $_SERVER['PHP_SELF'];
 Template:<br>
 <select name="nosx_template" size="1">
 <?php
-if ($handle = opendir($BASE_DIRECTORY)) {
-	$files = array();
-	while ($files[] = readdir($handle));
-	sort($files);
-	foreach ($files as $file) { if ($file[0] != "." && $file != ""){ print "<option value=\"$file\">$file</option>\n"; } }
-	closedir($handle);
-}
+foreach ($TEMPLATES as $FILE) { print "<option value=\"$FILE\">$FILE</option>\n"; }
 ?>
 </select>
 </td></tr><tr><td>
@@ -88,35 +86,34 @@ Action:<br>
 /******************************************************************************************/
 /******************************************************************************************/
 
-   if ($_SERVER['REQUEST_METHOD'] == 'POST'){
-
-//### ALL STEPS VARIABLES ###
-
-	foreach ($_POST as $var_name => $var_value) { if (preg_match('/nosx/',$var_name)) { $_SESSION[$var_name]=$var_value; } }
-
-$_SESSION['nosx_step']++;
-
-
-//### RE print and store all our previous screens variables! ###
-
-print "<form name=\"nosx_templatetool\" method=\"post\" action=\"$PAGE_SELF\">\n";
-
-?>
-
-<table>
-<?php
-
-   if ($debug > 3){
-	foreach ($_SESSION as $var_name => $var_value) {
-		print "<tr><td>$var_name</td><td>=</td><td>$var_value</tr>\n";
+if ($_SERVER['REQUEST_METHOD'] == "POST" )
+{
+	//### ALL STEPS VARIABLES ###
+	foreach ($_POST as $var_name => $var_value)
+	{
+		if ( preg_match('/nosx/',$var_name) )
+		{
+			$_SESSION[$var_name]=$var_value;
+		}
 	}
-   }
-?>
-</table>
+	// Increase our step counter every page post
+	$_SESSION['nosx_step']++;
 
-<?php
+	// sanity check that the template we are using exists...
+	if ( !in_array($_SESSION["nosx_template"],$TEMPLATES) ) { die("Error: Template not in list...\n" . $HTML->footer() ); }
 
-///### Step 2 VIEW action ###
+	//### RE print and store all our previous screens variables! ###
+	print "<form name=\"nosx_templatetool\" method=\"post\" action=\"$PAGE_SELF\">\n";
+	if ($debug > 3)
+	{
+		print "<table>\n";
+		foreach ($_SESSION as $var_name => $var_value) {
+			print "<tr><td>$var_name</td><td>=</td><td>$var_value</tr>\n";
+		}
+		print "</table>\n";
+	}
+
+  ///### Step 2 VIEW action ###
 
 if ($_SESSION['nosx_step'] == 2 & $_SESSION['nosx_action'] == "view" && $_SESSION['nosx_template']!="")
 {
@@ -311,12 +308,12 @@ elseif ($_SESSION['nosx_step'] >= 2 && $_SESSION['nosx_action'] == "run" && $_SE
 	print "<b>Error: session data is inconsistent.</b><br><br>You may have hit the back button and reloaded the page or used the same window to submit another form on this site.<br><br>Please restart this session.\n";
 }
 
-   }
+}
 print "</form></div>\n";
 
 if ($_SESSION['nosx_step'] >= 1)
 {
-	print $HTML->footer("Restart",$THISPAGE);
+	print $HTML->footer("Restart",$HTML->thispage);
 }else{
 	print $HTML->footer();
 }
