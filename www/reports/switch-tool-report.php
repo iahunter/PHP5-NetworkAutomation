@@ -3,7 +3,7 @@ require_once "/etc/networkautomation/networkautomation.inc.php";
 
 $HTML->breadcrumb("Home","/");
 $HTML->breadcrumb("Reports","");
-$HTML->breadcrumb("Switch Viewer Utilization Report",$THISPAGE);
+$HTML->breadcrumb("Switch Viewer Utilization Report",$HTML->thispage);
 print $HTML->header("Switch Viewer Utilization Report");
 
 $QUERY = <<<END

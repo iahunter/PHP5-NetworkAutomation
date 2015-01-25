@@ -18,6 +18,7 @@ $SERVICEQUERY["ezvpn"		]	= "%EZVPN_CLIENT%"		;
 $SERVICEQUERY["verizon"		]	= "%remote-as 65000%"	;
 $SERVICEQUERY["centurylink"	]	= "%remote-as 209%"		;
 $SERVICEQUERY["telus"		]	= "%telus%"				;
+$SERVICEQUERY["att"			]	= "%remote-as 13979%"	;
 
 if (isset($_GET['service']))
 {

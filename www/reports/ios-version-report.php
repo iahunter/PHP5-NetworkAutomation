@@ -3,7 +3,7 @@ require_once "/etc/networkautomation/networkautomation.inc.php";
 
 $HTML->breadcrumb("Home","/");
 $HTML->breadcrumb("Reports","/reports/");
-$HTML->breadcrumb("IOS Version",$THISPAGE);
+$HTML->breadcrumb("IOS Version",$HTML->thispage);
 print $HTML->header("IOS Version Report");
 
 // Function for mapping show version output to an actual software version string
@@ -180,7 +180,7 @@ END;
 	print HTML::quicktable_report("IOS Versions", array("IOS","Count"), $IOS_VERSION) . "\n";
 	print "</td></tr></table>";
 
-	print $HTML->footer("Back",$THISPAGE);
+	print $HTML->footer("Back",$HTML->thispage);
 }
 
 ?>

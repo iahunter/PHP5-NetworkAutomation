@@ -1,8 +1,10 @@
 <?php
+define("MONITOR_USER_EXPERIENCE","0");	// Disable UXM/Boomerangs for this page
 require_once "/etc/networkautomation/networkautomation.inc.php";
+
 $HTML->breadcrumb("Home","/");
 $HTML->breadcrumb("Monitoring","/monitoring/");
-$HTML->breadcrumb("BGP",$THISPAGE);
+$HTML->breadcrumb("BGP",$HTML->thispage);
 
 $HEAD_EXTRA = <<<EOT
 <META HTTP-EQUIV=REFRESH CONTENT=300>

@@ -3,7 +3,7 @@ require_once "/etc/networkautomation/networkautomation.inc.php";
 
 $HTML->breadcrumb("Home","/");
 $HTML->breadcrumb("Reports","/reports");
-$HTML->breadcrumb("Inaccessible Devices",$THISPAGE);
+$HTML->breadcrumb("Inaccessible Devices",$HTML->thispage);
 
 $HEAD_EXTRA = <<<EOT
 <script type="text/javascript" language="javascript">
@@ -40,7 +40,7 @@ $SEARCH = array(	// Search for all network devices
 				"category"      => "management",
 				"type"          => "device_network_%",
 				);
-$RESULTS = Information::search($SEARCH);
+$RESULTS = Information::search($SEARCH,"stringfield4");	// Search with order!
 $RECORDCOUNT = count($RESULTS);
 
 $i=0;

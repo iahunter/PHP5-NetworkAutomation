@@ -16,7 +16,8 @@ $INFOBJECT = Information::retrieve($ID);
 $PERMISSION = "information";
 if (!empty($INFOBJECT->data['category'])) { $PERMISSION .= ".{$INFOBJECT->data['category']}"; }
 $PERMISSION .= ".{$INFOBJECT->data['type']}";
-$PERMISSION .= ".action";
+$PERMISSION .= ".action.{$ACTION}";
+/*
 if(permission_check($PERMISSION))
 {
 	print $INFOBJECT->action($ACTION,$ARRAY);
@@ -25,6 +26,12 @@ if(permission_check($PERMISSION))
 }else{
 	print "Error: You lack permission $PERMISSION to perform this action!\n";
 }
+/**/
+PERMISSION_REQUIRE($PERMISSION);
+
+print $INFOBJECT->action($ACTION,$ARRAY);
+$MESSAGE = "Information Action ID:{$ID} CATEGORY:{$INFOBJECT->data['category']} TYPE:{$INFOBJECT->data['type']} ACTION:{$ACTION}";
+$DB->log($MESSAGE);
 
 print $HTML->footer();
 

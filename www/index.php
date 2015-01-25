@@ -18,6 +18,30 @@ if (PERMISSION_CHECK("tool.log"))
 	));
 }
 
+if (PERMISSION_CHECK("tool.supervisor"))
+{
+	array_push($BLOCKS,$HTML->featureblock(
+		"Supervisor",
+		"http://netman:9001/",
+		"/images/supervisord.png",
+		array(
+			"Gearman worker thread supervisor server"
+		)
+	));
+}
+
+if (PERMISSION_CHECK("tool.gearman"))
+{
+	array_push($BLOCKS,$HTML->featureblock(
+		"Gearman",
+		"/gearman",
+		"/images/gearman.png",
+		array(
+			"Gearman job queue, workers, and servers"
+		)
+	));
+}
+
 if (PERMISSION_CHECK("debug"))
 {
 	array_push($BLOCKS,$HTML->featureblock(
@@ -200,6 +224,20 @@ if (PERMISSION_CHECK("tool.ipv6plan"))
 	));
 }
 
+if (PERMISSION_CHECK("websvn.configrepo"))
+{
+	array_push($BLOCKS,$HTML->featureblock(
+		"Configuration Repository",
+		"/websvn/",
+		"/images/cydiapackage.png",
+		array(
+				"Network config revision tracking",
+				"THIS WILL TAKE TIME TO LOAD!",
+				"Please be patient...",
+		)
+	));
+}
+
 if (PERMISSION_CHECK("information.datacenter.site.view"))
 {
 	array_push($BLOCKS,$HTML->featureblock(
@@ -211,7 +249,7 @@ if (PERMISSION_CHECK("information.datacenter.site.view"))
 		)
 	));
 }
-
+/*
 if (PERMISSION_CHECK("tool.dns"))
 {
 	array_push($BLOCKS,$HTML->featureblock(
@@ -228,12 +266,25 @@ if (PERMISSION_CHECK("tool.dns"))
 if (PERMISSION_CHECK("information.provisioning.site.view"))
 {
 	array_push($BLOCKS,$HTML->featureblock(
-		"Provisioning Tool",
+		"Network Provisioning",
 		"/information/information-list.php?category=Provisioning&type=Site",
 		"/images/provisioning-icon.png",
 		array(
 			"Network Device Provisioning <b>BETA</b>",
 			"Track Devices and Generate Config"
+		)
+	));
+}
+
+if (PERMISSION_CHECK("information.security..view"))
+{
+	array_push($BLOCKS,$HTML->featureblock(
+		"Security Provisioning",
+		"/information/information-list.php?category=Security&type=Index",
+		"/images/firewall1.png",
+		array(
+			"Firewall Provisioning <b>BETA</b>",
+			"Track Applications & Hosts"
 		)
 	));
 }
@@ -250,7 +301,7 @@ if (PERMISSION_CHECK("information.equipment.terminalserver.view"))
 		)
 	));
 }
-
+/*
 if (PERMISSION_CHECK("information..tasklist.view"))
 {
 	array_push($BLOCKS,$HTML->featureblock(
@@ -263,23 +314,24 @@ if (PERMISSION_CHECK("information..tasklist.view"))
 		)
 	));
 }
-
+/**/
+/*
 if (PERMISSION_CHECK("information.checklist.server.view"))
 {
 	array_push($BLOCKS,$HTML->featureblock(
 		"Server Checklist",
-		"/information/information-list.php?category=Checklist&type=ChecklistGroup_Server",
+		"/information/information-list.php?category=Checklist&type=Index",
 		"/images/serverchecklist.png",
 		array(
-				"Server build process checklist",
+				"Server build process checklists",
+				"Server decom process checklists",
 				"Completion and QA tracking"
 		)
 	));
 }
-
-if ($_SESSION["AAA"]["username"] == "john.lavoie"	||
-	$_SESSION["AAA"]["username"] == "jw"		||
-	$_SESSION["AAA"]["username"] == "ed"	)
+/**/
+if ($_SESSION["AAA"]["username"] == "some.jerk"	||
+	$_SESSION["AAA"]["username"] == "short.round"	)
 {
 	array_push($BLOCKS,$HTML->featureblock(
 		"Random Error Message",
@@ -289,6 +341,15 @@ if ($_SESSION["AAA"]["username"] == "john.lavoie"	||
 			bofh_quote(),
 			"<br>",
 			"{$_SESSION["AAA"]["realname"]} is a " . insult(),
+		)
+	));
+
+	array_push($BLOCKS,$HTML->featureblock(
+		"Futurama Quote",
+		"",
+		"/images/bender.png",
+		array(
+			futurama_quote(),
 		)
 	));
 }
@@ -304,11 +365,8 @@ if ($_SESSION["AAA"]["username"] == "john.lavoie"	||
 		)
 	));
 
-
+//	<b>All is well. Nothing is broke.</b><br><br>
 print <<<END
-	<b>This website has migrated to a new server and upgraded to the latest php5-NetworkAutomation version<br>
-	Please excuse any bugs or broken features, they will be resolved asap</b><br><br>
-	These tools use active directory user authentication and active directory group membership for granular role based permissions<br><br>
 	<div style="table; width: 900px;">
 		<div style="display: table-row;">
 END;
@@ -340,7 +398,7 @@ print <<<END
 		<div style="display: table-row">
 			<div style="display: table-cell; padding: 5px;">
 				<div>
-					<a href="mailto:tool.admin@company.com?subject=Tool Bug Report"><img src="/images/bug.gif"></a>
+					<a href="mailto:some.jerk@company.com?subject=Tool Bug Report"><img src="/images/bug.gif"></a>
 				</div>
 			</div>
 		</div>

@@ -1,13 +1,6 @@
 <?php
-define(NO_AUTHENTICATION,1);	// Do not authenticate requests against this tool
+define("NO_AUTHENTICATION",1);	// Do not authenticate requests against this tool
 require_once "/etc/networkautomation/networkautomation.inc.php";
-
-/*
-$HTML->breadcrumb("Home","/");
-$HTML->breadcrumb("Reports","/reports");
-$HTML->breadcrumb("IPv4 Subnet",$THISPAGE);
-print $HTML->header("IPv4 Subnet Report");
-/**/
 
 $MESSAGE = "SITE SUBNET REPORT";
 $DB->log($MESSAGE);

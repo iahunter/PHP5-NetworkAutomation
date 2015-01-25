@@ -48,7 +48,7 @@ $RECORDCOUNT = count($RESULTS);
 
 if (isset($ID) || isset($SEARCH))
 { print <<<END
-	<form action="{$THISPAGE}" method="get">Search BGP Message Contents: <input type="text" name="search"> <input type="submit" value="Search!"></form><br>
+	<form action="{$HTML->thispage}" method="get">Search BGP Message Contents: <input type="text" name="search"> <input type="submit" value="Search!"></form><br>
 END;
 }
 
@@ -147,7 +147,7 @@ END;
 				<td class="report">{$TYPE}			</td>
 				<td class="report">{$PREFIX}		</td>
 				<td class="report">{$ASPATH_OUTPUT}	</td>
-				<td class="report"><a href="{$THISPAGE}?id={$ID}">Detail</a></td>
+				<td class="report"><a href="{$HTML->thispage}?id={$ID}">Detail</a></td>
 			</tr>
 END;
 	}

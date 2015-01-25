@@ -3,7 +3,7 @@ require_once "/etc/networkautomation/networkautomation.inc.php";
 
 $HTML->breadcrumb("Home","/");
 $HTML->breadcrumb("Reports");
-$HTML->breadcrumb("Netman Utilization Report",$THISPAGE);
+$HTML->breadcrumb("Netman Utilization Report",$HTML->thispage);
 print $HTML->header("Netman Utilization Report");
 
 PERMISSION_REQUIRE("tool.log");
@@ -22,6 +22,26 @@ try {
 	$DB->execute();
 	$RESULTS = $DB->results();
 } catch (Exception $E) {
+	$MESSAGE = "Exception: {$E->getMessage()}";
+	trigger_error($MESSAGE);
+	die($MESSAGE);
+}
+
+/*******
+* LDAP *
+*******/
+try {
+	$LDAP = new LDAP(
+					array(
+						"base_dn"		   => LDAP_BASE,
+						"admin_username"	=> LDAP_USER,
+						"admin_password"	=> LDAP_PASS,
+						"domain_controllers"=> array(LDAP_HOST),
+						"ad_port"		   => LDAP_PORT,
+						"account_suffix"	=> "@" . LDAP_DOMAIN,
+					)
+				);
+} catch (adLDAPException $E) {
 	$MESSAGE = "Exception: {$E->getMessage()}";
 	trigger_error($MESSAGE);
 	die($MESSAGE);

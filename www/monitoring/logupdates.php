@@ -33,7 +33,7 @@ $RECORDCOUNT = count($RESULTS);
 
 $WIDTH = array();
 $WIDTH[1] = 30;
-$WIDTH[2] = 120;
+$WIDTH[2] = 140;
 $WIDTH[3] = 200;
 $WIDTH[4] = 200;
 $WIDTH[5] = 40;
@@ -60,6 +60,26 @@ END;
 
 $USER_HITS = array();
 $TOOL_HITS = array();
+
+/*******
+* LDAP *
+*******/
+try {
+	$LDAP = new LDAP(
+					array(
+						"base_dn"		   => LDAP_BASE,
+						"admin_username"	=> LDAP_USER,
+						"admin_password"	=> LDAP_PASS,
+						"domain_controllers"=> array(LDAP_HOST),
+						"ad_port"		   => LDAP_PORT,
+						"account_suffix"	=> "@" . LDAP_DOMAIN,
+					)
+				);
+} catch (adLDAPException $E) {
+	$MESSAGE = "Exception: {$E->getMessage()}";
+	trigger_error($MESSAGE);
+	die($MESSAGE);
+}
 
 $i = 0;
 foreach($RESULTS as $RECORD)

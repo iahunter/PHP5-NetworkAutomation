@@ -5,14 +5,6 @@ if ( isset($_REQUEST['debug'])	)	{ $DEBUG = $_REQUEST['debug']; } else { $DEBUG 
 if ( isset($_REQUEST['term'])	)	{ $DEVICE = $_REQUEST['term']; } else { exit; }
 
 $i=0;
-//$RESULT = mysql_query("select switch_name,switch_id,switch_ip from switch where switch_name like '%$DEVICE%' and switch_ip is not null order by switch_name limit 30",$SQLCONNECTION);
-/*$RESULT = mysql_query("select distinct device.prompt,device.id,device.ip from device where prompt like '%$DEVICE%' and (
- prompt like '%swc%' or
- prompt like '%swi%' or
- prompt like '%swa%' or
- prompt like '%swp%'
-) and prompt is not null order by prompt limit 30",$SQLCONNECTION);
-/**/
 
 $DEVICE = "%".$DEVICE."%";
 

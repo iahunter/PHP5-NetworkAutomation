@@ -1,9 +1,10 @@
 <?php
+define("MONITOR_USER_EXPERIENCE","0");	// Disable UXM/Boomerangs for this page
 require_once "/etc/networkautomation/networkautomation.inc.php";
 
 $HTML->breadcrumb("Home","/");
 $HTML->breadcrumb("Monitoring","/monitoring/");
-$HTML->breadcrumb("Log",$THISPAGE);
+$HTML->breadcrumb("Log",$HTML->thispage);
 
 $USER = "%"; if (isset($_GET['user'])) { $USER = "{$_GET['user']}"; }
 $TOOL = "%"; if (isset($_GET['tool'])) { $TOOL = "{$_GET['tool']}"; }

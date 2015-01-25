@@ -1,5 +1,5 @@
 <?php
-define(NO_AUTHENTICATION,1);
+define("NO_AUTHENTICATION",1);
 require_once "/etc/networkautomation/networkautomation.inc.php";
 
 $OUTPUT = "";

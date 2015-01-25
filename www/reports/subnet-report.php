@@ -3,7 +3,7 @@ require_once "/etc/networkautomation/networkautomation.inc.php";
 
 $HTML->breadcrumb("Home","/");
 $HTML->breadcrumb("Reports","/reports");
-$HTML->breadcrumb("IPv4 Subnet",$THISPAGE);
+$HTML->breadcrumb("IPv4 Subnet",$HTML->thispage);
 print $HTML->header("IPv4 Subnet Report");
 
 set_include_path(get_include_path().PATH_SEPARATOR.'/usr/share/php');

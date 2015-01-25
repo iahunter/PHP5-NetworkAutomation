@@ -3,7 +3,7 @@ require_once "/etc/networkautomation/networkautomation.inc.php";
 
 $HTML->breadcrumb("Home","/");
 $HTML->breadcrumb("Reports","/reports");
-$HTML->breadcrumb("Site Service Report",$THISPAGE);
+$HTML->breadcrumb("Site Service Report",$HTML->thispage);
 print $HTML->header("Site Service Report");
 
 // Build our list of sites
@@ -27,7 +27,7 @@ END;
 	}
 $SITES = array(); foreach($RESULTS as $KEY => $RESULT) { array_push($SITES,$RESULT["sitecode"]); }
 
-$SERVICES = array('verizon','centurylink','telus','internet','ezvpn','flexvpn');
+$SERVICES = array('att','verizon','centurylink','telus','internet','ezvpn','flexvpn');
 
 //dumper($SITES);
 
