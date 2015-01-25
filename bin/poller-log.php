@@ -22,6 +22,6 @@ if (isset($argc))
 	die("Error: Did not recieve commandline arguements!\n");
 }
 
-$DB->log($LOG,1);
+$DB->log($LOG,2);
 ?>
 

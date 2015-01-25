@@ -1,0 +1,12 @@
+On ubuntu:
+apt-get install libxml2 libxml2-dev
+unpackage the tar.gz file
+./configure
+make
+make install
+copy the various files in this directory to the config location etc.
+install the correct autostart script
+configure screen to launch at boot with bgpmon-insert.php to parse xml->mysql.
+
+3
+

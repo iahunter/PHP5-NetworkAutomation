@@ -10,8 +10,6 @@ ip access-list standard ACL_SNMP_RW
   permit 10.123.0.0 0.0.255.255
  exit
 ip access-list standard ACL_SNMP_RO
-  permit 74.126.50.12
-  permit 74.126.50.129
   permit 10.0.112.0 0.0.15.255
   permit 10.0.210.0 0.0.1.255
   permit 10.202.0.0 0.0.255.255
@@ -25,8 +23,6 @@ snmp-server community NetworkRW RW ACL_SNMP_RW
 snmp-server enable traps config
 
 ip access-list standard ACL_REMOTE_MGMT
-  permit 74.126.50.0 0.0.0.255
-  permit 192.174.72.0 0.0.7.255
   permit 10.0.0.0 0.255.255.255
   permit 172.16.0.0 0.15.255.255
   permit 192.168.0.0 0.0.255.255

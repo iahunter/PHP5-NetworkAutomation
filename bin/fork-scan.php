@@ -3,7 +3,7 @@
 require_once "/etc/networkautomation/networkautomation.inc.php";
 
 //////////////////////////
-$MAXTHREADS = 70;		// Max number of forked processes
+$MAXTHREADS = 40;		// Max number of forked processes
 $MAXTIME	= 130;		// Allow a 130 second maximum time for a worker
 //////////////////////////
 

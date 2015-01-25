@@ -3,7 +3,7 @@
 require_once "/etc/networkautomation/networkautomation.inc.php";
 
 //////////////////////////
-$MAXTHREADS = 80;		// Max number of forked processes
+$MAXTHREADS = 60;		// Max number of forked processes
 $MAXTIME	= 130;		// Allow a 130 second maximum time for a worker
 //////////////////////////
 
@@ -51,6 +51,7 @@ $QUERY = <<<END
 	AND name != "a10nexu5000"
 	AND name != "b10nexu5000"
 	AND name != "khonemdcswi01"
+	AND name != "khonestdrbh01"
 	AND protocol != "none"
 	{$ADD}
 	ORDER BY id
