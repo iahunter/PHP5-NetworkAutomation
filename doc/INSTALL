@@ -1,7 +1,7 @@
 ##################################################
 # New tools install
 ##################################################
-# Load ubuntu-13.10-server-amd64.iso 64bit into a VM recommend 4 proc and 4 gb ram on a 50gb HDD thin provisioned
+# Load ubuntu-14.04-server-amd64.iso 64bit into a VM recommend 4 proc and 4 gb ram on a 50gb HDD thin provisioned
 
 ##################################################
 # Stuff to make my life easier
@@ -23,7 +23,7 @@ edit ntp.conf for our ntp servers
 apt-get install mysql-server
 
 # If this is a WEB only host
-apt-get install apache2 libapache2-mod-php5 php5-gd php5-json php5-curl php5-ldap php5-mysql php5-snmp php-pear snmp-mibs-downloader adminer
+apt-get install apache2 libapache2-mod-php5 php5-gd php5-json php5-curl php5-ldap php5-mysql php5-snmp php-pear snmp-mibs-downloader adminer websvn
 
 #If this is a POLLER/APP only host
 apt-get install php5 php5-gd php5-json php5-ldap php5-mysql php5-snmp php-pear snmp-mibs-downloader snmptt tftpd-hpa
@@ -105,7 +105,7 @@ pico /etc/php5/cli/php.ini # remove the function disabled line to = blank
 cd /opt/
 
 # Get the latest copy from subversion
-svn checkout http://subversion.repository.url
+svn checkout http://subversion.domain.com/svn/url
 
 # Copy our sample config from the base package
 mkdir /etc/networkautomation
