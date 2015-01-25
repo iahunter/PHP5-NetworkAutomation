@@ -5,4 +5,4 @@ rm /root/.ssh/known_hosts  2>&1 | grep -v such
 
 /opt/networkautomation/bin/fork-scan.php > /dev/null
 /opt/networkautomation/bin/poller-log.php --log="daily full scan complete"
-/opt/networkautomation/bin/scan-hourly.sh
+#/opt/networkautomation/bin/scan-hourly.sh
