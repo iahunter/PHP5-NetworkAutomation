@@ -25,7 +25,7 @@
  * @copyright 2009-2014 @authors
  * @license   http://www.gnu.org/copyleft/lesser.html The GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
  */
- 
+
 define("DEBUG_SUMMARY"	,0);  // Print summary debug text
 define("DEBUG_TEXT"		,1);  // Print text inline
 define("DEBUG_COMMENT"	,2);  // Print html <!-- comments -->
@@ -46,9 +46,9 @@ Class Debug
 
 	public function message($MESSAGE,$LEVEL = 1)
 	{
-		if ($LEVEL >= $_SESSION["DEBUG"])
+		if ( isset($_SESSION["DEBUG"]) ) { $BASELEVEL = 0; }else{ $BASELEVEL = intval($_SESSION["DEBUG"]); }
+		if ($LEVEL <= $BASELEVEL)
 		{
-			$MESSAGE = "DEBUG-{$LEVEL} {$MESSAGE}";
 			if ($this->format == DEBUG_SUMMARY)
 			{
 				array_push($this->messages, $MESSAGE);
@@ -75,15 +75,16 @@ Class Debug
 			}
 			if ($this->format == DEBUG_EMAIL)
 			{
+				global $DB;
 				$DB->log($MESSAGE,$LEVEL);
 				$LOGTO   = EMAIL_TO;
 				$LOGFROM = EMAIL_FROM;
-				$LOGHEADER = "From: NetworkTool <{$LOGFROM}>\r\nX-Mailer: php";
-				$LOGSUB  = "Tool Log Debug";
-				global $LDAP;
-				$REALNAME = $LDAP->user_to_realname($USERNAME);
-				$LOGBODY = "User: $USERNAME ($REALNAME)\nTool: $LOCATION\nMessage: $MESSAGE\n";
-				if ($DETAILS) { $LOGBODY .= "Details: $DETAILS\n";}
+				$LOGHEADER = "From: NetworkTool <{$LOGFROM}>\r\nMIME-Version: 1.0\r\nContent-Type: text/html; charset=ISO-8859-1\r\nX-Mailer: php";
+				$LOGSUB  = "Tool Log Debug({$LEVEL})";
+				if ( isset($_SESSION["AAA"]["realname"]) ) { $REALNAME = $_SESSION["AAA"]["realname"]; }else{ $REALNAME = "Unidentified"; }
+				$LOCATION = basename($_SERVER["SCRIPT_FILENAME"]);
+				$LOGBODY = "User: $USERNAME ($REALNAME)<br>\nTool: $LOCATION<br>\nMessage:<br>\n$MESSAGE<br>\n";
+				if ($DETAILS) { $LOGBODY .= "Details:<br>\n$DETAILS<br>\n";}
 				mail($LOGTO, $LOGSUB, $LOGBODY, $LOGHEADER);
 			}
 		}

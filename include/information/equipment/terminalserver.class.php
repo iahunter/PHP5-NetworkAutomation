@@ -33,48 +33,52 @@ class Equipment_TerminalServer  extends Information
     public $type = "Equipment_TerminalServer";
     public $customfunction = "";
 
-    public function customdata()    // This function is ONLY required if you are using stringfields!
-    {
-        $CHANGED = 0;
-        $CHANGED += $this->customfield("name"           ,"stringfield0");
-        $CHANGED += $this->customfield("ip4"            ,"stringfield1");
-        $CHANGED += $this->customfield("location"       ,"stringfield2");
-        $CHANGED += $this->customfield("serialnumber"   ,"stringfield3");
-        $CHANGED += $this->customfield("connection"     ,"stringfield4");
-        if($CHANGED && isset($this->data['id'])) { $this->update(); }   // If any of the fields have changed, run the update function.
-    }
+	public function customdata()    // This function is ONLY required if you are using stringfields!
+	{
+		$CHANGED = 0;
+		$CHANGED += $this->customfield("name"			,"stringfield0");
+		$CHANGED += $this->customfield("ip4"			,"stringfield1");
+		$CHANGED += $this->customfield("location"		,"stringfield2");
+		$CHANGED += $this->customfield("serialnumber"	,"stringfield3");
+		$CHANGED += $this->customfield("connection"		,"stringfield4");
+		$CHANGED += $this->customfield("iccid"			,"stringfield5");
+		$CHANGED += $this->customfield("wirelessid"		,"stringfield6");
+		if($CHANGED && isset($this->data['id'])) { $this->update(); }   // If any of the fields have changed, run the update function.
+	}
 
-    public function validate($NEWDATA)
-    {
-        if ($NEWDATA['name']        == "" ) { $this->data['error'] .= "ERROR: Invalid Name!\n";         return 0; }
-        if ($NEWDATA['ip4']         == "" ) { $this->data['error'] .= "ERROR: Invalid IP Address!\n";   return 0; }
-        if ($NEWDATA['location']    == "" ) { $this->data['error'] .= "ERROR: Invalid Location!\n";     return 0; }
-        if ($NEWDATA['serialnumber']== "" ) { $this->data['error'] .= "ERROR: Invalid Serial!\n";       return 0; }
+	public function update_bind()   // Used to override custom datatypes in children
+	{
+		global $DB;
+		$DB->bind("STRINGFIELD0"	,$this->data['name'			]);
+		$DB->bind("STRINGFIELD1"	,$this->data['ip4'			]);
+		$DB->bind("STRINGFIELD2"	,$this->data['location'		]);
+		$DB->bind("STRINGFIELD3"	,$this->data['serialnumber'	]);
+		$DB->bind("STRINGFIELD4"	,$this->data['connection'	]);
+		$DB->bind("STRINGFIELD5"	,$this->data['iccid'		]);
+		$DB->bind("STRINGFIELD6"	,$this->data['wirelessid'	]);
+	}
 
-        return 1;
-    }
+	public function validate($NEWDATA)
+	{
+		if ($NEWDATA['name']        == "" ) { $this->data['error'] .= "ERROR: Invalid Name!\n";         return 0; }
+		if ($NEWDATA['ip4']         == "" ) { $this->data['error'] .= "ERROR: Invalid IP Address!\n";   return 0; }
+		if ($NEWDATA['location']    == "" ) { $this->data['error'] .= "ERROR: Invalid Location!\n";     return 0; }
+		if ($NEWDATA['serialnumber']== "" ) { $this->data['error'] .= "ERROR: Invalid Serial!\n";       return 0; }
+		return 1;
+	}
 
-    public function update_bind()   // Used to override custom datatypes in children
-    {
-        global $DB;
-        $DB->bind("STRINGFIELD0"    ,$this->data['name'         ]);
-        $DB->bind("STRINGFIELD1"    ,$this->data['ip4'          ]);
-        $DB->bind("STRINGFIELD2"    ,$this->data['location'     ]);
-        $DB->bind("STRINGFIELD3"    ,$this->data['serialnumber' ]);
-        $DB->bind("STRINGFIELD4"    ,$this->data['connection'   ]);
-    }
-
-    public function html_width()
-    {
-        $this->html_width = array();    $i = 1;
-        $this->html_width[$i++] = 35;   // ID
-        $this->html_width[$i++] = 200;  // Name
-        $this->html_width[$i++] = 120;  // IP
-        $this->html_width[$i++] = 250;  // Location
-        $this->html_width[$i++] = 150;  // Serial Number
-        $this->html_width[0]    = array_sum($this->html_width);
-    }
-
+	public function html_width()
+	{
+		$this->html_width = array();    $i = 1;
+		$this->html_width[$i++] = 35;   // ID
+		$this->html_width[$i++] = 200;  // Name
+		$this->html_width[$i++] = 120;  // IP
+		$this->html_width[$i++] = 250;  // Location
+		$this->html_width[$i++] = 150;  // Serial Number
+		$this->html_width[$i++] = 150;  // IMEI Number
+		$this->html_width[$i++] = 150;  // SIM ICCID
+		$this->html_width[0]    = array_sum($this->html_width);
+	}
 
     public function html_list_header()
     {
@@ -95,6 +99,8 @@ class Equipment_TerminalServer  extends Information
                     <th class="report" width="{$WIDTH[$i++]}">IP Address</th>
                     <th class="report" width="{$WIDTH[$i++]}">Location</th>
                     <th class="report" width="{$WIDTH[$i++]}">Serial Number</th>
+                    <th class="report" width="{$WIDTH[$i++]}">IMEI Number</th>
+                    <th class="report" width="{$WIDTH[$i++]}">SIM ICCID</th>
                 </tr>
             </thead>
             <tbody class="report">
@@ -120,6 +126,8 @@ END;
                     <td class="report" width="{$WIDTH[$i++]}">{$this->data['ip4']}</td>
                     <td class="report" width="{$WIDTH[$i++]}">{$this->data['location']}</td>
                     <td class="report" width="{$WIDTH[$i++]}">{$this->data['serialnumber']}</td>
+                    <td class="report" width="{$WIDTH[$i++]}">{$this->data['wirelessid']}</td>
+                    <td class="report" width="{$WIDTH[$i++]}">{$this->data['iccid']}</td>
                 </tr>
 END;
         return $OUTPUT;
@@ -176,6 +184,8 @@ END;
                     <th class="report" width="{$WIDTH[$i++]}">IP Address</th>
                     <th class="report" width="{$WIDTH[$i++]}">Location</th>
                     <th class="report" width="{$WIDTH[$i++]}">Serial Number</th>
+                    <th class="report" width="{$WIDTH[$i++]}">IMEI Number</th>
+                    <th class="report" width="{$WIDTH[$i++]}">SIM ICCID</th>
                 </tr>
             </thead>
             <tbody class="report">
@@ -206,7 +216,6 @@ END;
                     <strong>Name:</strong>
                     <input type="text" name="name" size="50" value="{$this->data['name']}">
                 </td></tr>
-
                 <tr><td>
                     <strong>IPv4 Address:</strong>
                     <input type="text" name="ip4" size="50" value="{$this->data['ip4']}">
@@ -230,6 +239,11 @@ END;
                 <tr><td>
                     <strong>Wireless ID (EMEI, ESN, or MAC):</strong>
                     <input type="text" name="wirelessid" size="50" value="{$this->data['wirelessid']}">
+                </td></tr>
+
+                <tr><td>
+                    <strong>SIM ICCID:</strong>
+                    <input type="text" name="iccid" size="50" value="{$this->data['iccid']}">
                 </td></tr>
 
                 <tr><td>

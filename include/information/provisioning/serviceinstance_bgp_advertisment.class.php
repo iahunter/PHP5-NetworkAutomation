@@ -26,6 +26,8 @@
  * @license   http://www.gnu.org/copyleft/lesser.html The GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
  */
 
+require_once "information/provisioning/serviceinstance.class.php";
+
 class Provisioning_ServiceInstance_BGP_Advertisment	extends Provisioning_ServiceInstance
 {
 	public $type = "Provisioning_ServiceInstance_BGP_Advertisment";

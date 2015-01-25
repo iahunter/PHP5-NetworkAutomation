@@ -1,0 +1,25 @@
+// $Id: TODO 151405 2004-02-14 23:20:56Z neufeind $
+
+                           N E T _ T R A C E R O U T E
+
+brought to you by the help of SpeedPartner.de
+
+PEAR homepage: http://pear.php.net/package/Image_Graph
+additional information: http://pear.speedpartner.de
+
+maintainer: Stefan Neufeind <pear.neufeind at speedpartner.de>
+
+
+What will be next?
+------------------
+Well, surely there are already some plans. These include:
+
+ - include support for Darwin (Mac)
+   already got testoutput here waiting to be worked through
+   thanks go to Christian Stocker for providing the output
+ - check and add support for other plattforms except Linus and Windows
+ - perform more plattform-testing
+  
+
+If you would like to help working on any of these ideas or have more good ideas to
+add to our list, simply leave me a message.

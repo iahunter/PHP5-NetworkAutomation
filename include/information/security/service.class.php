@@ -108,7 +108,7 @@ class Security_Service	extends Information
 	{
 		$this->html_width = array();	$i = 1;
 		$this->html_width[$i++] = 35;	// ID
-		$this->html_width[$i++] = 100;	// Name
+		$this->html_width[$i++] = 200;	// Name
 		$this->html_width[$i++] = 100;	// Protocol
 		$this->html_width[$i++] = 300;	// Description
 		$this->html_width[0]	= array_sum($this->html_width);
@@ -231,7 +231,74 @@ END;
 
 		$OUTPUT .= "  " . Utility::last_stack_call(new Exception);
 		$OUTPUT .= "  ! SERVICE {$this->data["id"]} CONFIGURATION: {$this->data["protocol"]}/{$this->data["port"]} {$this->data["description"]}\n";
-		$OUTPUT .= "  service-object {$this->data["protocol"]} destination eq {$this->data["port"]}\n";
+
+		$CISCO_PROTOCOL_XLATE = array(
+			"5120"	=> "aol",
+			"123"	=> "ntp",
+			"161"	=> "snmp",
+			"162"	=> "snmptrap",
+			"69"	=> "tftp",
+			"179"	=> "bgp",
+			"19"	=> "chargen",
+			"3020"	=> "cifs",
+			"1494"	=> "citrix-ica",
+			"2748"	=> "ctiqbe",
+			"13"	=> "daytime",
+			"9"		=> "discard",
+			"53"	=> "domain",
+			"7"		=> "echo",
+			"512"	=> "exec",
+			"79"	=> "finger",
+			"21"	=> "ftp",
+			"20"	=> "ftp-data",
+			"70"	=> "gopher",
+			"1720"	=> "h323",
+			"101"	=> "hostname",
+			"80"	=> "http",
+			"443"	=> "https",
+			"113"	=> "ident",
+			"143"	=> "imap4",
+			"194"	=> "irc",
+			"543"	=> "klogin",
+			"544"	=> "kshell",
+			"636"	=> "ldaps",
+			"513"	=> "login",
+			"1352"	=> "lotusnotes",
+			"515"	=> "lpd",
+			"137"	=> "netbios-ns",
+			"138"	=> "netbios-dgm",
+			"139"	=> "netbios-ssn",
+			"2049"	=> "nfs",
+			"119"	=> "nntp",
+			"5631"	=> "pcanywhere-data",
+			"496"	=> "pim-auto-rp",
+			"109"	=> "pop2",
+			"110"	=> "pop3",
+			"1723"	=> "pptp",
+			"554"	=> "rtsp",
+			"5060"	=> "sip",
+			"25"	=> "smtp",
+			"1522"	=> "sqlnet",
+			"22"	=> "ssh",
+			"111"	=> "sunrpc",
+			"49"	=> "tacacs",
+			"517"	=> "talk",
+			"23"	=> "telnet",
+			"540"	=> "uucp",
+			"43"	=> "whois",
+			"80"	=> "www",
+		);
+
+		$PROTOCOL = $this->data["port"];
+		// Translate the protocol IF NECESSARY to the WORD Cisco ASA's use for it!
+		if ( isset($CISCO_PROTOCOL_XLATE[$PROTOCOL]) ) { $PROTOCOL = $CISCO_PROTOCOL_XLATE[$PROTOCOL]; }
+
+		if ( preg_match("/(\d+)-(\d+)/",$this->data["port"],$REG) )
+		{
+			$OUTPUT .= "  service-object {$this->data["protocol"]} destination range {$REG[1]} {$REG[2]}\n";
+		}else{
+			$OUTPUT .= "  service-object {$this->data["protocol"]} destination eq {$PROTOCOL}\n";
+		}
 
 		return $OUTPUT;
 	}

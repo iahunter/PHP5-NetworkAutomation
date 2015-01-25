@@ -147,7 +147,7 @@ END;
 
 		$OUTPUT .= $this->html_list_footer();
 
-		// All the different types of child objects for estimating, in order.
+		// All the different types of child objects in order.
 		$CHILDTYPES = array();
 		array_push($CHILDTYPES,"Link_Host");
 		foreach ($CHILDTYPES as $CHILDTYPE)

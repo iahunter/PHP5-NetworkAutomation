@@ -31,7 +31,7 @@ require_once "information/link.class.php";
 class Security_Link_Host extends Link
 {
 	public $category = "Security";
-	public $type = "Link_Host";
+	public $type = "Security_Link_Host";
 
 	public function html_width()
 	{

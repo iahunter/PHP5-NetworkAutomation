@@ -32,7 +32,7 @@ class Security_Application	extends Information
 {
 	public $category = "Security";
 	public $type = "Security_Application";
-	public $customfunction = "";
+	public $customfunction = "Spreadsheet";
 
 	public function customdata()	// This function is ONLY required if you are using stringfields!
 	{
@@ -45,7 +45,7 @@ class Security_Application	extends Information
 	public function update_bind()	// Used to override custom datatypes in children
 	{
 		global $DB;
-		$DB->bind("STRINGFIELD0"	,$this->data['linked'		]);
+		$DB->bind("STRINGFIELD0"	,$this->data['linked'	]);
 		$DB->bind("STRINGFIELD1"	,$this->data['name'		]);
 	}
 
@@ -173,17 +173,28 @@ END;
 END;
 		$OUTPUT .= $this->html_list_row($i++);
 
-		$rowclass = "row".(($i % 2)+1); $i++;
+		$rowclass = "row".(($i++ % 2)+1);
+		$OUTPUT .= <<<END
+				<tr class="{$rowclass}"><td colspan="{$columns}">Business Process Owner: {$this->data["contact_bpo"]}</td></tr>
+END;
+
+		$rowclass = "row".(($i++ % 2)+1);
+		$OUTPUT .= <<<END
+				<tr class="{$rowclass}"><td colspan="{$columns}">Technical Point of Contact: {$this->data["contact_tech"]}</td></tr>
+END;
+
 		$CREATED_BY	 = $this->created_by();
 		$CREATED_WHEN	= $this->created_when();
+
+		$rowclass = "row".(($i++ % 2)+1);
 		$OUTPUT .= <<<END
 				<tr class="{$rowclass}"><td colspan="{$columns}">Created by {$CREATED_BY} on {$CREATED_WHEN}</td></tr>
 END;
+
 		$rowclass = "row".(($i++ % 2)+1);
 		$OUTPUT .= <<<END
 				<tr class="{$rowclass}"><td colspan="{$columns}">Modified by {$this->data['modifiedby']} on {$this->data['modifiedwhen']}</td></tr>
 END;
-		$rowclass = "row".(($i++ % 2)+1);
 
 		$OUTPUT .= $this->html_list_footer();
 
@@ -232,8 +243,10 @@ END;
 		$OUTPUT .= $this->html_form_header();
 		//$OUTPUT .= $this->html_toggle_active_button();	// Permit the user to deactivate any devices and children
 
-		$OUTPUT .= $this->html_form_field_text("name"		,"Application Name"			);
-		$OUTPUT .= $this->html_form_field_text("description","Description"				);
+		$OUTPUT .= $this->html_form_field_text("name"			,"Application Name"						);
+		$OUTPUT .= $this->html_form_field_text("description"	,"Description"							);
+		$OUTPUT .= $this->html_form_field_text("contact_bpo"	,"Business Process Owner AD Username"	);
+		$OUTPUT .= $this->html_form_field_text("contact_tech"	,"Technical Contact AD Username"		);
 		$OUTPUT .= $this->html_form_extended();
 		$OUTPUT .= $this->html_form_footer();
 
@@ -248,6 +261,35 @@ END;
 		$OUTPUT .= Utility::last_stack_call(new Exception);
 		$OUTPUT .= "! Application ID {$this->data["id"]} Name: {$this->data["name"]} Description: {$this->data["description"]}\n\n";
 		$OUTPUT .= "\tTODO: Find all the children and configure them\n";
+
+		return $OUTPUT;
+	}
+
+	public function spreadsheet()
+	{	return $this->html_spreadsheet(); }
+
+	public function html_spreadsheet()
+	{
+		$OUTPUT = "";
+
+		$OUTPUT .= "<h2>Firewall Spreadsheet Contents</h2>";
+
+		// Find all our application components (where we are parent)
+		$SEARCH = array(
+					"category"	=> $this->category,
+					"type"		=> "application_component%",
+					"parent"	=> $this->data["id"],
+					);
+		$RESULTS = Information::search($SEARCH);
+		$COUNT = count($RESULTS);
+		$OUTPUT .= "Found {$COUNT} application components:<br>\n";
+		foreach ($RESULTS as $RESULT)
+		{
+			$APPCOMPONENT = Information::retrieve($RESULT);
+			$OUTPUT .= "<br>\n<hr style=\"border: 0; color: #ccc; background-color: #aaa; height: 1px;\">\n<br>\n<br>\n";
+			$OUTPUT .= $APPCOMPONENT->html_spreadsheet();
+			unset($APPCOMPONENT);
+		}
 
 		return $OUTPUT;
 	}

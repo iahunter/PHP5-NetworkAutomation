@@ -174,7 +174,7 @@ END;
 	{
 		$OUTPUT = "";
 		$OUTPUT .= $this->html_form_header();
-		//$OUTPUT .= $this->html_toggle_active_button();	// Permit the user to deactivate any devices and children
+		$OUTPUT .= $this->html_toggle_active_button();	// Permit the user to deactivate any devices and children
 
 		if (!isset($this->data["name"])) { $this->data["name"] = $this->parent()->data["name"] . " "; }
 		$OUTPUT .= $this->html_form_field_text("name"		,"Application Component Name"								);
@@ -202,9 +202,17 @@ END;
 		return $OUTPUT;
 	}
 
+	public function config_gearman($DATA)
+	{
+		$OUTPUT = "";
+		$OUTPUT = $this->config($DATA["acl"]);
+		return $OUTPUT;
+	}
+
 	public function config($ACL)
 	{
 		$OUTPUT = "";
+		if ( !isset($ACL) || $ACL == "" ) { return "ERROR! ACL NOT PASSED!\n"; }
 
 		$OUTPUT .= Utility::last_stack_call(new Exception);
 		$OUTPUT .= "! Application Component ID {$this->data["id"]} Name: {$this->data["name"]} Description: {$this->data["description"]}\n";
@@ -214,8 +222,39 @@ END;
 		$SRCGROUP = Information::retrieve($this->data["srchostgroup"]);	$OUTPUT .= $SRCGROUP->config();	unset($SRCGROUP);
 		$DSTGROUP = Information::retrieve($this->data["dsthostgroup"]);	$OUTPUT .= $DSTGROUP->config();	unset($DSTGROUP);
 
-		$OUTPUT .= "access-list {$ACL} remark ID {$this->data["id"]} NAME {$this->data["name"]} DESCRIPTION {$this->data["description"]}\n";
+		$REMARK .= "access-list {$ACL} remark ID {$this->data["id"]} NAME {$this->data["name"]} DESCRIPTION {$this->data["description"]}";
+		if ( strlen($REMARK) > 145 ) { $REMARK = substr($REMARK , 0 , 145) . "..."; }	// Limit remark lines to 100 total characters!
+		/*
+		access-list ACL_V901:DMZ_V101:DATACENTER remark (47 characters)
+		ID 53855 NAME Cylance Syslog DMZ VIP to Flow Replicator DESCRIPTION DMZ VIP to internal flow replicator
+		1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
+                 1         2         3         4         5         6         7         8         9         0         1         2         3         4         5         6
+                                                                                                           1         1         1         1         1         1         1
+		/**/
+		$OUTPUT .= "{$REMARK}\n";	// Add our remark with a newline to the output!
 		$OUTPUT .= "access-list {$ACL} extended permit object-group OBJ_SVS_{$this->data["servicegroup"]} object-group OBJ_NET_{$this->data["srchostgroup"]} object-group OBJ_NET_{$this->data["dsthostgroup"]}\n";
+
+		return $OUTPUT;
+	}
+
+	public function html_spreadsheet()
+	{
+		$OUTPUT = "";
+
+		// Configure our object groups for service, source, and destination
+		$SVSGROUP = Information::retrieve($this->data["servicegroup"]);	$SVSCELL = $SVSGROUP->html_children("Link_Service");	unset($SVSGROUP);
+		$SRCGROUP = Information::retrieve($this->data["srchostgroup"]);	$SRCCELL = $SRCGROUP->html_children("Link_Host");		unset($SRCGROUP);
+		$DSTGROUP = Information::retrieve($this->data["dsthostgroup"]);	$DSTCELL = $DSTGROUP->html_children("Link_Host");		unset($DSTGROUP);
+
+		$OUTPUT .= $this->html_list_header_template("Application Component ID {$this->data["id"]} Name: {$this->data["name"]} Description: {$this->data["description"]}",array("Clients","Servers","Services") );
+		$OUTPUT .= <<<END
+				<tr class="{$rowclass}">
+					<td class="report"><br>{$SRCCELL}</td>
+					<td class="report"><br>{$DSTCELL}</td>
+					<td class="report"><br>{$SVSCELL}</td>
+				</tr>
+END;
+		$OUTPUT .= $this->html_list_footer();
 
 		return $OUTPUT;
 	}

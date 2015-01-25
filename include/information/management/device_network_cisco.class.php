@@ -305,6 +305,120 @@ class Management_Device_Network_Cisco	extends Management_Device_Network
         }
 	}
 
+	public function push($PUSH_LINES)
+	{
+		$DEVICE = $this;
+		$LOG = "PUSH DEVICE ID {$DEVICE->data['id']} PROMPT {$DEVICE->data["name"]} IP {$DEVICE->data['ip']}\n";
+		global $DB; $DB->log($LOG,2); $this->jprint($LOG);
+
+		if (count($PUSH_LINES) < 1) { $this->jprint("DONE, NO LINES TO PUSH!\n"); return; }
+
+		// Start with a ping test, see if we can ping the IP
+		$PING = new Ping($DEVICE->data['ip']);
+		$LATENCY = $PING->ping("exec");
+		if (!$LATENCY)
+		{
+			$this->jprint(" Could not ping, connection may fail.");
+		}else{
+			$this->jprint(" Latency: {$LATENCY}ms");
+		}
+		unset($PING);
+
+		// Then try to get the CLI
+		$COMMAND = new Command($DEVICE->data);
+		$this->jprint(" Connection:");
+		$CLI = $COMMAND->getcli();
+		if ($CLI)
+		{
+			$this->jprint(" {$CLI->service}");
+		}else{
+			$this->jprint(" Could not connect! Aborting!\n"); return;
+		}
+
+		$this->jprint(" Prompt:");
+		$PROMPT = strtolower($CLI->prompt);
+		if ($PROMPT != "")
+		{
+			$this->jprint(" {$PROMPT} ");
+			$PROTO = $CLI->service;
+		}else{
+			$this->jprint(" Could not get prompt! Aborting!\n"); return;
+		}
+
+		// Make sure we know what we are connected to!
+		$this->jprint("Firewall detection: ");
+		$FUNCTION = "";
+		$CLI->exec("terminal length 0");
+		$SHOW_INVENTORY = $CLI->exec("show inventory | I PID");
+		$MODEL = inventory_to_model($SHOW_INVENTORY);
+		if ($MODEL == "Unknown")
+		{
+			$SHOW_VERSION = $CLI->exec("show version | I C");
+			$MODEL = version_to_model($SHOW_VERSION);
+		}
+		if ($MODEL == "Unknown")
+		{
+			$this->jprint(" Could not detect device type/model! Aborting!\n"); return;
+		}
+
+		if (preg_match('/(ASA|FWM|PIX)/',$MODEL,$REG))
+		{
+			$FUNCTION = "Firewall";
+			$this->jprint(" YES! Model: {$MODEL}");
+		}else{
+			$this->jprint(" NO! Model: {$MODEL}");
+		}
+
+		// Special handling in case we are in a firewall
+		if($FUNCTION == "Firewall")
+		{
+			$this->jprint(" Firewall, sending enable");
+			$COMMAND = "enable\n" . TACACS_ENABLE;	$OUTPUT = $CLI->exec($COMMAND);
+			sleep(4);
+			$COMMAND = "no pager";					$OUTPUT = $CLI->exec($COMMAND);
+			$COMMAND = "terminal pager 0";			$OUTPUT = $CLI->exec($COMMAND);
+			$TERMINAL_PAGER_OUTPUT = $OUTPUT;
+			$this->jprint(" Pager disabled");
+			if (cisco_check_input_error($TERMINAL_PAGER_OUTPUT))
+			{
+				$this->jprint(" Enabled Successfully!");
+			}else{
+				$this->jprint(" Error Enabling! Aborting!"); return;
+			}
+		}else{
+			$CLI->exec("terminal length 0");
+			$CLI->exec("terminal width 500");
+		}
+
+		// Build the final configuration for this device to push
+		$PUSH = array();
+		array_push($PUSH,"config t"					);
+		foreach($PUSH_LINES as $LINE) { array_push($PUSH,$LINE); }
+		array_push($PUSH,"end"						);
+
+		// Debugging before actually running this to make live config changes
+		//dumper($PUSH);	die("CROAK!\n");	// Comment me out
+
+		// Perform the config push
+		foreach($PUSH as $COMMAND)
+		{
+			$COMMAND = trim($COMMAND);
+			$this->jprint("Running: {$COMMAND}\n");
+			$OUTPUT = trim($CLI->exec($COMMAND));
+			$this->jprint("{$OUTPUT}\n\n");
+		}
+
+		// Do a config save and rescan the device
+		$this->jprint(" PUSH COMPLETE, saving config and running scan!\n");
+		$COMMAND = "timeout 1m php ".BASEDIR."/bin/save-config.php --id={$DEVICE->data['id']} > /dev/null 2>/dev/null &";
+		$this->jprint("running $COMMAND\n");
+		exec($COMMAND);
+		$COMMAND = "timeout 1m php ".BASEDIR."/bin/scan-device.php --id={$DEVICE->data['id']} > /dev/null 2>/dev/null &";
+		$this->jprint("running $COMMAND\n");
+		exec($COMMAND);
+		$this->jprint("Work Complete!\n");
+	}
+
 }
 
 ?>

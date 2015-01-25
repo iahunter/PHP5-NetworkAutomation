@@ -66,22 +66,22 @@ class Cisco
 	public function dnsabbreviate($INTERFACE)
 	{
 		$INTERFACE = strtolower($INTERFACE);
-		$INTERFACE = preg_replace("gigabitethernet","gig",$INTERFACE);
-		$INTERFACE = preg_replace("gigabiteth","gig",$INTERFACE);
-		$INTERFACE = preg_replace("gi\/","gig\/",$INTERFACE);
-		$INTERFACE = preg_replace("fastethernet","fa",$INTERFACE);
-		$INTERFACE = preg_replace("port\-channel","po",$INTERFACE);
-		$INTERFACE = preg_replace("loopback","lo",$INTERFACE);
-		$INTERFACE = preg_replace("ethernet","eth",$INTERFACE);
-		$INTERFACE = preg_replace("tunnel","tun",$INTERFACE);
-		$INTERFACE = preg_replace("bvi","bvi",$INTERFACE);
-		$INTERFACE = preg_replace("atm","atm",$INTERFACE);
-		$INTERFACE = preg_replace("serial","se",$INTERFACE);
-		$INTERFACE = preg_replace("dialer","di",$INTERFACE);
-		$INTERFACE = preg_replace("multilink","mu",$INTERFACE);
-		$INTERFACE = preg_replace("/","-",$INTERFACE);
-		$INTERFACE = preg_replace("\.","-",$INTERFACE);
-		$INTERFACE = preg_replace(":","-",$INTERFACE);
+		$INTERFACE = preg_replace("/gigabitethernet/","gig",$INTERFACE);
+		$INTERFACE = preg_replace("/gigabiteth/"	,"gig",$INTERFACE);
+		$INTERFACE = preg_replace("/gi\//","gig\/"	,$INTERFACE);
+		$INTERFACE = preg_replace("/fastethernet/"	,"fa",$INTERFACE);
+		$INTERFACE = preg_replace("/port\-channel/"	,"po",$INTERFACE);
+		$INTERFACE = preg_replace("/loopback/"		,"lo",$INTERFACE);
+		$INTERFACE = preg_replace("/ethernet/"		,"eth",$INTERFACE);
+		$INTERFACE = preg_replace("/tunnel/"		,"tun",$INTERFACE);
+		$INTERFACE = preg_replace("/bvi/"			,"bvi",$INTERFACE);
+		$INTERFACE = preg_replace("/atm/"			,"atm",$INTERFACE);
+		$INTERFACE = preg_replace("/serial/"		,"se",$INTERFACE);
+		$INTERFACE = preg_replace("/dialer/"		,"di",$INTERFACE);
+		$INTERFACE = preg_replace("/multilink/"		,"mu",$INTERFACE);
+		$INTERFACE = preg_replace("/\//"			,"-",$INTERFACE);
+		$INTERFACE = preg_replace("/\./"			,"-",$INTERFACE);
+		$INTERFACE = preg_replace("/:/"				,"-",$INTERFACE);
 		return $INTERFACE;
 	}
 

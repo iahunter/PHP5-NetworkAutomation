@@ -45,9 +45,6 @@ class LDAP extends adLDAP\adLDAP
 		{
 			$MESSAGE = "Authentication failed for user $USERNAME from $USERIP LDAP error " . $this->getLastError();
 			$DB->log($MESSAGE,1);
-		}else{
-			$MESSAGE = "Authentication succeeded for user $USERNAME from $USERIP";
-			$DB->log($MESSAGE,1);
 		}
 		return $AUTHENTICATED;
 	}

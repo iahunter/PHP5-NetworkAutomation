@@ -1,0 +1,279 @@
+<?php
+
+/**
+ * include/information/*.class.php
+ *
+ * Extension leveraging the information repository
+ *
+ * PHP version 5
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * @category  default
+ * @package   none
+ * @author    John Lavoie
+ * @copyright 2009-2014 @authors
+ * @license   http://www.gnu.org/copyleft/lesser.html The GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
+ */
+
+require_once "information/provisioning/serviceinstance.class.php";
+
+class Provisioning_ServiceInstance_VoiceGateway	extends Provisioning_ServiceInstance
+{
+	public $type = "Provisioning_ServiceInstance_VoiceGateway";
+
+	public function html_form_extended()
+	{
+		$OUTPUT = "";
+		$OUTPUT .= $this->html_form_field_text("vwicslot"	,"VWIC SubSlot"			);
+		$OUTPUT .= $this->html_form_field_text("carrier"	,"PRI Carrier (Verizon)");
+		$OUTPUT .= $this->html_form_field_text("circuitid"	,"Circuit ID"			);
+		$OUTPUT .= $this->html_form_field_text("didrange"	,"DID Range"			);
+		$OUTPUT .= $this->html_form_field_text("areacode"	,"3 Digit Area Code"	);
+		$OUTPUT .= $this->html_form_field_text("reception"	,"10 Digit Reception/AA DID");
+		$OUTPUT .= $this->html_form_field_text("pattern"	,"4 Digit Pattern (73..)");
+		$OUTPUT .= $this->html_form_field_text("licenses"	,"SRST Licenses Purchased");
+		$SELECT = array(
+			"10.252.22.13"	=> "KHO",
+			"10.252.11.13"	=> "KOS",
+			"10.252.11.12"	=> "Mountain & Pacific",
+			"10.252.22.12"	=> "Central & Eastern",
+		);
+		$OUTPUT .= $this->html_form_field_select("subipprimary"	,"Primary Sub IP",$SELECT);
+		$SELECT = array(
+			"10.252.11.14"	=> "KHO & Central & Eastern",
+			"10.252.22.14"	=> "KOS & Mountain & Pacific",
+		);
+		$OUTPUT .= $this->html_form_field_select("subipsecondary","Secondary Sub IP",$SELECT);
+		$OUTPUT .= $this->html_form_field_textarea("comments"	,"Comments");
+		return $OUTPUT;
+	}
+
+	public function config_serviceinstance()
+	{
+		$OUTPUT = "";
+		$ASN		= $this->parent()->parent()->get_asn();
+		$SITECODE	= $this->parent()->parent()->data["sitecode"];
+		$MGMTINT	= $this->parent()->data["mgmtint"];
+		$MGMTIP4	= $this->parent()->data["mgmtip4"];
+
+		$OUTPUT .= <<<END
+
+interface {$MGMTINT}
+  h323-gateway voip interface
+  h323-gateway voip bind srcaddr {$MGMTIP4}
+ exit
+
+! T1 WIC card settings - Single T1 PRI - Modify to correct settings
+card type t1 0 {$this->data["vwicslot"]}
+
+network-clock-participate wic {$this->data["vwicslot"]}
+network-clock-select 1 T1 0/{$this->data["vwicslot"]}/0
+
+isdn switch-type primary-ni
+
+controller t1 0/{$this->data["vwicslot"]}/0
+  cablelength long 0db
+  pri-group timeslots 1-24
+ exit
+
+! Serial and Voice interfaces - Single T1 PRI
+
+interface Serial0/{$this->data["vwicslot"]}/0:23
+  description PRI_{$this->data["provider"]}_{$this->data["circuitid"]}
+  no ip address
+  encapsulation hdlc
+  isdn switch-type primary-ni
+  isdn incoming-voice voice
+  no cdp enable
+  no shutdown
+ exit
+
+voice-port 0/{$this->data["vwicslot"]}/0:23
+  description PRI_{$this->data["provider"]}_{$this->data["didrange"]}
+  echo-cancel coverage 64
+ exit
+
+! VoIP Settings - Modify to correct settings
+
+voice-card 0
+  dsp services dspfarm
+ exit
+
+voice service voip
+  allow-connections h323 to h323
+ exit
+
+voice class codec 1
+  codec preference 1 g711ulaw
+  codec preference 2 g729r8
+ exit
+
+voice class h323 1
+  h225 timeout tcp establish 3
+ exit
+
+sccp local {$MGMTINT}
+sccp ccm {$this->data["subipprimary"]} identifier 1 priority 1 version 7.0
+sccp ccm {$this->data["subipsecondary"]} identifier 2 priority 2 version 7.0
+sccp
+
+sccp ccm group 1
+  bind interface {$MGMTINT}
+  associate ccm 1 priority 1
+  associate ccm 2 priority 2
+  associate profile 3 register {$SITECODE}_CFB
+  associate profile 2 register {$SITECODE}_711
+  associate profile 1 register {$SITECODE}_729
+ exit
+
+dspfarm profile 3 conference
+  codec g711ulaw
+  codec g711alaw
+  codec g729ar8
+  codec g729abr8
+  codec g729r8
+  codec g729br8
+  maximum sessions 4
+  associate application SCCP
+ exit
+
+dspfarm profile 1 mtp
+  codec pass-through
+  codec g729r8
+  maximum sessions software 200
+  associate application SCCP
+ exit
+
+dspfarm profile 2 mtp
+  codec g711ulaw
+  codec pass-through
+  maximum sessions software 200
+  associate application SCCP
+ exit
+
+! VoIP Translation Settings
+
+voice translation-rule 5
+  rule 1 /^9011/ /\\1/ type any international plan any isdn
+ exit
+
+voice translation-profile INTL
+  translate called 5
+ exit
+
+! VoIP Dial Peer Settings - Modify to correct settings / change port to trunkgroup Outgoing if using 1FB
+
+dial-peer voice 1 pots
+  translation-profile incoming inbound-voice
+  incoming called-number .
+  direct-inward-dial
+ exit
+
+dial-peer voice 911 pots
+  destination-pattern ^911$
+  progress_ind progress enable 8
+  port 0/{$this->data["vwicslot"]}/0:23
+  forward-digits 3
+ exit
+
+dial-peer voice 9911 pots
+  destination-pattern ^9911$
+  progress_ind progress enable 8
+  port 0/{$this->data["vwicslot"]}/0:23
+  forward-digits 3
+ exit
+
+dial-peer voice 101 pots
+  preference 1
+  destination-pattern 9T
+  progress_ind progress enable 8
+  port 0/{$this->data["vwicslot"]}/0:23
+ exit
+
+dial-peer voice 201 pots
+  translation-profile outgoing INTL
+  preference 1
+  destination-pattern 9011T
+  progress_ind setup enable 3
+  progress_ind alert enable 8
+  progress_ind progress enable 8
+  progress_ind connect enable 1
+  port 0/{$this->data["vwicslot"]}/0:23
+  forward-digits all
+ exit
+
+dial-peer voice 3001 voip
+  preference 1
+  destination-pattern {$this->data["areacode"]}.......
+  progress_ind setup enable 3
+  modem passthrough nse codec g711ulaw
+  session target ipv4:{$this->data["subipprimary"]}
+  incoming called-number .
+  voice-class codec 1
+  voice-class h323 1
+  dtmf-relay h245-alphanumeric
+  no vad
+ exit
+
+dial-peer voice 3002 voip
+  preference 2
+  destination-pattern {$this->data["areacode"]}.......
+  progress_ind setup enable 3
+  modem passthrough nse codec g711ulaw
+  session target ipv4:{$this->data["subipsecondary"]}
+  incoming called-number .
+  voice-class codec 1
+  voice-class h323 1
+  dtmf-relay h245-alphanumeric
+  no vad
+ exit
+
+dial-peer voice 7778 voip
+  translation-profile outgoing SRST
+  destination-pattern {$this->data["pattern"]}
+  session target ipv4:{$MGMTIP4}
+ exit
+
+! VoIP Fallback Settings - APPLY ONLY THIS PORTION THEN ACCEPT EULA BEFORE PROCEEDING
+
+call-manager-fallback
+  max-conferences 4 gain -6
+  transfer-system full-consult
+  ip source-address {$MGMTIP4} port 2000
+ exit
+
+!!! STOP !!! ACCEPT EULA AFTER MAX-EPHONES
+!!! STOP !!! ACCEPT EULA AFTER MAX-EPHONES
+!!! STOP !!! ACCEPT EULA AFTER MAX-EPHONES
+
+! VoIP Fallback Settings
+
+max-ephones {$this->data["licenses"]}
+  max-dn {$this->data["licenses"]}
+  transfer-pattern 9T
+  transfer-pattern {$this->data["areacode"]}.......
+  transfer-pattern {$this->data["pattern"]}
+  keepalive 10
+  default-destination {$this->data["reception"]}
+  voicemail 91123412341
+  call-forward pattern .T
+  call-forward busy 91123412341
+  call-forward noan 91123412341 timeout 22
+ exit
+
+END;
+		return $OUTPUT;
+	}
+
+}

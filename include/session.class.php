@@ -31,6 +31,7 @@ require_once "database.class.php";
 Class Session
 {
 	public $DB;
+	public $DATA;
 
 	public function __construct()
 	{
@@ -95,15 +96,17 @@ Class Session
 		$COUNT = count($RESULTS);
 		$MESSAGE = "Session {$ID} Read, {$COUNT} Records Returned.";
 //		trigger_error($MESSAGE);
+		$this->DATA = "";
 		if($COUNT > 0)
 		{
-			return $RESULTS[0]['data'];
+			$this->DATA = reset($RESULTS)["data"];
 		}
-		return "";
+		return $this->DATA;
 	}
 
 	public function write($ID,$DATA)
 	{
+		if ($this->DATA == $DATA) { return 1; /* IF our session did NOT change, do NOT write it to the database! */ }
 		$QUERY = "REPLACE INTO session VALUES (:ID, :DATA, now())";
 		$this->DB->query($QUERY);
 		try {
@@ -116,7 +119,8 @@ Class Session
 			global $HTML;
 			die($MESSAGE . $HTML->footer());
 		}
-		$MESSAGE = "Session {$ID} Written To Database.";
+		$COUNT = $this->DB->DB_STATEMENT->rowCount();
+		$MESSAGE = "Session {$ID} Written, {$COUNT} Records Altered.";
 //		trigger_error($MESSAGE);
 		return 1;
 	}
@@ -134,9 +138,11 @@ Class Session
 			global $HTML;
 			die($MESSAGE . $HTML->footer());
 		}
-		$MESSAGE = "Session Destroyed for user {$_SESSION["AAA"]["username"]} from {$_SERVER['REMOTE_ADDR']}";
-		$this->DB->log($MESSAGE,1);	// This is the log message for users that logout
-//		trigger_error($MESSAGE);
+		if (isset($_SESSION["AAA"]["username"]) && $_SESSION["AAA"]["username"] != "" && $_SESSION["AAA"]["username"] != "Anonymous")
+		{
+			$MESSAGE = "Session Destroyed for user {$_SESSION["AAA"]["username"]} from {$_SERVER['REMOTE_ADDR']}";
+			$this->DB->log($MESSAGE,1);	// This is the log message for users that logout
+		}
 		return 1;
 	}
 

@@ -409,7 +409,8 @@ END;
 										"extra"   => "-publicDNS",
 									); //$IPV4LONG += 512; // Dont need this because no more subnets added
 
-		$OUTPUT .= "!HEY - Please email SITE:{$this->data["sitecode"]} BLOCK:{$IPV4BLOCK} TO:bill@company.com so that the proper AD sites and services entries are created for this site!\n<pre>\n";
+//		$OUTPUT .= "! Please open a service desk ticket with IM DCO - Server Administration to have SITE:{$this->data["sitecode"]} BLOCK:{$IPV4BLOCK} added in Active Directory Sites & Services!\n<pre>\n";
+		$OUTPUT .= "! Please update IM DCO - Server Administration from Project Task to have SITE:{$this->data["sitecode"]} BLOCK:{$IPV4BLOCK} added in Active Directory Sites & Services!\n<pre>\n";
 		foreach($SCOPES as $SCOPENAME => $SCOPE)
 		{
 			$OUTPUT .= <<<END

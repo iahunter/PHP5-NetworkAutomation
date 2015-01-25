@@ -34,6 +34,25 @@ class Checklist_ChecklistGroup_Server	extends Checklist_ChecklistGroup
 	public $type = "Checklist_ChecklistGroup_Server";
 	public $customfunction = "";
 
+	public function list_query()
+	{
+		global $DB; // Our Database Wrapper Object
+		$QUERY = "select id from information where type like :TYPE and category like :CATEGORY and active = 1 order by stringfield1";
+		$DB->query($QUERY);
+		try {
+			$DB->bind("TYPE",$this->data['type'] . "%");
+			$DB->bind("CATEGORY",$this->data['category']);
+			$DB->execute();
+			$RESULTS = $DB->results();
+		} catch (Exception $E) {
+			$MESSAGE = "Exception: {$E->getMessage()}";
+			trigger_error($MESSAGE);
+			global $HTML;
+			die($MESSAGE . $HTML->footer());
+		}
+		return $RESULTS;
+	}
+
 	public function html_detail()
 	{
 		$OUTPUT = "";

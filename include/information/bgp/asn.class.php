@@ -53,6 +53,24 @@ class BGP_ASN	extends Information
 			return 0;
 		}
 
+		$SEARCH = array(
+						"category"      => "BGP",
+						"type"          => "ASN",
+						"stringfield1"  => "{$ASN}",
+                        );
+		$RESULTS = Information::search($SEARCH);
+		foreach ($RESULTS as $AS)
+		{
+			print "Getting info for ASN ID {$AS}\n";
+			$ASOBJ = Information::retrieve($AS);
+			if ( $ASOBJ->data["id"] != $this->data["id"] )
+			{
+				$this->data['error'] .= "ERROR: {$ASN} is already linked with the following information record:";
+				$this->data['error'] .= dumper_to_string($ASOBJ);
+				return 0;
+			}
+		}
+
 		return 1;
 	}
 

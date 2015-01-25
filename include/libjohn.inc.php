@@ -31,11 +31,11 @@ function PERMISSION_REQUIRE($PERMISSION)
 {
 	if (!PERMISSION_CHECK($PERMISSION))
 	{
-		$MESSAGE = "UNAUTHORIZED ACCESS BY " . $_SESSION["AAA"]["username"];
+		$MESSAGE = "UNAUTHORIZED ACCESS BY {$_SESSION["AAA"]["username"]} PERMISSION {$PERMISSION}";
 		global $DB;
 		$DB->log($MESSAGE);
 		trigger_error($MESSAGE);
-		print "Permission $PERMISSION DENIED!<br>\n";
+		print "Error: Your user session lacks the permission '{$PERMISSION}' required to perform this action.<br>\n";
 		global $HTML;
 		die($HTML->footer());
 	}
@@ -313,7 +313,7 @@ function john_flush ()
 {
 	if (php_sapi_name() != "cli") // DONT FLUSH THE FUCKING CLI!
 	{
-		echo(str_repeat(' ',256));
+//		echo(str_repeat(' ',256));
 		if (ob_get_length())
 		{
 			@ob_flush();
@@ -523,7 +523,7 @@ function cisco_filter_config($CONFIG)
 			$LINE = $REG[1];	// Strip out the KEYS from a server-private line!
 		}
 
-
+		$LINE = rtrim($LINE);	// Trim whitespace off the right end!
 		array_push($LINES_OUT, $LINE);
 	}
 
@@ -626,6 +626,7 @@ function cisco_download_config($DEVICE)
 			break;
 		}
 
+		$LINE = rtrim($LINE);	// Trim whitespace off the right end!
 		array_push($LINES_OUT, $LINE);
 	}
 
@@ -646,6 +647,15 @@ function cisco_download_config($DEVICE)
 	special_output(" Config Saved!\n");
 
 	return 1;
+}
+
+// Find if a character $NEEDLE is in a string $HAYSTACK defaulting to case sensitive!
+function in_string($needle, $haystack, $insensitive = false) {
+    if ($insensitive) {
+        return false !== stristr($haystack, $needle);
+    } else {
+        return false !== strpos($haystack, $needle);
+    }
 }
 
 function preg_grep_keys($pattern, $input, $flags = 0)
@@ -893,6 +903,14 @@ dragon
 balloon"
 	);
 	return phrase_generator($WORDS);
+}
+
+function futurama_quote()
+{
+	$JSONFILENAME = BASEDIR."/archive/bender/futurama.json";
+	$QUOTES = json_decode( file_get_contents($JSONFILENAME) );
+	$QUOTE = implode("\n",$QUOTES[ rand( 0 , count($QUOTES) - 1 ) ]);
+	return $QUOTE;
 }
 
 ?>

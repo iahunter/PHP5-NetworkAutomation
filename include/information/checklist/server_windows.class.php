@@ -249,6 +249,7 @@ END;
 	{
 		$TASKS = array(
 			"Create CMDB Entry",
+			"If Enterprise Application - Ensure the Product/DR fields are completed in Ops REPO.",
 			"Assign IP Address",
 			"Create Computer Object in AD",
 			"Deploy Server (Template or Full Build)",

@@ -55,6 +55,8 @@ class Provisioning_Device_IOS_MLS_DIST	extends Provisioning_Device_IOS_MLS
 
 		$OUTPUT .= "hostname $DEV_NAME\n";
 
+		$OUTPUT .= "lldp run\n";
+
 		$OUTPUT .= $this->config_loopback();
 
 //		$OUTPUT .= $this->config_management();	 // On dist devices we dont use dedicated mgmt interfaces, mgmt networks, mgmt vrfs, etc.

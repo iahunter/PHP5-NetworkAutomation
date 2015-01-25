@@ -53,7 +53,7 @@ class Provisioning_Device_IOS_SWI_ACC	extends Provisioning_Device_IOS_SWI
 
 		$OUTPUT .= "hostname $DEV_NAME\n";
 
-
+		$OUTPUT .= "lldp run\n";
 
 		$OUTPUT .= $this->config_management();
 

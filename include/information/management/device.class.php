@@ -69,6 +69,7 @@ class Management_Device	extends Information
 		$this->html_width[$i++] = 250;	// Name
 		$this->html_width[$i++] = 150;	// IPv4 Management Address
 		$this->html_width[$i++] = 100;	// Protocol
+		$this->html_width[$i++] = 150;	// Last Scanned
 		$this->html_width[0]	= array_sum($this->html_width);
 	}
 
@@ -90,6 +91,7 @@ class Management_Device	extends Information
 					<th class="report" width="{$WIDTH[$i++]}">Name</th>
 					<th class="report" width="{$WIDTH[$i++]}">Mgmt IP</th>
 					<th class="report" width="{$WIDTH[$i++]}">Protocol</th>
+					<th class="report" width="{$WIDTH[$i++]}">Last Scanned</th>
 				</tr>
 			</thead>
 			<tbody class="report">
@@ -115,6 +117,7 @@ END;
 					<td class="report" width="{$WIDTH[$i++]}"><a href="/information/information-view.php?id={$this->data['id']}">{$this->data['name']}</a></td>
 					<td class="report" width="{$WIDTH[$i++]}"><a href="/information/information-view.php?id={$this->data['id']}">{$this->data['ip']}</a></td>
 					<td class="report" width="{$WIDTH[$i++]}">{$this->data['protocol']}</td>
+					<td class="report" width="{$WIDTH[$i++]}">{$this->data['lastscan']}</td>
 				</tr>
 END;
 		return $OUTPUT;
@@ -130,7 +133,7 @@ END;
 		// Information table itself
 		$rowclass = "row1";
 
-		$COLUMNS = array("ID","Name","Management IP","Protocol");
+		$COLUMNS = array("ID","Name","Management IP","Protocol","Last Scanned");
 		$OUTPUT .= $this->html_list_header_template("Information Detail",$COLUMNS);
 
 		$columns = count($this->html_width)-1;

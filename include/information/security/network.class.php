@@ -118,11 +118,11 @@ class Security_Network	extends Information
 	{
 		$this->html_width = array();	$i = 1;
 		$this->html_width[$i++] = 35;	// ID
-		$this->html_width[$i++] = 200;	// Name
-		$this->html_width[$i++] = 75;	// IPv4
+		$this->html_width[$i++] = 250;	// Name
+		$this->html_width[$i++] = 100;	// IPv4
 		$this->html_width[$i++] = 125;	// IPv6
-		$this->html_width[$i++] = 50;	// Zone
-		$this->html_width[$i++] = 300;	// Description
+		$this->html_width[$i++] = 125;	// Zone
+		$this->html_width[$i++] = 400;	// Description
 
 		$this->html_width[0]	= array_sum($this->html_width);
 	}

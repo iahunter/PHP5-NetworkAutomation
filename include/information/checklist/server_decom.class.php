@@ -32,6 +32,32 @@ class Checklist_Server_Decom	extends Checklist_Server
 {
 	public $type = "Checklist_Server_Decom";
 
+	public function list_query()
+	{
+		global $DB; // Our Database Wrapper Object
+		$QUERY = "select id from information where type like :TYPE and category like :CATEGORY AND active = 1 ORDER BY stringfield1";
+		$DB->query($QUERY);
+		try {
+			$DB->bind("TYPE",$this->data['type'] . "%");
+			$DB->bind("CATEGORY",$this->data['category']);
+			$DB->execute();
+			$RESULTS = $DB->results();
+		} catch (Exception $E) {
+			$MESSAGE = "Exception: {$E->getMessage()}";
+			trigger_error($MESSAGE);
+			global $HTML;
+			die($MESSAGE . $HTML->footer());
+		}
+		return $RESULTS;
+	}
+
+	public function html_list_header()
+	{
+		$COLUMNS = array("ID","Ticket","Site","Contact","BPO","Hostname","Created By","Modified");
+		$OUTPUT = $this->html_list_header_template("Server Decom Checklist",$COLUMNS);
+		return $OUTPUT;
+	}
+
 	public function html_form_extended()
 	{
 		$OUTPUT = "";
@@ -63,6 +89,7 @@ END;
 			"DNS Removed",
 			"AD  Removed",
 			"OPSrepo Updated",
+			"If Enterprise Application - Ensure the Product/DR fields are completed in Ops REPO",
 			"VM deleted from disk VMware",
 		);
 		$this->addtasks($TASKS);

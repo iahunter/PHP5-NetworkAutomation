@@ -26,7 +26,6 @@
  * @license   http://www.gnu.org/copyleft/lesser.html The GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
  */
 
- 
 class Command {
 
 	public $data;

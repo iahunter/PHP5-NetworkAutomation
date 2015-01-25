@@ -33,8 +33,9 @@ class Checklist_Server	extends Information
 	public $category = "Checklist";
 	public $type = "Checklist_Server";
 	public $customfunction = "";
+	public $html_list_page_items = 50;
 
-	public function list_query()
+/*	public function list_query()
 	{
 		global $DB; // Our Database Wrapper Object
 		$QUERY = "select id from information where type like :TYPE and category like :CATEGORY and active = 1 order by ABS(stringfield0),id";
@@ -52,18 +53,35 @@ class Checklist_Server	extends Information
 		}
 		return $RESULTS;
     }
+/**/
+	public function list_query()
+	{
+		global $DB; // Our Database Wrapper Object
+		$QUERY = "select id from information where ( type LIKE 'server_%' AND type NOT LIKE 'server_decom' ) AND category = 'checklist' AND active = 1 ORDER BY stringfield1";
+		$DB->query($QUERY);
+		try {
+			$DB->execute();
+			$RESULTS = $DB->results();
+		} catch (Exception $E) {
+			$MESSAGE = "Exception: {$E->getMessage()}";
+			trigger_error($MESSAGE);
+			global $HTML;
+			die($MESSAGE . $HTML->footer());
+		}
+		return $RESULTS;
+	}
 
 	public function html_width()
 	{
 		$this->html_width = array();	$i = 1;
 		$this->html_width[$i++] = 35;	// ID
 		$this->html_width[$i++] = 100;	// Ticket
-		$this->html_width[$i++] = 100;	// Site
+		$this->html_width[$i++] = 150;	// Site
 		$this->html_width[$i++] = 100;	// Contact
-		$this->html_width[$i++] = 100;	// BPO
-		$this->html_width[$i++] = 100;	// Hostname
+		$this->html_width[$i++] = 150;	// BPO
+		$this->html_width[$i++] = 250;	// Hostname
 		$this->html_width[$i++] = 100;	// Creator
-		$this->html_width[$i++] = 150;	// Modified date/by
+		$this->html_width[$i++] = 300;	// Modified date/by
 		$this->html_width[0]	= array_sum($this->html_width);
 	}
 
@@ -161,9 +179,8 @@ END;	/**/
 		{
 			$SELECT = array(
 				"Server_Windows"	=> "Windows",
-				"Server_VMware"		=> "ESXi",
+//				"Server_VMware"		=> "ESXi",
 				"Server_Linux"		=> "Linux",
-				//"Server_Decom"		=> "Decommission",
 			);
 			$OUTPUT .= $this->html_form_field_select("newtype","Server Type",$SELECT);
 		}

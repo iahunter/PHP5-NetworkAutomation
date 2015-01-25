@@ -26,6 +26,8 @@
  * @license   http://www.gnu.org/copyleft/lesser.html The GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
  */
 
+require_once "information/provisioning/device.class.php";
+
 class Provisioning_Device_UPS_APC	extends Provisioning_Device
 {
 	public $type = "Provisioning_Device_UPS_APC";
@@ -81,16 +83,13 @@ system -l {$this->parent()->data['name']}
 
 radius -a local
 
-user -an telecom
-user -ap changeme
+user -n telecom -pw secret1 -e enable
 
 
-console -S ssh
-console -pt 23
+console -s enable ssh
 console -ps 22
 
-web -S https
-web -ph 80
+web -s enable https
 web -ps 443
 
 ntp -p 10.123.1.123

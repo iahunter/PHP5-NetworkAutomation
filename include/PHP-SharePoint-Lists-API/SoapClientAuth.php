@@ -77,10 +77,10 @@ class SoapClientAuth extends SoapClient {
       'User-Agent: PHP-SOAP',
       'Content-Type: text/xml; charset=utf-8',
       'SOAPAction: "' . $action . '"',
-      'Content-Length: ' . strlen($request),
       'Expect: 100-continue',
       'Connection: Keep-Alive'
     );
+//      'Content-Length: ' . strlen($request),
 
     $this->__last_request_headers = $headers;
     $ch = curl_init($location);

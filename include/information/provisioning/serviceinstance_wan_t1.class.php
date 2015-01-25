@@ -36,6 +36,7 @@ class Provisioning_ServiceInstance_WAN_T1	extends Provisioning_ServiceInstance
 	{
 		$OUTPUT = "";
 		$SELECT = array(
+			"AT&T"			=> "AT&T",
 			"Verizon"		=> "Verizon",
 			"CenturyLink"	=> "CenturyLink",
 			"Telus"			=> "Telus",
@@ -179,8 +180,17 @@ END;
 		if (isset($this->data['routemap_out']))	{ $OUTPUT .= "{$ROUTEMAPS[$this->data['routemap_out'	]]}\n"; }
 
 		// Set carrier peer IP and ASN
-		$this->data['peer_ip']	= long2ip(ip2long($this->data['ceipaddress']) - 1);	// PE is always 1 below the CE IP
+		if($this->data['provider'] == "AT&T")
+		{
+			$this->data['peer_ip']	= long2ip(ip2long($this->data['ceipaddress']) + 1);	// AT&T PE is always 1 higher the CE IP
+		}
+		else
+		{
+			$this->data['peer_ip']	= long2ip(ip2long($this->data['ceipaddress']) - 1);	// PE is always 1 below the CE IP
+		}
+
 		$PROVIDERASN = array();
+		$PROVIDERASN["AT&T"]		= "13979";
 		$PROVIDERASN["Verizon"]		= "65000";
 		$PROVIDERASN["CenturyLink"]	= "209";
 		$PROVIDERASN["Telus"]		= "852";
@@ -203,6 +213,8 @@ END;
 		if (isset($this->data['routemap_out']))	{ $OUTPUT .= "    neighbor {$this->data['peer_ip']} route-map {$this->data['routemap_out']} out\n"; }
 		if (isset($this->data['vrf'])) { $OUTPUT .= "   exit\n"; }
 		$OUTPUT .= " exit\n";
+
+		$OUTPUT .= $this->parent()->config_qos($MBPS,$this->data["interface"]);
 
 		return $OUTPUT;
 	}

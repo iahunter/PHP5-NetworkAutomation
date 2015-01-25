@@ -25,25 +25,48 @@
  * @copyright 2009-2014 @authors
  * @license   http://www.gnu.org/copyleft/lesser.html The GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
  */
- 
-Class Database
+
+class Database
 {
 	public $QUERIES;
+	public $QUERYTIME;
+	public $CACHETIME;
 	public $RECORDCOUNT;
 
 	public $DB_HANDLE;
 	public $DB_STATEMENT;
 
-	public function __construct()
+	public static function try_connect( $TRIES = 3 )
+	{
+		if ( $TRIES <= 0 ) { die("FATAL ERROR: Could not connect to mysql after multiple consecutive tries!\n"); }
+
+		global $DB;
+	    try {
+	        $DB = new Database();
+	    } catch (Exception $E) {
+	        $MESSAGE = "Exception: {$E->getMessage()}\n";
+	        trigger_error($MESSAGE);
+	        unset($DB);
+	        sleep(1);
+			Database::try_connect($TRIES - 1);	// Recursion is cool because recursion is cool because recursion is cool
+		}
+	}
+
+	public function __construct(
+								$DATASOURCE = "",
+								$USERNAME = DB_USERNAME,
+								$PASSWORD = DB_PASSWORD
+								)
 	{
 		$this->QUERIES = array();
+		$this->QUERYTIME = 0;
+		$this->CACHETIME = 0;
 		$this->RECORDCOUNT = 0;
-		$DATASOURCE = "mysql:host=" . DB_HOSTNAME . ";dbname=" . DB_DATABASE;
+		if ( $DATASOURCE == "" ) { $DATASOURCE = "mysql:host=" . DB_HOSTNAME . ";dbname=" . DB_DATABASE; }
 		$OPTIONS = array(
-//		    PDO::ATTR_PERSISTENT => true,
-		    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+			PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
 		);
-		$this->DB_HANDLE = new PDO($DATASOURCE,DB_USERNAME,DB_PASSWORD,$OPTIONS);
+		$this->DB_HANDLE = new PDO($DATASOURCE,$USERNAME,$PASSWORD,$OPTIONS);
 	}
 
 	public function query($QUERY)
@@ -74,8 +97,16 @@ Class Database
 
 	public function execute()
 	{
-		array_push($this->QUERIES,$this->DB_STATEMENT->queryString);
+//		array_push($this->QUERIES,$this->DB_STATEMENT->queryString);
+		$BASETIME = Utility::microtime_ticks();
 		$this->DB_STATEMENT->execute();
+		$DIFFTIME = Utility::microtime_ticks() - $BASETIME;
+
+		$QUERY = array();
+		$QUERY["query"] = $this->DB_STATEMENT->queryString;
+		$QUERY["time"] = $DIFFTIME;
+		array_push($this->QUERIES,$QUERY);
+		$this->QUERYTIME += $DIFFTIME;
 		$this->RECORDCOUNT += intval($this->DB_STATEMENT->rowCount());
 	}
 

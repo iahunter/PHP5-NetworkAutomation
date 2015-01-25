@@ -110,6 +110,8 @@ class Provisioning_Device_IOS_MLS	extends Provisioning_Device_IOS
 		{
 			$OUTPUT .= "  switchport\n";
 			$OUTPUT .= "  auto qos trust dscp\n";
+			$OUTPUT .= "  storm-control broadcast level 0.4\n";
+			$OUTPUT .= "  storm-control multicast level 0.4\n";
 			if (preg_match("/^(\d+)$/",$INT_VLAN,$MATCH))
 			{
 				$VLAN = $MATCH[1];
@@ -329,6 +331,7 @@ class Provisioning_Device_IOS_MLS	extends Provisioning_Device_IOS
 
 		return $CONFIG;
 	}
+
 }
 
 ?>

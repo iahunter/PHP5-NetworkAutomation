@@ -132,6 +132,7 @@ END;
 			"ServiceInstance_WAN_FlexVPN"		=> "WAN FlexVPN",
 			"ServiceInstance_VoiceGateway"		=> "Voice Gateway",
 			"ServiceInstance_WCCP_Riverbed"		=> "WCCP Riverbed",
+			"ServiceInstance_Switch_Stack"		=> "Switch Stack",
 		);
 		$OUTPUT .= $this->html_form_field_select("newtype","Service Instance Type",$SELECT);
 		return $OUTPUT;

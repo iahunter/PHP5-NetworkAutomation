@@ -204,7 +204,7 @@ class HTML extends Base
      * 
      * @param  unknown $PAGE_TITLE Parameter description (if any) ...
      * @return string  Return description (if any) ...
-     * @access public 
+     * @access public
      */
     public function header($PAGE_TITLE)
     {
@@ -380,29 +380,67 @@ class HTML extends Base
             return "Quicktable Error (table data is not an array)\n";
         }
         $html = "";
-	$html .= "<table class=\"report\">
-		<caption class=\"report\">$title</caption>
-		<thead>
-			<tr>";
+		$html .= "<table class=\"report\">
+			<caption class=\"report\">$title</caption>
+			<thead>
+				<tr>";
+				foreach ($cols as $col)
+				{
+					$html .= "<th class=\"report\">$col</th>";
+				}
+				$html .= "</tr>
+				</thead>
+				<tbody class=\"report\">\n";
+		$i=1;
+		foreach ($varval as $key => $value)
+		{
+			$i++; $rowclass = "row".(($i % 2)+1);
+			$html .= "<tr class='".$rowclass."'>
+				<td class=\"report\">$key</td>
+				<td class=\"report\">$value</td>
+				</tr>\n";
+		}
+		$html .= "</tbody></table>\n";
+		return $html;
+    }
+
+    public function quicktable_assoc_report($title, $cols, $varval)
+    {
+        if (!is_array($cols))
+        {
+            return "Quicktable Error (table cols is not an array)\n";
+        }
+        if (!is_array($varval))
+        {
+            return "Quicktable Error (table data is not an array)\n";
+        }
+        $html = "";
+		$html .= "<table class=\"report\">
+			<caption class=\"report\">$title</caption>
+			<thead>
+				<tr>";
+				foreach ($cols as $col)
+				{
+					$html .= "<th class=\"report\">$col</th>";
+				}
+				$html .= "</tr>
+				</thead>
+				<tbody class=\"report\">\n";
+		$i=1;
+		foreach ($varval as $element)
+		{
+			$i++; $rowclass = "row".(($i % 2)+1);
+			$html .= "<tr class='".$rowclass."'>\n";
 			foreach ($cols as $col)
 			{
-				$html .= "<th class=\"report\">$col</th>";
+				$html .= "<td class=\"report\">{$element[$col]}</td>";
 			}
-			$html .= "</tr>
-			</thead>
-			<tbody class=\"report\">\n";
-	$i=1;
-	foreach ($varval as $key => $value)
-	{
-		$i++; $rowclass = "row".(($i % 2)+1);
-		$html .= "<tr class='".$rowclass."'>
-			<td class=\"report\">$key</td>
-			<td class=\"report\">$value</td>
-			</tr>\n";
-	}
-	$html .= "</tbody></table>\n";
-	return $html;
+			$html .= "</tr>\n";
+		}
+		$html .= "</tbody></table>\n";
+		return $html;
     }
+
 }
 
 ?>

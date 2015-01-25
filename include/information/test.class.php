@@ -31,4 +31,10 @@ class Test	extends Information
 	public $category = "";
 	public $type = "Test";
 	public $customfunction = "";
+
+	public function ping($ARRAY)
+	{
+		$OUTPUT = "MY ID IS {$this->data["id"]} and you sent me: " . implode(" ",$ARRAY);
+		return $OUTPUT;
+	}
 }

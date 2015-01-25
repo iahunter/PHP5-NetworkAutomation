@@ -96,7 +96,7 @@ class Security_Network_Host extends Security_Network
 		return $OUTPUT;
 	}
 
-	public function config_object()
+	public function config_object($EXTRA = "")
 	{
 		$OUTPUT = "";
 
@@ -105,6 +105,7 @@ class Security_Network_Host extends Security_Network
 		$OUTPUT .= "object network OBJ_NET_{$this->data["id"]}\n";
 		$OUTPUT .= "  description ID {$this->data["id"]} NAME {$this->data["name"]} DESCRIPTION {$this->data["description"]}\n";
 		$OUTPUT .= "  host {$this->data["ip4"]}\n";
+		if ($EXTRA) { $OUTPUT .= "  {$EXTRA}\n"; }
 		$OUTPUT .= " exit\n";
 
 		return $OUTPUT;

@@ -109,6 +109,8 @@ class Provisioning_Device_IOS_SWI	extends Provisioning_Device_IOS_MLS
 		if ($INT_LAYER == "2")
 		{
 			$OUTPUT .= "  auto qos trust dscp\n";
+			$OUTPUT .= "  storm-control broadcast level 0.4\n";
+			$OUTPUT .= "  storm-control multicast level 0.4\n";
 			if (preg_match("/^(\d+)$/",$INT_VLAN,$MATCH))
 			{
 				$VLAN = $MATCH[1];

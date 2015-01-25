@@ -97,6 +97,22 @@ class Utility
 		return $RETURN;
 	}
 
+	public static function assoc_array_keys($ARRAY)
+	{
+		$RETURN = array();
+		$KEYS = array_keys($ARRAY);
+		foreach ($KEYS as $KEY)
+		{ $RETURN["$KEY"] = $KEY; }
+		return $RETURN;
+	}
+
+	public static function assoc_array_field($ARRAY,$FIELD)
+	{
+		$RETURN = array();
+		foreach ($ARRAY as $ELEMENT) { array_push($RETURN,$ELEMENT[$FIELD]); }
+		return $RETURN;
+	}
+
 	public static function recursive_strip_tags($INPUT, $ALLOWED_TAGS = "")
 	{
 //		print "Running recursive_strip_tags on "; dumper($INPUT); print "<br>\n"; john_flush();
@@ -211,6 +227,70 @@ END;
 		}
 /**/
 		return $RESULTS;
+	}
+
+	public static function ifconfig_interfaces()
+	{
+		$COMMAND = "/sbin/ifconfig";
+		$IFCONFIG = shell_exec($COMMAND);
+		return Utility::parse_ifconfig($IFCONFIG);
+	}
+
+	public static function parse_ifconfig($IFCONFIG)
+	{
+		$INTERFACES = array();
+
+		$LINES = explode("\n",$IFCONFIG);
+		$INT = "Unknown";
+		// Parse through output and identify interfaces
+		foreach ($LINES as $LINE)
+		{
+			// Match ($INT) Link encap:(something) (hardware info)
+			$MATCH = "/^(\w+)\s+Link\s+encap:(\w+)\s+(.+)/";
+			if ( preg_match($MATCH,$LINE,$REG) )
+			{
+				$INT = $REG[1];									// We found a new interface!
+				$INTERFACES[$INT] = array();
+				$INTERFACES[$INT]["name"] = $INT;				// Store the interface name
+				$INTERFACES[$INT]["encapsulation"] = $REG[2];	// Encapsulation type
+				$INTERFACES[$INT]["hardware"] = $REG[3];		// Hardware information
+				$INTERFACES[$INT]["ipv4"] = array();			// and precreate the array of any addresses
+				$INTERFACES[$INT]["ipv6"] = array();			// for ipv4 and ipv6!
+			}
+
+			// Match inet addr:(i.p.a.d) blah blah Mask:(255.128.0.0)
+			$MATCH = "/^\s+inet addr:(\S+)\s+.*Mask:(\S+)/";
+			if ( preg_match($MATCH,$LINE,$REG) )
+			{
+				$ADDRESS = array();								// We found an address on the interface
+				$ADDRESS["address"] = $REG[1];					// IPv4 address
+				$ADDRESS["mask"] = $REG[2];						// Subnet mask
+				array_push($INTERFACES[$INT]["ipv4"],$ADDRESS);	// Stuff this address onto the interface
+			}
+
+			// Match inet6 addr: (i:p:v:6:a:d) blah? Scope:(Global)
+			$MATCH = "/^\s+inet6 addr: (\S+)\s+.*Scope:(\S+)/";
+			if ( preg_match($MATCH,$LINE,$REG) )
+			{
+				$ADDRESS = array();								// We found an address on the interface
+				$ADDRESS["address"] = $REG[1];					// IPv6 address/prefix in CIDR notation!
+				$ADDRESS["scope"] = $REG[2];					// Network scope
+				array_push($INTERFACES[$INT]["ipv6"],$ADDRESS);	// Stuff this address onto the interface
+			}
+
+			// TODO: Consider adding MTU, flags, metrics, statistics?
+		}
+
+		// Remove the loopback interfaces, this just screws up some apps...
+		if ( isset($INTERFACES["lo"]) ) { unset($INTERFACES["lo"]); }
+
+		return $INTERFACES;
+	}
+
+	public static function microtime_ticks()
+	{
+		$TICKS = explode(" ", microtime() );	// Turn microtime into an array (12345 0.7563262)
+		return $TICKS[0] + $TICKS[1];			// Return the sum of the two numbers (double precision number)
 	}
 
 }

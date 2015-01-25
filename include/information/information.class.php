@@ -33,6 +33,7 @@ class Information
 	public $type = "Information";
 	public $customfunction = "customfunction";
 	public $html_width;
+	public $html_list_page_items = 0;
 
 	public function __construct($DATA = null)
 	{
@@ -65,27 +66,51 @@ class Information
 			global $HTML; if (is_object($HTML)) { $MESSAGE .= $HTML->footer(); }
 			die($MESSAGE);
 		}
-		$QUERY = "select * from information where id= :ID";
-		$DB->query($QUERY);
-		try {
-			$DB->bind("ID",$ID);
-			$DB->execute();
-			$RESULTS = $DB->results();
-		} catch (Exception $E) {
-			$MESSAGE = "Exception: {$E->getMessage()}";
-			trigger_error($MESSAGE);
-			global $HTML; if (is_object($HTML)) { $MESSAGE .= $HTML->footer(); }
-			die($MESSAGE);
-		}
-		$RECORDCOUNT = count($RESULTS);
-		if ($RECORDCOUNT != 1)
+		$data = "";
+		if ( isset($GLOBALS["CACHE"]) )
 		{
-			$MESSAGE = "ERROR: Request for information ID {$ID} returned {$RECORDCOUNT} results!";
-			$DB->log($MESSAGE);
-			global $HTML; if (is_object($HTML)) { $MESSAGE .= $HTML->footer(); }
-			die($MESSAGE);
+			//print "ATTEMPTING TO PULL FROM CACHE!\n";
+			global $CACHE;
+			$PREFIX = "InfoID:";
+			$KEY = "{$PREFIX}{$ID}";
+			$BASETIME = Utility::microtime_ticks();
+			$data = unserialize($CACHE->get($KEY));
+			$DIFFTIME = Utility::microtime_ticks() - $BASETIME;
+			$DB->CACHETIME += $DIFFTIME;
 		}
-		$data = $RESULTS[0];
+		if ( $data == "" ) // IF we didnt get any data out of the cache
+		{
+			//print "CACHE MISS, FALLING BACK TO SQL!\n";
+			$QUERY = "select * from information where id= :ID";
+			$DB->query($QUERY);
+			try {
+				$DB->bind("ID",$ID);
+				$DB->execute();
+				$RESULTS = $DB->results();
+			} catch (Exception $E) {
+				$MESSAGE = "Exception: {$E->getMessage()}";
+				trigger_error($MESSAGE);
+				global $HTML; if (is_object($HTML)) { $MESSAGE .= $HTML->footer(); }
+				die($MESSAGE);
+			}
+			$RECORDCOUNT = count($RESULTS);
+			if ($RECORDCOUNT != 1)
+			{
+				$MESSAGE = "ERROR: Request for information ID {$ID} returned {$RECORDCOUNT} results!";
+				$DB->log($MESSAGE);
+				global $HTML; if (is_object($HTML)) { $MESSAGE .= $HTML->footer(); }
+				die($MESSAGE);
+			}
+			$data = $RESULTS[0];
+			if ( isset($GLOBALS["CACHE"]) )
+			{
+				//print "SQL SUCCESS, PUSHING TO CACHE!\n";
+				global $CACHE;
+				$PREFIX = "InfoID:";
+				$KEY = "{$PREFIX}{$ID}";
+				$CACHE->set($KEY,serialize($data));
+			}
+		}
 
 		// This installs all serialized custom information into the standard data array
 		$custom = unserialize($data['custom']);		// Unserialize what we got out of the database
@@ -147,7 +172,8 @@ class Information
 		$QUERY = "SELECT id FROM information WHERE parent = :ID AND active = :ACTIVE";
 		if ($TYPE != "") { $QUERY .= " and type like :TYPE"; }
 		if ($CATEGORY != "") { $QUERY .= " and category like :CATEGORY"; }
-		$QUERY .= " order by category,type,id";
+//		$QUERY .= " order by category,type,id";	// THIS INCURS A MASSIVE TIME PENALTY!
+		$QUERY .= " order by id";
 
 		global $DB;
 		$DB->query($QUERY);
@@ -171,6 +197,13 @@ class Information
 			array_push($CHILDREN, Information::retrieve($CHILD['id']));
 		}
 		return $CHILDREN;
+	}
+
+	public static function ids_to_objs($INFOIDS)
+	{
+		$INFOBJS = array();
+		foreach ($INFOIDS as $INFOID) { array_push($INFOBJS, Information::retrieve($INFOID) ); }
+		return $INFOBJS;
 	}
 
 	public function parent()
@@ -382,6 +415,77 @@ END;
 			global $HTML; if (is_object($HTML)) { $MESSAGE .= $HTML->footer(); }
 			die($MESSAGE);
 		}
+		if ( isset($GLOBALS["CACHE"]) )
+		{
+			$ID = $this->data["id"];
+			//print "SQL UPDATED ID {$ID}, FLUSHING FROM CACHE!\n";
+			global $CACHE;
+			$PREFIX = "InfoID:";
+			$KEY = "{$PREFIX}{$ID}";
+			$CACHE->del($KEY);
+		}
+	}
+
+	public function otr_update()
+	{
+		$QUERY = <<<END
+			UPDATE information SET
+			active			= :ACTIVE,
+			parent			= :PARENT,
+			type			= :TYPE,
+			category		= :CATEGORY,
+			custom			= :SERIALDATA,
+			stringfield0	= :STRINGFIELD0,
+			stringfield1	= :STRINGFIELD1,
+			stringfield2	= :STRINGFIELD2,
+			stringfield3	= :STRINGFIELD3,
+			stringfield4	= :STRINGFIELD4,
+			stringfield5	= :STRINGFIELD5,
+			stringfield6	= :STRINGFIELD6,
+			stringfield7	= :STRINGFIELD7,
+			stringfield8	= :STRINGFIELD8,
+			stringfield9	= :STRINGFIELD9
+			WHERE id = :ID
+END;
+		global $DB;
+		$DB->query($QUERY);
+		try {
+			$this->update_bind(); // Always call update_bind first allowing the child type to override data in the structure!
+			$this->update_override();	// This is a function for final overwriting or appending of data.
+			$DB->bind("ACTIVE"			,$this->data['active'			]);
+			$DB->bind("PARENT"			,$this->data['parent'			]);
+			$DB->bind("TYPE"			,$this->data['type'				]);
+			$DB->bind("CATEGORY"		,$this->data['category'			]);
+			$DB->bind("ID"				,$this->data['id'				]);
+			$DB->bind("STRINGFIELD0"	,$this->data['stringfield0'		]);
+			$DB->bind("STRINGFIELD1"	,$this->data['stringfield1'		]);
+			$DB->bind("STRINGFIELD2"	,$this->data['stringfield2'		]);
+			$DB->bind("STRINGFIELD3"	,$this->data['stringfield3'		]);
+			$DB->bind("STRINGFIELD4"	,$this->data['stringfield4'		]);
+			$DB->bind("STRINGFIELD5"	,$this->data['stringfield5'		]);
+			$DB->bind("STRINGFIELD6"	,$this->data['stringfield6'		]);
+			$DB->bind("STRINGFIELD7"	,$this->data['stringfield7'		]);
+			$DB->bind("STRINGFIELD8"	,$this->data['stringfield8'		]);
+			$DB->bind("STRINGFIELD9"	,$this->data['stringfield9'		]);
+			$this->update_bind(); // Always call update_bind again allowing the child type to override the default bindings
+			$this->update_type(); // Check to see if the datatype was changed by this update and redirect accordingly!
+			$DB->bind("SERIALDATA"		,serialize($this->data)			);
+			$DB->execute();
+		} catch (Exception $E) {
+			$MESSAGE = "Exception: {$E->getMessage()}";
+			trigger_error($MESSAGE);
+			global $HTML; if (is_object($HTML)) { $MESSAGE .= $HTML->footer(); }
+			die($MESSAGE);
+		}
+		if ( isset($GLOBALS["CACHE"]) )
+		{
+			$ID = $this->data["id"];
+			//print "SQL UPDATED ID {$ID}, FLUSHING FROM CACHE!\n";
+			global $CACHE;
+			$PREFIX = "InfoID:";
+			$KEY = "{$PREFIX}{$ID}";
+			$CACHE->del($KEY);
+		}
 	}
 
 	public function update_bind()	// Used to override custom datatypes in children
@@ -456,6 +560,9 @@ END;
 
 	public function created_by()
 	{
+		// if we have the data already in the object, just return that!
+		if ( isset($this->data["createdby"]) && $this->data["createdby"] != "" ) { return $this->data["createdby"]; }
+		// Otherwise go get it and update ourselves!
 		global $DB;
 		$QUERY = "SELECT user,date FROM log WHERE description LIKE 'Information Added ID:{$this->data['id']} %' ORDER BY id";
 		$DB->query($QUERY);
@@ -475,11 +582,18 @@ END;
 			$CREATOR = $RESULT['user'];
 			$CREATED = $RESULT['date'];
 		}
+		// Jam it into the structure and OTR update the record
+		$this->data["createdby"] = $CREATOR;
+		$this->data["createdwhen"] = $CREATED;
+		if ($CREATOR || $CREATED) { $this->otr_update(); }
 		return $CREATOR;
 	}
 
 	public function created_when()
 	{
+		// if we have the data already in the object, just return that!
+		if ( isset($this->data["createdwhen"]) && $this->data["createdwhen"] != "" ) { return $this->data["createdwhen"]; }
+		// Otherwise go get it and update ourselves!
 		global $DB;
 		$QUERY = "SELECT user,date FROM log WHERE description LIKE 'Information Added ID:{$this->data['id']} %' ORDER BY id";
 		$DB->query($QUERY);
@@ -499,6 +613,10 @@ END;
 			$CREATOR = $RESULT['user'];
 			$CREATED = $RESULT['date'];
 		}
+		// Jam it into the structure and OTR update the record
+		$this->data["createdby"] = $CREATOR;
+		$this->data["createdwhen"] = $CREATED;
+		if ($CREATOR || $CREATED) { $this->otr_update(); }
 		return $CREATED;
 	}
 
@@ -580,55 +698,89 @@ END;
 		$this->html_width[$i++] = 100;	// Type
 		$this->html_width[0]	= array_sum($this->html_width);
 	}
-/*
-	// This old html list function worked great, but it loaded the entire
-	// list object set into ram at once causing issues with large sets!
-	public function html_list()
-	{
-		$OUTPUT = "";
-		$this->html_width();
-		$RESULTS = $this->list_query();
-		$INFOBJECTS = array();
-		foreach ($RESULTS as $INFO)
-		{
-			array_push($INFOBJECTS,Information::retrieve($INFO['id']));
-		}
 
-		$OUTPUT .= $this->html_list_buttons();
-
-		if (!empty($INFOBJECTS))
-		{
-			$INFOBJECT = reset($INFOBJECTS);
-			$OUTPUT .= $INFOBJECT->html_list_header();
-			$i = 1;
-			foreach ($INFOBJECTS as $INFOBJECT)
-			{
-				$OUTPUT .= $INFOBJECT->html_list_row($i++);
-			}
-			$OUTPUT .= $INFOBJECT->html_list_footer();
-		}
-		return $OUTPUT;
-	}
-/**/
-
-	public function html_list()
+	public function html_list( $PAGE = 0 )
 	{
 		$OUTPUT = "";
 		$this->html_width();
 		$RESULTS = $this->list_query();
 
+		// Buttons at the top to add items, etc.
 		$OUTPUT .= $this->html_list_buttons();
+
+		// TODO: if this object type supports user SEARCH function! Add a search box?
+
+		$OUTPUT .= $this->html_list_pagination( $RESULTS, $PAGE ); // If this object type uses paginated lists generate the header for pages
+
+		// Process the resulting items one at a time to add to the list table & sandwich them between header and footer
 		if (count($RESULTS) > 0)
 		{
+			// Just grab the first record and use its html_list_header function (should be the same for all objects of type X)
 			$FIRSTRECORD = reset($RESULTS);
 			$FIRSTOBJECT = Information::retrieve($FIRSTRECORD['id']);
 			$OUTPUT .= $FIRSTOBJECT->html_list_header();
 			$i = 1;
+			// Loop through all the remaining items
 			foreach ($RESULTS as $INFO)
 			{
 				$INFOBJECT = Information::retrieve($INFO['id']);
 				$OUTPUT .= $INFOBJECT->html_list_row($i++);
 				unset ($INFOBJECT);	// THIS FREES UP MEMORY WHEN LISTING VERY LARGE SETS!
+			}
+			$OUTPUT .= $FIRSTOBJECT->html_list_footer();
+		}
+		return $OUTPUT;
+	}
+
+	public function html_list_gearman( $PAGE = 0 )
+	{
+		$OUTPUT = "";
+		$this->html_width();
+		$RESULTS = $this->list_query();
+
+		// Buttons at the top to add items, etc.
+		$OUTPUT .= $this->html_list_buttons();
+
+		// TODO: if this object type supports user SEARCH function! Add a search box?
+
+		$OUTPUT .= $this->html_list_pagination( $RESULTS, $PAGE ); // If this object type uses paginated lists generate the header for pages
+
+		// Process the resulting items one at a time to add to the list table & sandwich them between header and footer
+		if (count($RESULTS) > 0)
+		{
+			// Just grab the first record and use its html_list_header function (should be the same for all objects of type X)
+			$FIRSTRECORD = reset($RESULTS);
+			$FIRSTOBJECT = Information::retrieve($FIRSTRECORD["id"]);
+			$OUTPUT .= $FIRSTOBJECT->html_list_header();
+			$i = 1;
+			// Loop through all the remaining items IN PARALLEL WITH GEARMAN!!!
+			$GEARMAN = new Gearman_Client;
+			$FUNCTION	= "information-action";
+			$QUEUE		= "web";
+			$WORK		= "{$FUNCTION}-{$QUEUE}";
+			$i = 1;
+			foreach ($RESULTS as $RECORD)
+			{
+				$DATA = array();
+				$DATA["id"] = $RECORD["id"];
+				$DATA["method"] = "html_list_row_gearman";
+				$DATA["rowclass"] = $i++;
+				$GEARMAN->addTask($WORK, $DATA);
+			}
+			$GEARMAN->setTimeout(12000);// Make sure that we have a timeout set (12 seconds)
+			if (! $GEARMAN->runTasks())	// Now run all those tasks in parallel!
+			{
+				global $DB; $DB->log("GEARMAN ERROR: " . $GEARMAN->error() );
+				return "<b>ERROR:</b> " . $GEARMAN->error() . " <b>Attempting to load the page without gearman...</b><br>\n" . $this->html_list($PAGE);
+			}
+			foreach ($GEARMAN->tasks as $HANDLE => $TASKINFO)
+			{
+				if ( isset($TASKINFO["output"]) )
+				{
+					$OUTPUT .= $TASKINFO["output"];
+				}else{
+					$OUTPUT .= "ERROR! " . dumper_to_string($TASKINFO);
+				}
 			}
 			$OUTPUT .= $FIRSTOBJECT->html_list_footer();
 		}
@@ -682,6 +834,37 @@ END;
 		return $OUTPUT;
 	}
 
+	public function html_list_pagination( & $RESULTS, $PAGE = 0 )
+	{
+		$OUTPUT = "";
+
+		// If this object type uses paginated lists...
+		if ($this->html_list_page_items)
+		{
+			$COUNT = count($RESULTS);
+			$HTML_PAGE_LIST = "";	// I put this in a separate variable in case I need to add the page list at the BOTTOM of the list as well as the top!
+			$PAGES = array_chunk($RESULTS,$this->html_list_page_items);	// Split the result set into pages of html_list_page_items size
+			$PAGECOUNT = count($PAGES);									// Count the number of pages that gives us total
+			$HTML_PAGE_LIST .= "Found {$COUNT} items, displaying page " . ($PAGE + 1) . " of {$PAGECOUNT} ({$this->html_list_page_items} max items per page) - ";
+			$HTML_PAGE_LINKS = array();
+			foreach(range(0,$PAGECOUNT - 1) as $NUMBER)	// Screwy math, count is readable, array index is - 1
+			{
+				$DISPLAY_PAGE = $NUMBER + 1;
+				if ($NUMBER == $PAGE)	// If we are viewing page number N already, dont link to ourselves?
+				{
+					array_push($HTML_PAGE_LINKS,"<b>{$DISPLAY_PAGE}</b>");
+				}else{
+					array_push($HTML_PAGE_LINKS,"<a href=\"/information/information-list.php?category={$this->data['category']}&type={$this->data['type']}&page={$NUMBER}\">$DISPLAY_PAGE</a>");
+				}
+			}
+			$HTML_PAGE_LIST .= "<b>Page: </b>" . implode(", ",$HTML_PAGE_LINKS);
+			$OUTPUT .= "{$HTML_PAGE_LIST}<br><br>\n";	// Append the page link list to the current output...
+			$RESULTS = $PAGES[$PAGE];					// Set $RESULTS = the subset of items for THIS page!
+		}
+
+		return $OUTPUT;
+	}
+
 	public function html_list_buttons()
 	{
 		$OUTPUT = "";
@@ -700,6 +883,11 @@ END;
 		</table>
 END;
 		return $OUTPUT;
+	}
+
+	public function html_list_row_gearman($DATA)
+	{
+		return $this->html_list_row($DATA["rowclass"]);
 	}
 
 	public function html_list_row($i = 1)
@@ -788,6 +976,44 @@ END;
 		return $OUTPUT;
 	}
 
+	public function html_children_button($CHILDTYPE)
+	{
+		$OUTPUT = "";
+		$OUTPUT .= <<<END
+
+			<table width="{$this->html_width[0]}" border="0" cellspacing="0" cellpadding="1">
+				<tr>
+					<td align="right">
+						<ul class="object-tools">
+							<li>
+								<a href="/information/information-add.php?parent={$this->data["id"]}&category={$this->data["category"]}&type={$CHILDTYPE}" class="addlink">Add {$CHILDTYPE}</a>
+							</li>
+						</ul>
+					</td>
+				</tr>
+			</table>
+END;
+		return $OUTPUT;
+	}
+
+	public function html_children($CHILDTYPE)
+	{
+		$OUTPUT = "";
+		$CHILDREN = $this->children($this->id,$CHILDTYPE . "%",$this->category);
+		if (!empty($CHILDREN))
+		{
+			$CHILD = reset($CHILDREN);
+			$OUTPUT .= $CHILD->html_list_header();
+			$i = 1;
+			foreach ($CHILDREN as $CHILD)
+			{
+				$OUTPUT .= $CHILD->html_list_row($i++);
+			}
+			$OUTPUT .= $CHILD->html_list_footer();
+		}
+		return $OUTPUT;
+	}
+
 	public function html_detail_buttons($EXTRA = "")
 	{
 		$OUTPUT = "";
@@ -852,6 +1078,17 @@ END;
 	public function html_form_extended()	// This is a function that some children override in large inheritance hierarchies
 	{
 		$OUTPUT = "";
+		return $OUTPUT;
+	}
+
+	public function html_form_section($TEXT)
+	{
+		$OUTPUT = "";
+		$OUTPUT .= <<<END
+				<tr class="row1">
+					<th>$TEXT</th>
+				</tr>
+END;
 		return $OUTPUT;
 	}
 
@@ -956,23 +1193,14 @@ END;
 
 				<tr><td>
 					<strong>{$TEXT}:</strong>
-					<select multiple name="{$FIELD}" size="8">
+					<select multiple name="{$FIELD}[]" size="8">
 END;
-		if (isset($this->data[$FIELD]))
-		{
-			foreach($this->data[$FIELD] as $KEY => $VALUE)
-			{
-				$OUTPUT .= <<<END
-
-					<option value="{$this->data[$FIELD]}" selected>{$this->data[$FIELD]}</option>
-END;
-			}
-		}
 		foreach($KEYVALUE as $KEY => $VALUE)
 		{
+			if ( in_array($KEY,$this->data[$FIELD]) ) { $SELECTED = " selected"; }else{ $SELECTED = ""; }
 			$OUTPUT .= <<<END
 
-					<option value="{$KEY}">{$VALUE}</option>
+					<option value="{$KEY}"{$SELECTED}>{$VALUE}</option>
 END;
 		}
 		$OUTPUT .= <<<END
@@ -1139,6 +1367,45 @@ END;
 			}
 		}
 		return $OUTPUT;
+	}
+
+	public function png_graph_simple($POINTS,$LABEL)
+	{
+		// Graphing inclusions
+		include("pChart/pData.class");
+		include("pChart/pChart.class");
+
+		// Dataset definition
+		$DataSet = new pData;
+
+		$AXIS = "AXIS1";	
+		$DataSet->AddPoint($POINTS,$AXIS);
+		$DataSet->AddSerie($AXIS);
+		$DataSet->SetSerieName($LABEL,$AXIS);
+
+		// Initialise the graph
+		$Test = new pChart(900,500);
+
+		$FONT = BASEDIR . "/font/tahoma.ttf";
+		$Test->setFontProperties($FONT,13); // Font size for the X and Y axis count/date numbers
+		$Test->setGraphArea(50,10,860,440);
+		$Test->drawGraphArea(255,255,255,TRUE);
+		//$Test->setLineStyle(1,0);
+		$Test->drawScale($DataSet->GetData(),$DataSet->GetDataDescription(),SCALE_NORMAL,150,150,150,TRUE,45,2); // 45 is text rotation angle for date!
+		$Test->drawGrid(5,TRUE,230,230,230,50); // 5 is dotted line width on background 230 is grey and 50 is alternating gradient transparency
+
+		// Draw the line graph
+		$Test->setLineStyle(2,0);
+		$Test->setColorPalette(0,   0   ,   0   ,   255 );  // Make our first line blue
+		$Test->setColorPalette(1,   255 ,   120 ,   0   );  // Make our second line orange
+		$Test->drawLineGraph($DataSet->GetData(),$DataSet->GetDataDescription());
+		$Test->drawPlotGraph($DataSet->GetData(),$DataSet->GetDataDescription(),5,2,255,255,255); // 5 is dot size on the line, 3 is dot background
+
+		// Finish the graph
+		$Test->setFontProperties($FONT,14); // Font size of the axis labels
+		$Test->drawLegend(60,20,$DataSet->GetDataDescription(),255,255,255);
+		$Test->stroke();
+
 	}
 
 	public function assoc_select_name($OBJECTIDARRAY)

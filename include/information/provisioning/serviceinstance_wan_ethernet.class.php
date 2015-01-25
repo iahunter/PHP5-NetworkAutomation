@@ -36,6 +36,7 @@ class Provisioning_ServiceInstance_WAN_Ethernet	extends Provisioning_ServiceInst
 	{
 		$OUTPUT = "";
 		$SELECT = array(
+			"AT&T"			=> "AT&T",
 			"Verizon"		=> "Verizon",
 			"CenturyLink"	=> "CenturyLink",
 			"Telus"			=> "Telus",
@@ -48,6 +49,8 @@ class Provisioning_ServiceInstance_WAN_Ethernet	extends Provisioning_ServiceInst
 		$SELECT = array(
 			"GigabitEthernet0/2"		=> "GigabitEthernet0/2",
 			"GigabitEthernet0/1"		=> "GigabitEthernet0/1",
+			"GigabitEthernet0/1/0"		=> "GigabitEthernet0/1/0",
+			"GigabitEthernet0/3/0"		=> "GigabitEthernet0/3/0",
 		);
 		$OUTPUT .= $this->html_form_field_select("interface"	,"WAN Interface",$SELECT	);
 		$OUTPUT .= $this->html_form_field_text	("vlan"			,"VLAN (blank for none)"	);
@@ -61,12 +64,12 @@ class Provisioning_ServiceInstance_WAN_Ethernet	extends Provisioning_ServiceInst
 	{
 		$OUTPUT = "";
 		$ASN = $this->parent()->parent()->get_asn();
-		$MBPS = $this->data['speed'];
 
 		// Configure Ethernet Interface
 		if ($this->data['vlan'])	// If we have a VLAN, configure the base interface and subinterface with dot1q encapsulation
 		{
 			$KBPS = 850 * $this->data['speed'];	// There is a sizeable ethernet overhead!
+			$MBPS = $KBPS / 1000;
 			$OUTPUT .= <<<END
 interface {$this->data['interface']}
   description WAN_MPLS_{$this->data['provider']}_{$MBPS}Mbps_{$this->data['circuitid']}
@@ -86,6 +89,7 @@ interface {$this->data['interface']}
 END;
 		}else{						// If we are UNTAGGED use the base interface for everything
 			$KBPS = 900 * $this->data['speed'];	// There is a sizeable ethernet overhead!
+			$MBPS = $KBPS / 1000;
 			$OUTPUT .= <<<END
 interface {$this->data['interface']}
   description WAN_MPLS_{$this->data['provider']}_{$MBPS}Mbps_{$this->data['circuitid']}
@@ -120,8 +124,17 @@ END;
 		if (isset($this->data['routemap_out']))	{ $OUTPUT .= "{$ROUTEMAPS[$this->data['routemap_out'	]]}\n"; }
 
 		// Set carrier peer IP and ASN
-		$this->data['peer_ip']	= long2ip(ip2long($this->data['ceipaddress']) - 1);	// PE is always 1 below the CE IP
+		if($this->data['provider'] == "AT&T")
+		{
+			$this->data['peer_ip']	= long2ip(ip2long($this->data['ceipaddress']) + 1);	// AT&T PE is always 1 higher the CE IP
+		}
+		else
+		{
+			$this->data['peer_ip']	= long2ip(ip2long($this->data['ceipaddress']) - 1);	// PE is always 1 below the CE IP
+		}
+
 		$PROVIDERASN = array();
+		$PROVIDERASN["AT&T"]		= "13979";
 		$PROVIDERASN["Verizon"]		= "65000";
 		$PROVIDERASN["CenturyLink"]	= "209";
 		$PROVIDERASN["Telus"]		= "852";
@@ -144,6 +157,13 @@ END;
 		if (isset($this->data['routemap_out']))	{ $OUTPUT .= "    neighbor {$this->data['peer_ip']} route-map {$this->data['routemap_out']} out\n"; }
 		if (isset($this->data['vrf'])) { $OUTPUT .= "   exit\n"; }
 		$OUTPUT .= " exit\n";
+
+		if ($this->data['vlan'])
+		{
+			$OUTPUT .= $this->parent()->config_qos($MBPS,$this->data["interface"] . "." . $this->data['vlan']);
+		}else{
+			$OUTPUT .= $this->parent()->config_qos($MBPS,$this->data["interface"]);
+		}
 
 		return $OUTPUT;
 	}

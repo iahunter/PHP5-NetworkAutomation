@@ -26,8 +26,6 @@
  * @license   http://www.gnu.org/copyleft/lesser.html The GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
  */
 
-require_once "global.inc.php";
-
 class TaskList		extends Information
 {
 	public $data;
@@ -190,6 +188,7 @@ END;
 	public function html_form()
 	{
 		$OUTPUT = "";
+		$OUTPUT .= $this->html_toggle_active_button();    // Permit the user to deactivate any devices and children
 
 		$OUTPUT .= $this->html_form_header();
 		$OUTPUT .= $this->html_form_field_text("name"			,"Task List name"							);
