@@ -362,7 +362,7 @@ int loopback0
 		$OUTPUT = "";
 		$OUTPUT .= Utility::last_stack_call(new Exception);
 
-		$DEV_BGPASN = $this->parent->get_asn();
+		$DEV_BGPASN = $this->parent()->get_asn();
 
 	$OUTPUT .= "
 ip bgp-community new-format
@@ -412,12 +412,7 @@ router bgp $DEV_BGPASN
 				        $OUTPUT .= "    route-target import $DEV_BGPASN:$VRF_RT\n";
 				        $OUTPUT .= "    route-target export $DEV_BGPASN:$VRF_RT\n";
 				}/**/
-				if ($VPNID >= 100 && $VPNID <= 199)
-				{
-					$OUTPUT .= "    maximum routes 10000 80\n";
-				}else{
-					$OUTPUT .= "    maximum routes 100 80\n";
-				}
+				$OUTPUT .= "    maximum routes 10000 80\n";
 				$OUTPUT .= "   exit\n";
 				$OUTPUT .= " exit\n";
 				$OUTPUT .= "router bgp $DEV_BGPASN\n";

@@ -11,6 +11,7 @@ $QUERY = <<<END
 	WHERE bgpxml LIKE '%UPDATE%'
 	ORDER BY id
 	DESC
+	LIMIT 100000
 END;
 
 global $DB;

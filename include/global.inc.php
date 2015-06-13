@@ -130,10 +130,12 @@ if (php_sapi_name() == "cli")
 		if (isset($_SESSION) && !isset($_SESSION["AAA"]))	// If we have a session AND dont have an AAA section, lets create one and ask them to log in!
 		{
 			$_SESSION["AAA"] = array();
-			$_SESSION["AAA"]["authenticated"] = 0;
-			$_SESSION["AAA"]["username"] = "Anonymous";
-			$_SESSION["AAA"]["permission"] = array();
+			$_SESSION["AAA"]["authenticated"]	= 0;
+			$_SESSION["AAA"]["username"]		= "Anonymous";
+			$_SESSION["AAA"]["permission"]		= array();
 		}
+		$_SESSION["AAA"]["ip"]					= $_SERVER["REMOTE_ADDR"];
+		$_SESSION["AAA"]["useragent"]			= $_SERVER["HTTP_USER_AGENT"];
 
 		// HTML Utility Object
 		$HTML = new HTML;

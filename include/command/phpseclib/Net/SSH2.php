@@ -2414,6 +2414,109 @@ class Net_SSH2
     }
 
     /**
+     * Returns the output of an interactive shell
+     *
+     * Returns when there's a match for $expect, which can take the form of a string literal or,
+     * if $mode == NET_SSH2_READ_REGEX, a regular expression.
+     *
+     * @see Net_SSH2::write()
+     * @param String $expect
+     * @param Integer $mode
+     * @return String
+     * @access public
+     */
+    function read2($expect = '', $mode = NET_SSH2_READ_SIMPLE)
+    {
+        $this->curTimeout = $this->timeout;
+        $this->is_timeout = false;
+
+        if (!($this->bitmap & NET_SSH2_MASK_LOGIN)) {
+            user_error('Operation disallowed prior to login()');
+            return false;
+        }
+
+        if (!($this->bitmap & NET_SSH2_MASK_SHELL) && !$this->_initShell()) {
+            user_error('Unable to initiate an interactive shell session');
+            return false;
+        }
+
+        $channel = $this->_get_interactive_channel();
+
+        $match = $expect;
+        while (true) {
+            if ($mode == NET_SSH2_READ_REGEX) {
+                preg_match($expect, substr($this->interactiveBuffer, -1024), $matches);
+                $match = isset($matches[0]) ? $matches[0] : '';
+            }
+            $pos = strlen($match) ? strpos($this->interactiveBuffer, $match) : false;
+            if ($pos !== false) {
+                return $this->_string_shift($this->interactiveBuffer, $pos + strlen($match));
+            }
+            $response = $this->_get_channel_packet($channel);
+            if (is_bool($response)) {
+                $this->in_request_pty_exec = false;
+                return $response ? $this->_string_shift($this->interactiveBuffer, strlen($this->interactiveBuffer)) : false;
+            }
+
+            $this->interactiveBuffer.= $response;
+        }
+    }
+
+    /**
+     * Returns the output of an interactive shell
+     *
+     * Returns when there's a match for $expect, which can take the form of a string literal or,
+     * if $mode == NET_SSH2_READ_REGEX, a regular expression.
+     *
+     * @see Net_SSH2::write()
+     * @param String $expect
+     * @param Integer $mode
+     * @return String
+     * @access public
+     */
+    function read3($expect = '', $mode = NET_SSH2_READ_SIMPLE)
+    {
+        $this->curTimeout = $this->timeout;
+        $this->is_timeout = false;
+
+        if (!($this->bitmap & NET_SSH2_MASK_LOGIN)) {
+            user_error('Operation disallowed prior to login()');
+            return false;
+        }
+
+        if (!($this->bitmap & NET_SSH2_MASK_SHELL) && !$this->_initShell()) {
+            user_error('Unable to initiate an interactive shell session');
+            return false;
+        }
+
+        $channel = $this->_get_interactive_channel();
+
+        $match = $expect;
+		$buffer = "";
+        while (true) {
+            if ($mode == NET_SSH2_READ_REGEX) {
+                preg_match($expect, $this->interactiveBuffer, $matches);
+                $match = isset($matches[0]) ? $matches[0] : '';
+            }
+            $pos = strlen($match) ? strpos($this->interactiveBuffer, $match) : false;
+            if ($pos !== false) {
+                return $buffer . $this->_string_shift($this->interactiveBuffer, $pos + strlen($match));
+            }
+            $response = $this->_get_channel_packet($channel);
+            if (is_bool($response)) {
+                $this->in_request_pty_exec = false;
+                return $response ? $buffer . $this->_string_shift($this->interactiveBuffer, strlen($this->interactiveBuffer)) : false;
+            }
+
+            $this->interactiveBuffer.= $response;
+            if ( strlen($this->interactiveBuffer) > 4096 )
+            {
+                $buffer .= $this->_string_shift($this->interactiveBuffer, 3072);
+            }
+        }
+    }
+
+    /**
      * Inputs a command into an interactive shell.
      *
      * @see Net_SSH2::read()

@@ -63,6 +63,7 @@ print <<<END
 			<th class="report">Last Scanned</th>
 			<th class="report">Scan</th>
 			<th class="report">Edit</th>
+			<th class="report">Deactivate</th>
 		</tr>
 	</thead>
 	<tbody class=\"report\">
@@ -140,6 +141,12 @@ END;
 		{
 			print <<<END
 			<td class="report" width="49" align="center"><a href="/information/information-edit.php?id={$DEVICE->data["id"]}" target="_blank"><img src="/images/icon_changelink.gif"></a></td>
+END;
+		}else { print "<td></td>"; }
+		if(PERMISSION_CHECK("information.management.device.*.edit"))
+		{
+			print <<<END
+			<td class="report" width="49" align="center"><a href="/information/information-toggleactive.php?id={$DEVICE->data["id"]}" target="_blank"><img src="/images/icon_deletelink.gif"></a></td>
 END;
 		}else { print "<td></td>"; }
 		print "</tr>\n";

@@ -383,7 +383,7 @@ END;
 		foreach ($DEL as $IP)														// Loop through the list of IPs to clear
 		{
 			print "\t\tDELETING {$IP} FROM SENSOR ID {$this->data["id"]}\n";
-			while( array_search($IP, $this->data["hostiles"]) )						// Loop through our list of hostiles in this sensor
+			while( is_int( array_search($IP, $this->data["hostiles"]) ) )			// Loop through our list of hostiles in this sensor
 			{
 				$POSITION = array_search($IP, $this->data["hostiles"]);				// Find the position of the ip in our hostile list
 				print "\t\t\tLOCATED {$IP} @ POSITION {$POSITION} IN HOSTILES, REMOVING...\n";

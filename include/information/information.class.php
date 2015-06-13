@@ -670,14 +670,16 @@ END;
 		return $OUTPUT;
 	}
 
-	public function list_query()
+	public function list_query($FILTER = "")
 	{
 		global $DB; // Our Database Wrapper Object
 		$QUERY = "select id from information where type like :TYPE and category like :CATEGORY and active = 1";
+		if ($FILTER) { $QUERY .= " AND custom LIKE :CUSTOM"; }
 		$DB->query($QUERY);
 		try {
 			$DB->bind("TYPE",$this->data['type']);
 			$DB->bind("CATEGORY",$this->data['category']);
+			if ($FILTER) { $DB->bind("CUSTOM","%{$FILTER}%"); }
 			$DB->execute();
 			$RESULTS = $DB->results();
 		} catch (Exception $E) {
@@ -699,18 +701,19 @@ END;
 		$this->html_width[0]	= array_sum($this->html_width);
 	}
 
-	public function html_list( $PAGE = 0 )
+	public function html_list( $PAGE = 0 , $FILTER = "")
 	{
 		$OUTPUT = "";
 		$this->html_width();
-		$RESULTS = $this->list_query();
+		$RESULTS = $this->list_query($FILTER);
 
 		// Buttons at the top to add items, etc.
 		$OUTPUT .= $this->html_list_buttons();
 
-		// TODO: if this object type supports user SEARCH function! Add a search box?
+		//if this object type supports user SEARCH function! Add a search box?
+		$OUTPUT .= $this->html_list_filter($FILTER);
 
-		$OUTPUT .= $this->html_list_pagination( $RESULTS, $PAGE ); // If this object type uses paginated lists generate the header for pages
+		$OUTPUT .= $this->html_list_pagination( $RESULTS, $PAGE, $FILTER ); // If this object type uses paginated lists generate the header for pages
 
 		// Process the resulting items one at a time to add to the list table & sandwich them between header and footer
 		if (count($RESULTS) > 0)
@@ -732,18 +735,19 @@ END;
 		return $OUTPUT;
 	}
 
-	public function html_list_gearman( $PAGE = 0 )
+	public function html_list_gearman( $PAGE = 0 , $FILTER = "")
 	{
 		$OUTPUT = "";
 		$this->html_width();
-		$RESULTS = $this->list_query();
+		$RESULTS = $this->list_query($FILTER);
 
 		// Buttons at the top to add items, etc.
 		$OUTPUT .= $this->html_list_buttons();
 
-		// TODO: if this object type supports user SEARCH function! Add a search box?
+		//if this object type supports user SEARCH function! Add a search box?
+		$OUTPUT .= $this->html_list_filter($FILTER);
 
-		$OUTPUT .= $this->html_list_pagination( $RESULTS, $PAGE ); // If this object type uses paginated lists generate the header for pages
+		$OUTPUT .= $this->html_list_pagination( $RESULTS, $PAGE, $FILTER ); // If this object type uses paginated lists generate the header for pages
 
 		// Process the resulting items one at a time to add to the list table & sandwich them between header and footer
 		if (count($RESULTS) > 0)
@@ -784,6 +788,34 @@ END;
 			}
 			$OUTPUT .= $FIRSTOBJECT->html_list_footer();
 		}
+		return $OUTPUT;
+	}
+
+	public function html_list_filter($FILTER = "")
+	{
+		return "";	// This does NOTHING if the object isnt EXPLICITLY search enabled!
+	}
+
+	public function html_list_filter_form($FILTER = "")
+	{
+		$OUTPUT = "";
+		$OUTPUT .= <<<END
+			<div id="nosx_form">
+			<form method="get" action="{$_SERVER['PHP_SELF']}" enctype="multipart/form-data">
+END;
+		foreach ($_GET as $KEY => $VALUE)
+		{
+			if ($KEY == "filter") { continue; }	// Skip creating a hidden field for ourselves...
+			if ($KEY == "page") { continue; }	// Skip creating a hidden field for ourselves...
+			$OUTPUT .= "\t\t\t<input type=\"hidden\" name=\"{$KEY}\" value=\"{$VALUE}\"/>\n";
+		}
+		$OUTPUT .= <<<END
+			<input type="hidden" name="page" value="0">
+			<input type="text" name="filter" size="50" value="{$FILTER}">
+			<input type="submit"                value="Filter List">
+			</form>
+			</div>
+END;
 		return $OUTPUT;
 	}
 
@@ -834,7 +866,7 @@ END;
 		return $OUTPUT;
 	}
 
-	public function html_list_pagination( & $RESULTS, $PAGE = 0 )
+	public function html_list_pagination( & $RESULTS, $PAGE = 0, $FILTER = "" )
 	{
 		$OUTPUT = "";
 
@@ -846,6 +878,7 @@ END;
 			$PAGES = array_chunk($RESULTS,$this->html_list_page_items);	// Split the result set into pages of html_list_page_items size
 			$PAGECOUNT = count($PAGES);									// Count the number of pages that gives us total
 			$HTML_PAGE_LIST .= "Found {$COUNT} items, displaying page " . ($PAGE + 1) . " of {$PAGECOUNT} ({$this->html_list_page_items} max items per page) - ";
+			if ( !$COUNT ) { return "Found 0 items (Check Filter?)<br><br>\n"; }
 			$HTML_PAGE_LINKS = array();
 			foreach(range(0,$PAGECOUNT - 1) as $NUMBER)	// Screwy math, count is readable, array index is - 1
 			{
@@ -854,7 +887,7 @@ END;
 				{
 					array_push($HTML_PAGE_LINKS,"<b>{$DISPLAY_PAGE}</b>");
 				}else{
-					array_push($HTML_PAGE_LINKS,"<a href=\"/information/information-list.php?category={$this->data['category']}&type={$this->data['type']}&page={$NUMBER}\">$DISPLAY_PAGE</a>");
+					array_push($HTML_PAGE_LINKS,"<a href=\"/information/information-list.php?category={$this->data['category']}&type={$this->data['type']}&filter={$FILTER}&page={$NUMBER}\">$DISPLAY_PAGE</a>");
 				}
 			}
 			$HTML_PAGE_LIST .= "<b>Page: </b>" . implode(", ",$HTML_PAGE_LINKS);
@@ -1378,7 +1411,7 @@ END;
 		// Dataset definition
 		$DataSet = new pData;
 
-		$AXIS = "AXIS1";	
+		$AXIS = "AXIS1";
 		$DataSet->AddPoint($POINTS,$AXIS);
 		$DataSet->AddSerie($AXIS);
 		$DataSet->SetSerieName($LABEL,$AXIS);

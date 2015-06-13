@@ -338,13 +338,13 @@ END;
 	{
 		$OUTPUT = "";
 		$OUTPUT .= $this->html_form_header();
-		//$OUTPUT .= $this->html_toggle_active_button();  // Permit the user to deactivate any devices and children
+		$OUTPUT .= $this->html_toggle_active_button();  // Permit the user to deactivate any devices and children
 
 		if ( !isset($this->data["id"]) )    // If this is a NEW record being added, NOT an edit
 		{
-			$WSDL = "https://portal.company.com/sites/imclientengag/logistics/_vti_bin/Lists.asmx?WSDL"; // Site Code Register list
-			require_once "PHP-SharePoint-Lists-API/SharePointAPI.php";
-			$SP = new SharePointAPI(LDAP_USER, LDAP_PASS, $WSDL, TRUE);
+			$WSDL = "https://portal.company.com/sites/imclientgag/logistics/_vti_bin/Lists.asmx?WSDL"; // Site Code Register list
+			require_once "PHP-SharePoint-Lists-API-develop/SharePointAPI.php";
+			$SP = new Thybag\SharePointAPI(LDAP_USER, LDAP_PASS, $WSDL, "NTLM");
 			$SITEREGLIST = $SP->read("{6EECFAF1-2D97-4DC9-A34B-AD9A29498E29}", NULL, NULL, "{850F94A7-849B-44EE-89AE-731AFBBF1D81}");   // Site Code Register list, view is for ALL items (default is not!)
 			$SELECT = array();
 			// Enforce only 8 characters per site name
@@ -494,8 +494,9 @@ END;
 
 			// WAN Router 01
 			$DEVICE		= Information::create($TYPE,$CATEGORY,$PARENT);
+			$DEVICE->data["name"]	= "{$this->data["sitecode"]}RWA01";
 			$DEVICE->data["name"] = "{$this->data["sitecode"]}RWA01";
-			$DEVICE->data["mgmtip4"] = long2ip($IPV4LONG + 3) . "/32";;
+			$DEVICE->data["mgmtip4"] = long2ip($IPV4LONG + 3) . "/32";
 			$ID = $DEVICE->insert();
 			$MESSAGE = "Information Added ID:$ID PARENT:$PARENT CATEGORY:$CATEGORY TYPE:$TYPE";
 			$DB->log($MESSAGE);
@@ -507,7 +508,7 @@ END;
 			// WAN Router 02
 			$DEVICE		= Information::create($TYPE,$CATEGORY,$PARENT);
 			$DEVICE->data["name"] = "{$this->data["sitecode"]}RWA02";
-			$DEVICE->data["mgmtip4"] = long2ip($IPV4LONG + 4) . "/32";;
+			$DEVICE->data["mgmtip4"] = long2ip($IPV4LONG + 4) . "/32";
 			$ID = $DEVICE->insert();
 			$MESSAGE = "Information Added ID:$ID PARENT:$PARENT CATEGORY:$CATEGORY TYPE:$TYPE";
 			$DB->log($MESSAGE);
@@ -522,7 +523,7 @@ END;
 			// Distribution mls 01
 			$DEVICE		= Information::create($TYPE,$CATEGORY,$PARENT);
 			$DEVICE->data["name"] = "{$this->data["sitecode"]}SWD01";
-			$DEVICE->data["mgmtip4"] = long2ip($IPV4LONG + 1) . "/32";;
+			$DEVICE->data["mgmtip4"] = long2ip($IPV4LONG + 1) . "/32";
 			$ID = $DEVICE->insert();
 			$MESSAGE = "Information Added ID:$ID PARENT:$PARENT CATEGORY:$CATEGORY TYPE:$TYPE";
 			$DB->log($MESSAGE);
@@ -534,7 +535,7 @@ END;
 			// Distribution mls 02
 			$DEVICE		= Information::create($TYPE,$CATEGORY,$PARENT);
 			$DEVICE->data["name"] = "{$this->data["sitecode"]}SWD02";
-			$DEVICE->data["mgmtip4"] = long2ip($IPV4LONG + 2) . "/32";;
+			$DEVICE->data["mgmtip4"] = long2ip($IPV4LONG + 2) . "/32";
 			$ID = $DEVICE->insert();
 			$MESSAGE = "Information Added ID:$ID PARENT:$PARENT CATEGORY:$CATEGORY TYPE:$TYPE";
 			$DB->log($MESSAGE);
@@ -542,6 +543,42 @@ END;
 			$DEVICE = Information::retrieve($ID);
 			$OUTPUT .= $DEVICE->initialize();
 			$DEVICE->update();
+
+			// Access Switches
+			$TYPE		= "Device_IOS_SWI_ACC_2960X_48";
+			/*
+			// Access Switch 01
+			$DEVICE		= Information::create($TYPE,$CATEGORY,$PARENT);
+			$DEVICE->data["name"] = "{$this->data["sitecode"]}SWA01";
+			$IPV4LONG	= ip2long($IPV4NETWORK);
+			$DEVICE->data["mgmtip4"]= long2ip($IPV4LONG + 11) . "/22";
+			$DEVICE->data["mgmtgw"]	= long2ip($IPV4LONG + 1);
+			$DEVICE->data["mgmtint"]= "Vlan1";
+			$ID = $DEVICE->insert();
+			$MESSAGE = "Information Added ID:$ID PARENT:$PARENT CATEGORY:$CATEGORY TYPE:$TYPE";
+			$DB->log($MESSAGE);
+			$OUTPUT .= "Auto Initialized: {$MESSAGE}<br>\n";
+			$DEVICE = Information::retrieve($ID);
+			$OUTPUT .= $DEVICE->initialize();
+			$DEVICE->update();	/**/
+
+			//Create Access Switches
+			foreach( range(1,4) as $switchno )
+			{
+				$DEVICE		= Information::create($TYPE,$CATEGORY,$PARENT);
+				$DEVICE->data["name"] = "{$this->data["sitecode"]}SWA0{$switchno}";
+				$IPV4LONG	= ip2long($IPV4NETWORK);
+				$DEVICE->data["mgmtip4"]= long2ip($IPV4LONG + 10 + $switchno) . "/22";
+				$DEVICE->data["mgmtgw"]	= long2ip($IPV4LONG + 1);
+				$DEVICE->data["mgmtint"]= "Vlan1";
+				$ID = $DEVICE->insert();
+				$MESSAGE = "Information Added ID:$ID PARENT:$PARENT CATEGORY:$CATEGORY TYPE:$TYPE";
+				$DB->log($MESSAGE);
+				$OUTPUT .= "Auto Initialized: {$MESSAGE}<br>\n";
+				$DEVICE = Information::retrieve($ID);
+				$OUTPUT .= $DEVICE->initialize();
+				$DEVICE->update();
+			}
 		}
 		return $OUTPUT;
 	}

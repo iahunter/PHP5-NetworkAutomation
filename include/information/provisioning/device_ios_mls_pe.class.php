@@ -124,13 +124,22 @@ router bgp $DEV_BGPASN
     update-source Loopback0
    exit-peer-session
 
+  template peer-policy PEER_POLICY_VPNV6_RR
+    send-community both
+   exit-peer-policy
+  template peer-session PEER_SESSION_VPNV6_RR
+    remote-as $DEV_BGPASN
+    update-source Loopback0
+   exit-peer-session
+
 ";
 		$ASN_DEVICES = $this->get_devices_by_asn($DEV_BGPASN);
 		$RR_COUNT = count($ASN_DEVICES);
 		$OUTPUT .= "\n! Found $RR_COUNT layer 3 devices in this ASN.\n";
+		// Loop through each VPNv4 route reflector
 		foreach ($ASN_DEVICES as $L3DEVICE)
 		{
-			$REGEX = "/RR_/";
+			$REGEX = "/VPNRR_/";
 			if (preg_match($REGEX,$L3DEVICE->data['type'],$REG))
 			{
 				$RR_LOOP4 = $L3DEVICE->data['loopback4'];
@@ -142,6 +151,21 @@ router bgp $DEV_BGPASN
   address-family ipv4 mdt
     neighbor $RR_LOOP4 activate
     neighbor $RR_LOOP4 inherit peer-policy PEER_POLICY_VPNV4_RR
+   exit
+";
+			}
+		}
+		// Loop through VPNv6 route reflectors
+		foreach ($ASN_DEVICES as $L3DEVICE)
+		{
+			$REGEX = "/VPN6RR_/";
+			if (preg_match($REGEX,$L3DEVICE->data['type'],$REG))
+			{
+				$RR_LOOP4 = $L3DEVICE->data['loopback4'];
+				$OUTPUT .= "  neighbor $RR_LOOP4 inherit peer-session PEER_SESSION_VPNV6_RR
+  address-family vpnv6
+    neighbor $RR_LOOP4 activate
+    neighbor $RR_LOOP4 inherit peer-policy PEER_POLICY_VPNV6_RR
    exit
 ";
 			}

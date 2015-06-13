@@ -174,61 +174,6 @@ class Utility
 		return $RETURN;
 	}
 
-	public static function get_devices_by_search($SEARCH)
-	{
-		if ($SEARCH == "") { return array(); } // Prevent me from accidentally calling this function with a blank parameter again...
-/*		$SEARCH = "%".$SEARCH."%";
-		$QUERY = <<<END
-			SELECT device.* FROM device
-				WHERE prompt LIKE :SEARCH
-			UNION
-			SELECT device.*
-				FROM showcmd
-				RIGHT JOIN device
-				USING (id)
-				WHERE showcmd.run LIKE :SEARCH
-			UNION
-			SELECT device.*
-				FROM showcmd
-				RIGHT JOIN device
-				USING (id)
-				WHERE showcmd.version LIKE :SEARCH
-			UNION
-			SELECT device.*
-				FROM showcmd
-				RIGHT JOIN device
-				USING (id)
-				WHERE showcmd.inventory LIKE :SEARCH
-			UNION
-			SELECT device.*
-				FROM showcmd
-				RIGHT JOIN device
-				USING (id)
-				WHERE showcmd.diag LIKE :SEARCH
-			UNION
-			SELECT device.*
-				FROM showcmd
-				RIGHT JOIN device
-				USING (id)
-				WHERE showcmd.module LIKE :SEARCH
-			ORDER BY id
-END;
-		global $DB;
-		$DB->query($QUERY);
-		try {
-			$DB->bind("SEARCH"	,$SEARCH);
-			$DB->execute();
-			$RESULTS = $DB->results();
-		} catch (Exception $E) {
-			$MESSAGE = "Exception: {$E->getMessage()}";
-			trigger_error($MESSAGE);
-			global $HTML;
-			die($MESSAGE . $HTML->footer());
-		}
-/**/
-		return $RESULTS;
-	}
-
 	public static function ifconfig_interfaces()
 	{
 		$COMMAND = "/sbin/ifconfig";

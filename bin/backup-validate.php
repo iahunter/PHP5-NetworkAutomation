@@ -40,6 +40,7 @@ $FILENAME .= ".sql";		//	print "$FILENAME\n";
 if ($COMPRESS) { $FILENAME .= ".gz"; }
 
 $BACKUP_COMMAND = "mysqldump --all-databases -h " . DB_HOSTNAME . " -u " . DB_BACKUP_USERNAME . " -p" . DB_BACKUP_PASSWORD . " {$COMPRESS} >> ${TEMPFOLDER}{$FILENAME}" ;
+//print "BACKUP COMMAND: {$BACKUP_COMMAND}\n";
 
 /****************************************************************/
 
@@ -63,11 +64,19 @@ $OUTPUT = shell_exec($BACKUP_COMMAND);
 if ( !file_exists($TEMPFOLDER . $FILENAME) )	// If our backup command failed to create the file
 {
 	$LOG .= " Failed, temp file not created! Output: {$OUTPUT}";		//print "{$LOG}\n";
-//	$DB->log($LOG);								// Log some error output
+	$DB->log($LOG);								// Log some error output
 	die($LOG);									// and exit
 }
 
-$LOG .= " TEMP FILE OK";												//print "{$LOG}\n";
+$FILESIZE = filesize($TEMPFOLDER . $FILENAME);
+if ( $FILESIZE < 100000 )	// If our backup command failed to backup enough data
+{
+	$LOG .= " Failed, backup too small! Backup file {$FILESIZE} Bytes. Output: {$OUTPUT}";		//print "{$LOG}\n";
+	$DB->log($LOG);								// Log some error output
+	die($LOG);									// and exit
+}
+
+$LOG .= " TEMP FILE {$FILESIZE} BYTES";												//print "{$LOG}\n";
 
 $TEMPHASH = md5_file($TEMPFOLDER . $FILENAME);
 

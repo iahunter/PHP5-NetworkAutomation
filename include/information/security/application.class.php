@@ -73,6 +73,10 @@ class Security_Application	extends Information
 			}
 		}
 
+		$DEBUG = new Debug(DEBUG_EMAIL);
+		if (isset($this->data["name"])) { $NAME = $this->data["name"]; }else{ $NAME = $NEWDATA["name"]; }
+		$DEBUG->message("SECURITY APPLICATION UPDATED! ID {$this->data["id"]}<br>\n<a href='" . BASEURL . "information/information-view.php?id={$this->data["id"]}'>App {$NAME}</a>!\n",0);
+
 		return 1;
 	}
 

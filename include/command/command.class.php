@@ -47,6 +47,11 @@ class Command {
 		// Load a set of common default prompt patterns!
 		// These patterns are applied IN ORDER, so put the most specific FIRST!
 		$this->patterns = array(
+			// Aruba is dumb: (Stupid-Preferred-Master) #
+				array(	'devicetype'	=> 'aruba' ,
+					'detect'	=> '/\(([\w\-\/]+)\)\s+[#>]\s*$/' ,
+					'match'		=> '/(.*)\(%s\).*(>|#)\s*/'
+					),
 			/*
 				Sample Prompts: ( Test with http://regex101.com/ )
 					IOS	 -   KHONEMDCRRR01#
@@ -75,7 +80,7 @@ class Command {
 /*				array(	'devicetype'	=> 'cisconxos' ,
 					'detect'	=> '/([\w\-]+)(\/.*)?[#>]\s*$/' ,
 					'match'		=> '/(.*)%s.*(>|#)([^ \n\r^M]+)/'
-					)
+					),
 /**/
 			);
 
@@ -162,7 +167,8 @@ class Command {
 
 	protected function findprompt()
 	{
-//print "<pre>entering find prompt()</pre>\n"; john_flush;
+		global $DEBUGPROMPT;
+if ($DEBUGPROMPT) { print "<pre>entering find prompt()</pre>\n"; john_flush; }
 		if (!$this->connected)	{ return 0; }
 		if (!$this->patterns)	{ return 0; }
 		$this->settimeout(5);
@@ -171,7 +177,7 @@ class Command {
 		$try = 0;
 		while ($try++ < 5)
 		{
-//print "<pre>looking for prompt try $try</pre>\n"; john_flush;
+if ($DEBUGPROMPT) { print "<pre>looking for prompt try $try</pre>\n"; john_flush; }
 			$DATA = $this->read("/.*[>|#]/");
 			$LINES = explode("\n", $DATA);
 			foreach ($LINES as $LINE)
@@ -182,21 +188,25 @@ class Command {
 					{
 						$this->prompt = $MATCH[1];		// I think we found the prompt.
 						$this->pattern = $PATTERN;		// Use this pattern for matching
-/*
+if ($DEBUGPROMPT) {
 print "<pre>I think I found a prompt $this->prompt</pre>\n"; john_flush;
 print "<pre>Escaped prompt is:" . preg_quote($this->prompt,"/") . "</pre>\n"; john_flush;
 print "<pre>Testing to see if $this->prompt is really a prompt</pre>\n"; john_flush;
-/**/
+} /**/
 						$this->write("\n");				// So lets send a new line and check.
 						if ( $this->read( sprintf( $this->pattern['match'],preg_quote($this->prompt,"/") ) ) )
 						{
-/*
+if ($DEBUGPROMPT) {
 print "<pre>Success! I believe $this->prompt is really a prompt!</pre>\n"; john_flush;
 print "<pre>Escaped prompt is:" . sprintf($this->pattern['match'],preg_quote($this->prompt,"/")) . "</pre>\n"; john_flush;
 dumper($this->pattern); john_flush();
-/**/
+} /**/
 							return $this->prompt;
 						}
+					}else{
+if ($DEBUGPROMPT) {
+print "<pre>Line did not match pattern {$PATTERN['detect']}: {$LINE}</pre>\n";
+}
 					}
 				}
 			}

@@ -103,10 +103,6 @@ class Security_Index	extends Information
 		$OUTPUT .= <<<END
 		<div style="width: 800px;">
 			<div style="padding: 5px; ">
-				<b>THIS SOFTWARE IS IN DEMO MODE!</b> Roles & permissions have been disabled to permit IMNetworkEngineering, Operations,
-				and IMServerAdminCore users to participate in testing. If you have any questions please contact John Lavoie.
-			</div>
-			<div style="padding: 5px; ">
 				<b>Welcome to the firewall automation and application documentation system!</b> This website is a collection of tools and
 				services that will collect and relate application, host, and service information to document application communication
 				and automate the configuration and management of firewalls.

@@ -25,19 +25,45 @@ $CATEGORY   = "Blackhole";
 $TYPE       = "Suspect";
 $PARENT     = "";
 
-$INFOBJECT = Information::create($TYPE,$CATEGORY,$PARENT);
-$ID = $INFOBJECT->insert();
-$INFOBJECT = Information::retrieve($ID);
-$INFOBJECT->initialize();
-$INFOBJECT->update();
+$QUERY = <<<END
+	SELECT id AS hits FROM information
+	WHERE category LIKE "{$CATEGORY}"
+	AND type LIKE "{$TYPE}"
+	AND stringfield1 = "{$ATTACKER}"
+	AND active = 1
+	AND modifiedwhen >= DATE_SUB(NOW(),INTERVAL 1 MINUTE);
+END;
 
-$INFOBJECT->data["source"]	= $ATTACKER;
-$INFOBJECT->data["target"]	= $HONEYPOT;
-$INFOBJECT->data["port"]	= $SERVICE;
+$DB->query($QUERY);
+try {
+	$DB->execute();
+	$RESULTS = $DB->results();
+} catch (Exception $E) {
+	sleep(3);
+	print "No Hacking ;)\n";
+	sleep(1);
+	die();
+}
+$COUNT = count($RESULTS);
 
-$INFOBJECT->update();
-//dumper($INFOBJECT);
+if ( $COUNT < 10 )
+{
+
+	$INFOBJECT = Information::create($TYPE,$CATEGORY,$PARENT);
+	$ID = $INFOBJECT->insert();
+	$INFOBJECT = Information::retrieve($ID);
+	$INFOBJECT->initialize();
+	$INFOBJECT->update();
+
+	$INFOBJECT->data["source"]	= $ATTACKER;
+	$INFOBJECT->data["target"]	= $HONEYPOT;
+	$INFOBJECT->data["port"]	= $SERVICE;
+
+	$INFOBJECT->update();
+	//dumper($INFOBJECT);
+}
+
 sleep(3);
-print "No Hacking ;)\n";
+print "No Hacking ;) {$COUNT}\n";
 sleep(1);
 ?>

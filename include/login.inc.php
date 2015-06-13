@@ -26,151 +26,100 @@
  * @license   http://www.gnu.org/copyleft/lesser.html The GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
  */
 
-if (isset($_POST['username']))	{ $USERNAME = strtolower($_POST['username']); }else{ $USERNAME = ""; }
+if (isset($_POST['username']))
+{
+	$USERNAME = strtolower($_POST["username"]);
+	$CERTIFICATE = "";
+}elseif(
+		isset($_SERVER["SSL_CLIENT_VERIFY"		])	&&
+		$_SERVER["SSL_CLIENT_VERIFY"] == "SUCCESS"	&&
+		isset($_SERVER["SSL_CLIENT_V_REMAIN"	])	&&
+		$_SERVER["SSL_CLIENT_V_REMAIN"] > 0			&&
+		isset($_SERVER["SSL_CLIENT_S_DN_CN"])		)
+{
+	$USERNAME = strtolower($_SERVER["SSL_CLIENT_S_DN_CN"]);
+	$CERTIFICATE = $_SERVER["SSL_CLIENT_CERT"];
+//	print "trying cert auth!\n<br>USERNAME: {$USERNAME}\n<br>";
+}else{
+//	print "no creds supplied\n";
+	$USERNAME = "";
+	$CERTIFICATE = "";
+}
 if (isset($_POST['password']))	{ $PASSWORD = $_POST['password']; }else{ $PASSWORD = ""; }
 
 $HEADER = "Please Log In";
 
-if ($USERNAME && $PASSWORD) // If we are given username and password, attempt to authenticate
-{
-	/*******
-	* LDAP *
-	*******/
-	try {
-		$LDAP = new LDAP(
-						array(
-							"base_dn"			=> LDAP_BASE,
-							"admin_username"	=> LDAP_USER,
-							"admin_password"	=> LDAP_PASS,
-							"domain_controllers"=> array(LDAP_HOST),
-							"ad_port"			=> LDAP_PORT,
-							"account_suffix"	=> "@" . LDAP_DOMAIN,
-						)
-					);
-	} catch (adLDAPException $E) {
-		$MESSAGE = "Exception: {$E->getMessage()}";
-		trigger_error($MESSAGE);
-		die($MESSAGE);
-	}
+/*******
+* LDAP *
+*******/
+try {
+	$LDAP = new LDAP(
+					array(
+						"base_dn"			=> LDAP_BASE,
+						"admin_username"	=> LDAP_USER,
+						"admin_password"	=> LDAP_PASS,
+						"domain_controllers"=> array(LDAP_HOST),
+						"ad_port"			=> LDAP_PORT,
+						"account_suffix"	=> "@" . LDAP_DOMAIN,
+					)
+				);
+} catch (adLDAPException $E) {
+	$MESSAGE = "Exception: {$E->getMessage()}";
+	trigger_error($MESSAGE);
+	die($MESSAGE);
+}
 
+// Authenticate the user with a username and password, or a certificate!
+if ( $USERNAME && $PASSWORD )	// If we are given username and password, attempt to authenticate
+{
 	if($LDAP->authenticate($USERNAME,$PASSWORD) && !preg_match('/\.admin$/',$USERNAME,$REG))
 	{
-		$_SESSION["DEBUG"				] = 0;			// Clear the debug flag
-		$_SESSION["AAA"]["authenticated"] = 1;			// Successfully Authenticated User!
-		$_SESSION["AAA"]["username"		] = $USERNAME;	// Store the username
-		$_SESSION["AAA"]["realname"		] = $LDAP->user_to_realname($USERNAME);	// Real name from LDAP
-		$MESSAGE = "Authentication succeeded for user {$USERNAME} from {$_SERVER["REMOTE_ADDR"]}";
-		$DB->log($MESSAGE,1);
-		/**************************
-		* GROUP based permissions *
-		**************************/
-		if ($LDAP->user()->inGroup($USERNAME,"IMServerAdminHex",1))								// Offshore Server Admins
-		{
-			$_SESSION["AAA"]["permission"]["information.checklist.*.*"]					= 1;		// Permit * on checklists
-		}
-		if ($LDAP->user()->inGroup($USERNAME,"CESwitchAdmins",1))								// Client Engagement Switch Admins
-		{
-			$_SESSION["AAA"]["permission"]["tool.switch.view"]							= 1;		// view switch ports
-			$_SESSION["AAA"]["permission"]["tool.switch.edit"]							= 1;		// edit switch ports
-		}
-		if ($LDAP->user()->inGroup($USERNAME,"IMNetworkImplementation",1))						// SWAT Network Implementation
-		{
-			$_SESSION["AAA"]["permission"]["tool.switch.view"]							= 1;		// view switch ports
-			$_SESSION["AAA"]["permission"]["tool.switch.edit"]							= 1;		// edit switch ports
-			$_SESSION["AAA"]["permission"]["tool.template"]								= 1;		// everybody uses the template tool
-			$_SESSION["AAA"]["permission"]["report.iosversion"]							= 1;		// run the ios version report
-			$_SESSION["AAA"]["permission"]["report.siteservice"]						= 1;		// run the site service report
-			$_SESSION["AAA"]["permission"]["information.management.device.*.*"]			= 1;		// Full control of devices (add edit deactivate rescan etc)
-			$_SESSION["AAA"]["permission"]["information.ipplan.*.view"]					= 1;		// Permit view on ipplan.* information
-			$_SESSION["AAA"]["permission"]["information.ipplan.*.edit"]					= 1;		// Permit edit on ipplan.* information
-			$_SESSION["AAA"]["permission"]["information.bgp.asn.view"]					= 1;		// Permit view on bgp asn)
-			$_SESSION["AAA"]["permission"]["information.bgp.asn.edit"]					= 1;		// Permit edit bgp asn
-			$_SESSION["AAA"]["permission"]["information.provisioning.*.view"]			= 1;		// Permit view on provisioning.* information
-			$_SESSION["AAA"]["permission"]["information.provisioning.*.edit"]			= 1;		// Permit edit on provisioning.* information
-			$_SESSION["AAA"]["permission"]["information.provisioning.*.action.*"]		= 1;		// Permit provisioning actions
-			$_SESSION["AAA"]["permission"]["information.equipment.terminalserver.*"]	= 1;		// Permit view/edit/update terminal servers
-			$_SESSION["AAA"]["permission"]["websvn.configrepo"]							= 1;		// Permit access to websvn config repo
-		}
-		if ($LDAP->user()->inGroup($USERNAME,"IMNetworkEngineering",1)					||		// Network Engineering
-			$LDAP->user()->inGroup($USERNAME,"IMNetworkOperations",1)					||		// Network Operations (KSS Tier 2)
-			$LDAP->user()->inGroup($USERNAME,"IMServerAdminCore",1)						||		// Server Admin Core Team
-			$LDAP->user()->inGroup($USERNAME,"IM.SecurityAnalyst",1)					||		// Infosec dudes!
-			$_SESSION["AAA"]["username"] == "dumb.jerk"							)		// Rusty Hook (Honorary Engineer)
-		{
-			$_SESSION["AAA"]["permission"]["tool.racktables"]							= 1;		// RackTables DCIM
-			$_SESSION["AAA"]["permission"]["tool.rescan"]								= 1;		// Rescan devices
-			$_SESSION["AAA"]["permission"]["tool.delete"]								= 1;		// Delete devices
-			$_SESSION["AAA"]["permission"]["tool.dns"]									= 1;		// generate DNS records
-			$_SESSION["AAA"]["permission"]["tool.switch.view"]							= 1;		// view switch ports
-			$_SESSION["AAA"]["permission"]["tool.switch.edit"]							= 1;		// edit switch ports
-			$_SESSION["AAA"]["permission"]["tool.template"]								= 1;		// everybody uses the template tool
-			$_SESSION["AAA"]["permission"]["tool.ipv6plan"]								= 1;		// ipv6 subnet planning tool
-			$_SESSION["AAA"]["permission"]["tool.search"]								= 1;		// new database search tool
-			$_SESSION["AAA"]["permission"]["report.iosversion"]							= 1;		// run the ios version report
-			$_SESSION["AAA"]["permission"]["report.siteservice"]						= 1;		// run the site service report
-			$_SESSION["AAA"]["permission"]["monitoring.bgp"]							= 1;		// bgpmonitor
-			$_SESSION["AAA"]["permission"]["information.management.device.*.*"]			= 1;		// Full control of devices (add edit deactivate rescan etc)
-			$_SESSION["AAA"]["permission"]["information.*.tasklist.*"]					= 1;		// Permit view add edit action on tasklist
-			$_SESSION["AAA"]["permission"]["information.mpls.vpn.view"]					= 1;		// Permit view on mpls l3vpn information
-			$_SESSION["AAA"]["permission"]["information.ipplan.*.view"]					= 1;		// Permit view on ipplan.* information
-			$_SESSION["AAA"]["permission"]["information.datacenter.*.view"]				= 1;		// Permit view on datacenter.* information
-			$_SESSION["AAA"]["permission"]["information.bgp.asn.view"]					= 1;		// Permit view on bgp asn
-			$_SESSION["AAA"]["permission"]["information.bgp.asn.add"]					= 1;		// Permit add bgp asn
-			$_SESSION["AAA"]["permission"]["information.bgp.asn.edit"]					= 1;		// Permit edit bgp asn
-			$_SESSION["AAA"]["permission"]["information.equipment.terminalserver.*"]	= 1;		// Permit view/edit/update terminal servers
-			$_SESSION["AAA"]["permission"]["information.provisioning.*"]				= 1;		// Permit view add edit action on provisioning
-			$_SESSION["AAA"]["permission"]["information.checklist.*.*"]					= 1;		// Permit view add edit action on checklists
-			$_SESSION["AAA"]["permission"]["information.security.*.view"]				= 1;		// Permit view of any security provisioning stuffs
-			$_SESSION["AAA"]["permission"]["websvn.configrepo"]							= 1;		// Permit access to websvn config repo
-		}
-		if ($LDAP->user()->inGroup($USERNAME,"IMNetworkEngineering",1))							// Network Engineering Only
-		{
-			$_SESSION["AAA"]["permission"]["information.ipplan.address.add"]			= 1;		// Only add/edit networks or addresses, NOT BLOCKS
-			$_SESSION["AAA"]["permission"]["information.ipplan.address.edit"]			= 1;
-			$_SESSION["AAA"]["permission"]["information.ipplan.network.add"]			= 1;
-			$_SESSION["AAA"]["permission"]["information.ipplan.network.edit"]			= 1;
-			$_SESSION["AAA"]["permission"]["information.datacenter.*.add"]				= 1;
-			$_SESSION["AAA"]["permission"]["information.datacenter.*.edit"]				= 1;
-			$_SESSION["AAA"]["permission"]["information.blackhole.hostile.view"]		= 1;		// Permit view blackhole
-		}
-		/*************************
-		* USER based permissions *
-		*************************/
-		if ($_SESSION["AAA"]["username"] == "some.body")										// a guy, phatty wants him to see the site service report
-		{
-			$_SESSION["AAA"]["permission"]["report.siteservice"]						= 1;		// run the site service report
-		}
-		if ($_SESSION["AAA"]["username"] == "these.jerks"								||		// Only let the qualified engineers assign blocks
-			$_SESSION["AAA"]["username"] == "smart.guy"							)
-		{
-			$_SESSION["AAA"]["permission"]["information.mpls.vpn.*"]					= 1;		// Permit add edit on mpls l3vpn information
-			$_SESSION["AAA"]["permission"]["information.ipplan.block.add"]				= 1;		// Permit add ipplan block
-			$_SESSION["AAA"]["permission"]["information.ipplan.block.edit"]				= 1;		// Permit edit ipplan block
-			$_SESSION["AAA"]["permission"]["information.security.*"]					= 1;		// Permit edit of any security provisioning stuffs
-			$_SESSION["AAA"]["permission"]["debug"]										= 1;		// Permit debug
-		}
-		if ($_SESSION["AAA"]["username"] == "hey.its.me"								||		// 3
-			$_SESSION["AAA"]["username"] == LDAP_USER									||		// Tool Account (ONLINE LDAP AND OFFLINE DEV)
-		    $_SESSION["AAA"]["username"] == "metaclassing"								)		// Offline (NO LDAP) development username
-		{
-			$_SESSION["AAA"]["permission"] = array();												// Clear out all permissions
-			$_SESSION["AAA"]["permission"][".*"]										= 1;		// Godmode On (IDKFA BlackSheepWall)
-			$_SESSION["DEBUG"]															= 1;		// Set debug level to 1 automatically!
-		}
-		// All users must be able to do boomerang beacon action/event for APM!
-		$_SESSION["AAA"]["permission"]["information.boomerang.beacon.action.event"]		= 1;		// Permit users to trigger boomerang/beacon events!
-
-		// Redirect them to their original destination
-//		header("Location: " . $_SERVER['REQUEST_URI']);		// Did not send query string so this was replaced.
-		header("Location: " . $_SERVER['HTTP_REFERER']);	// Changed to capture query string as well as URL.
-		exit;
+		$AUTHENTICATED = "LDAP";
 	}else{
+		$AUTHENTICATED = 0;
 		session_destroy();
 		$HEADER = "Authentication Failure!\n";
 		if (preg_match('/\.admin$/',$USERNAME,$REG)) { $HEADER = "Please do not login using windows administration (.ADMIN) accounts!"; }
 	}
+}elseif( $USERNAME && $CERTIFICATE )	// If we have a username and a certificate!
+{
+	// Make sure the username in our certificate is ACTUALLY in AD!
+	$USERSTRUCT = $LDAP->user()->info( $USERNAME , array("*") );
+	if ( $USERSTRUCT && !preg_match('/\.admin$/',$USERNAME,$REG) )
+	{
+		// TODO: Test cert here for other stuff like revocation and whatnot?
+		$AUTHENTICATED = "PKI";
+	}else{
+		$AUTHENTICATED = 0;
+		session_destroy();
+		$HEADER = "Certificate Authentication Failure!\n";
+		if (preg_match('/\.admin$/',$USERNAME,$REG)) { $HEADER = "Please do not login using windows administration (.ADMIN) accounts!"; }
+	}
+}else{
+	$AUTHENTICATED = 0;
 }
 
+
+// If we have a username and authenticated successfully
+if ( $USERNAME && $AUTHENTICATED )
+{
+		$_SESSION["DEBUG"				] = 0;				// Clear the debug flag
+		$_SESSION["AAA"]["authenticated"] = $AUTHENTICATED;	// Successfully Authenticated User!
+		$_SESSION["AAA"]["username"		] = $USERNAME;		// Store the username
+		$_SESSION["AAA"]["realname"		] = $LDAP->user_to_realname($USERNAME);	// Real name from LDAP
+		$MESSAGE = "Authentication succeeded for user {$USERNAME} from {$_SERVER["REMOTE_ADDR"]}";
+		if ( $CERTIFICATE ) { $MESSAGE.= " by Certificate"; }else{ $MESSAGE .= " by Password"; }
+		$DB->log($MESSAGE,1);
+
+		// Include this file to set the permissions for $USERNAME matching $LDAP groups
+		require_once("aaa.inc.php");
+
+		// Redirect the authenticated user to their original destination
+		header("Location: " . $_SERVER['HTTP_REFERER']);	// Changed to capture query string as well as URL.
+		exit;
+}
+
+// If the user is not authenticated, print out the login form
 if (!$_SESSION["AAA"]["authenticated"])
 {
 	$HTML->breadcrumb(" ","");

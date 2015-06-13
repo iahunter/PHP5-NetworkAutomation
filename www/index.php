@@ -6,14 +6,14 @@ print $HTML->header("Network Engineering Tools");
 
 $BLOCKS = array();
 
-if (PERMISSION_CHECK("tool.log"))
+if (PERMISSION_CHECK("tool.apache"))
 {
 	array_push($BLOCKS,$HTML->featureblock(
-		"Tool Activity Log",
-		"/monitoring/log.php",
-		"/images/videocamera.png",
+		"Apache",
+		"/server-status",
+		"/images/apache.png",
 		array(
-			"Audit trail & access log"
+			"Apache server status - worker threads"
 		)
 	));
 }
@@ -38,6 +38,18 @@ if (PERMISSION_CHECK("tool.gearman"))
 		"/images/gearman.png",
 		array(
 			"Gearman job queue, workers, and servers"
+		)
+	));
+}
+
+if (PERMISSION_CHECK("tool.log"))
+{
+	array_push($BLOCKS,$HTML->featureblock(
+		"Tool Activity Log",
+		"/monitoring/log.php",
+		"/images/videocamera.png",
+		array(
+			"Audit trail & access log"
 		)
 	));
 }
@@ -129,6 +141,19 @@ if (PERMISSION_CHECK("report.iosversion"))
 		array(
 			"Version information for",
 			"network devices globally"
+		)
+	));
+}
+
+if (PERMISSION_CHECK("tool.diff"))
+{
+	array_push($BLOCKS,$HTML->featureblock(
+		"Config Comparison",
+		"/tools/diff.php",
+		"/images/cherrys.png",
+		array(
+			"Differential comparison of",
+			"network device configuration"
 		)
 	));
 }
@@ -270,7 +295,7 @@ if (PERMISSION_CHECK("information.provisioning.site.view"))
 		"/information/information-list.php?category=Provisioning&type=Site",
 		"/images/provisioning-icon.png",
 		array(
-			"Network Device Provisioning <b>BETA</b>",
+			"Network Device Provisioning",
 			"Track Devices and Generate Config"
 		)
 	));
@@ -283,7 +308,7 @@ if (PERMISSION_CHECK("information.security..view"))
 		"/information/information-list.php?category=Security&type=Index",
 		"/images/firewall1.png",
 		array(
-			"Firewall Provisioning <b>BETA</b>",
+			"Firewall Provisioning",
 			"Track Applications & Hosts"
 		)
 	));
@@ -301,6 +326,19 @@ if (PERMISSION_CHECK("information.equipment.terminalserver.view"))
 		)
 	));
 }
+
+if (PERMISSION_CHECK("monitoring.honeypot"))
+{
+	array_push($BLOCKS,$HTML->featureblock(
+		"Honeypot Monitor",
+		"/monitoring/honeypot.php",
+		"/images/honeypot.png",
+		array(
+			"Live updated list attackers, targets, and protocols",
+		)
+	));
+}
+
 /*
 if (PERMISSION_CHECK("information..tasklist.view"))
 {

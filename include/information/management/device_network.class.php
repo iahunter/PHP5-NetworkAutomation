@@ -40,6 +40,75 @@ class Management_Device_Network	extends Management_Device
 		return $OUTPUT;
 	}
 
+	public function model()
+	{
+		$LINES = array();
+		if ( isset($this->data["inventory"	]) && $this->data["inventory"	] )
+		{
+			$LINES = array_merge($LINES, preg_split( "/\r\n|\r|\n/", $this->data["inventory"	] ) );
+		}
+		if ( isset($this->data["version"	]) && $this->data["version"		] )
+		{
+			$LINES = array_merge($LINES, preg_split( "/\r\n|\r|\n/", $this->data["version"	] ) );
+		}
+		$REGEX = array( "/.*PID:\s(\S+)\s.*/",		// Traditional Cisco show inventory output
+						"/.*SC Model.*: (\S+)/",	// New Aruba show inventory output
+						"/.*isco\s+(WS-\S+)\s.*/",	// Cisco show ver 1
+						"/.*isco\s+(OS-\S+)\s.*/",	// Cisco show ver 2
+						"/.*ardware:\s+(\S+),.*/",	// Cisco show ver 3
+						"/.*ardware:\s+(\S+).*/",	// Cisco show ver 4
+						"/^cisco\s+(\S+)\s+.*/",	// Cisco show ver 5...
+						"/.*\(MODEL: (\S+)\).*/",	// New Aruba show ver output
+						);
+		if ( count($LINES) )
+		{
+			foreach ($LINES as $LINE)
+			{
+				foreach ($REGEX as $REG)
+				{
+					if ( preg_match($REG,$LINE,$MATCHES) )
+					{
+						return $MATCHES[1];
+					}
+				}
+			}
+		}
+		return "unknown";
+	}
+
+	public function vendor()
+	{
+		$LINES = array();
+		if ( isset($this->data["inventory"	]) && $this->data["inventory"	] )
+		{
+			$LINES = array_merge($LINES, preg_split( "/\r\n|\r|\n/", $this->data["inventory"	] ) );
+		}
+		if ( isset($this->data["version"	]) && $this->data["version"		] )
+		{
+			$LINES = array_merge($LINES, preg_split( "/\r\n|\r|\n/", $this->data["version"	] ) );
+		}
+		$REGEX = array( "cisco" => "/.*cisco.*/i",	// Look for cisco information in output
+						"aruba" => "/.*aruba.*/i");	// And look for aruba in the output
+		$HITS = array();
+		$HITS["unknown"] = 1;	// So if we dont have >1 hit in all that output, return unknown.
+		if ( count($LINES) )
+		{
+			foreach ($LINES as $LINE)
+			{
+				foreach ($REGEX as $KEY => $REG)
+				{
+					if ( preg_match($REG,$LINE,$MATCHES) )
+					{
+						if ( !isset($HITS[$KEY]) ) { $HITS[$KEY] = 0; }
+						$HITS[$KEY]++;
+					}
+				}
+			}
+		}
+		arsort($HITS);
+		return reset( array_keys( $HITS ) );
+	}
+
 }
 
 ?>

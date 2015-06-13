@@ -29,8 +29,13 @@ try {
 if ($_GET['group'])
 {
 	$GROUP = $_GET['group'];
-	dumper($LDAP->group()->info($GROUP,array("*")));
-
+	$GROUPSTRUCT = $LDAP->group()->info( $GROUP , array("*") );
+	if ( $GROUPSTRUCT["count"] )
+	{
+		dumper($GROUPSTRUCT);
+	}else{
+		print "GROUP NOT FOUND IN AD!\n";
+	}
 }else{
 
 	if ($_GET['user'])
@@ -42,7 +47,13 @@ if ($_GET['group'])
 
 	$REALNAME = $LDAP->user_to_realname($USERNAME);
 	print "{$USERNAME}'s real name is: {$REALNAME}<br>\n";
-	dumper($LDAP->user()->info($USERNAME,array("*")));
+	$USERSTRUCT = $LDAP->user()->info( $USERNAME , array("*") );
+	if ( $USERSTRUCT )
+	{
+		dumper($USERSTRUCT);
+	}else{
+		print "USER NOT FOUND IN AD!\n";
+	}
 
 }
 

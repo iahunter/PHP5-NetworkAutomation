@@ -69,6 +69,11 @@ class Database
 		$this->DB_HANDLE = new PDO($DATASOURCE,$USERNAME,$PASSWORD,$OPTIONS);
 	}
 
+	public function close()
+	{
+		$this->DB_HANDLE = null;
+	}
+
 	public function query($QUERY)
 	{
 		$this->DB_STATEMENT = $this->DB_HANDLE->prepare($QUERY);

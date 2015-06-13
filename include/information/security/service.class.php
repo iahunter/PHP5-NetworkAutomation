@@ -82,6 +82,10 @@ class Security_Service	extends Information
 			}
 		}
 
+		$DEBUG = new Debug(DEBUG_EMAIL);
+		if (isset($this->data["name"])) { $NAME = $this->data["name"]; }else{ $NAME = $NEWDATA["name"]; }
+		$DEBUG->message("SECURITY SERVICE UPDATED! ID {$this->data["id"]}<br>\n<a href='" . BASEURL . "information/information-view.php?id={$this->data["id"]}'>Item {$NAME} : {$NEWDATA["protocol"]} / {$NEWDATA["port"]}</a>!\n",0);
+
 		return 1;
 	}
 /*
@@ -278,7 +282,7 @@ END;
 			"554"	=> "rtsp",
 			"5060"	=> "sip",
 			"25"	=> "smtp",
-			"1522"	=> "sqlnet",
+			"1521"	=> "sqlnet",
 			"22"	=> "ssh",
 			"111"	=> "sunrpc",
 			"49"	=> "tacacs",

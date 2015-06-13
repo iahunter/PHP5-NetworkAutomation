@@ -94,7 +94,7 @@ class command_ssh2	extends command
 
 
 
-		return $this->ssh->read($expect, NET_SSH2_READ_REGEX);
+		return $this->ssh->read2($expect, NET_SSH2_READ_REGEX);
 	}
 
 	public function settimeout($timeout)

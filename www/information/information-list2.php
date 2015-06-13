@@ -5,10 +5,11 @@ $HTML->breadcrumb("Information");
 
 if ($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['category']) && isset($_GET['type']))
 {
-	if (isset($_GET['parent']))		{ $PARENT	= $_GET['parent'];	}else{ $PARENT = 0;				}
-	if (isset($_GET['category']))	{ $CATEGORY	= $_GET['category'];}else{ $CATEGORY = "";			}
-	if (isset($_GET['type']))		{ $TYPE		= $_GET['type'];	}else{ $TYPE = "Information";	}
-	if (isset($_GET['page']))		{ $PAGE		= $_GET['page'];	}else{ $PAGE = 0;				}
+	if (isset($_GET["parent"	]))	{ $PARENT	= $_GET["parent"	];	}else{ $PARENT = 0;				}
+	if (isset($_GET["category"	]))	{ $CATEGORY	= $_GET["category"	];	}else{ $CATEGORY = "";			}
+	if (isset($_GET["type"		]))	{ $TYPE		= $_GET["type"		];	}else{ $TYPE = "Information";	}
+	if (isset($_GET["page"		]))	{ $PAGE		= $_GET["page"		];	}else{ $PAGE = 0;				}
+	if (isset($_GET["filter"	])) { $FILTER	= $_GET["filter"	];	}else{ $FILTER = "";			}
 
 	$SEARCH = array(			// Search for a category index!
 			"category"	=> $CATEGORY,
@@ -34,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['category']) && isset($_G
 	$PERMISSION .= ".view";
 	if(PERMISSION_CHECK($PERMISSION))
 	{
-		print $INFOBJECT->html_list_gearman($PAGE);
+		print $INFOBJECT->html_list_gearman($PAGE,$FILTER);
 	}else{
 		print "Error: You lack permission $PERMISSION to perform this action!\n";
 	}

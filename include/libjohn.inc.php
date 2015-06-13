@@ -209,6 +209,14 @@ function inventory_to_model($show_inventory)
 			$model = $reg[1];
 			return $model;
 		}
+		// Aruba WLC's:
+		// SC Model#                 	: Aruba7030-US
+		$REGEX = "/^SC Model.*: (.+)$/";
+		if ( preg_match($REGEX,$line,$REG) )
+		{
+			$model = $reg[1];
+			return $model;
+		}
 	}
 	return $model;
 }

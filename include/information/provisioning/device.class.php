@@ -211,13 +211,17 @@ END;
 		if ($this->data['type'] == "Device")	// This is important. Only change device type if this is the first base instance!
 		{
 			$SELECT = array(
-				"Device_IOS_RTR_WANRR_2900"		=> "2951 WAN Router",
-				"Device_IOS_MLS_DIST_3560X"		=> "Catalyst 3560x Distribution Switch",
-				"Device_IOS_SWI_ACC_2960X_24"	=> "Catalyst 2960x 24 Port Access Switch",
-				"Device_IOS_SWI_ACC_2960X_48"	=> "Catalyst 2960x 48 Port Access Switch",
-				"Device_IOS_MLS_PE_ME3800X"		=> "ME-3800x MPLS PE",
-				"Device_IOSXE_RTR_VPNRR_asr1001"=> "ASR1001 MPLS VPNv4 Route Reflector",
-				"Device_UPS_APC"				=> "APC UPS",
+				"Device_IOS_RTR_WANRR_2900"			=> "2951 WAN Router",
+				"Device_IOS_MLS_DIST_3560X"			=> "Catalyst 3560x Distribution Switch",
+				"Device_IOS_SWI_ACC_2960X_24"		=> "Catalyst 2960x 24 Port Access Switch",
+				"Device_IOS_SWI_ACC_2960X_48"		=> "Catalyst 2960x 48 Port Access Switch",
+				"Device_IOS_MLS_PE_ME3800X"			=> "ME-3800x MPLS PE",
+				"Device_IOSXE_RTR_PE_asr1002"		=> "ASR1002 MPLS PE",
+				"Device_IOSXE_RTR_VPNRR_asr1001"	=> "ASR1001 MPLS VPNv4 Route Reflector",
+				"Device_IOSXE_RTR_VPN6RR_asr1001"	=> "ASR1001 MPLS VPNv6 Route Reflector",
+				"Device_UPS_APC"					=> "APC UPS",
+				"Device_ArubaOS_WLC_Campus_7000"	=> "Aruba Campus WLC",
+				"Device_ArubaOS_WLC_Master_7000"	=> "Aruba Master WLC",
 			);
 			$OUTPUT .= $this->html_form_field_select("newtype","Device Model & Role",$SELECT);
 		}

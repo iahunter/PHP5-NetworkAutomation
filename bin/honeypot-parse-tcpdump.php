@@ -97,12 +97,38 @@ ERROR: DID NOT MATCH LINE: 11:14:07.710408 IP 37.139.14.86 > 123.456.72.9: ICMP 
 		// Check if we are worth tracking this suspect
 		if ( $SUSPECT_HITS[$SRC_IP] >= 10 )
 		{
-			print "SUSPECT {$SRC_IP} has {$SUSPECT_HITS[$SRC_IP]} hits in this time interval! resetting...\n";
+			$HITCOUNT = $SUSPECT_HITS[$SRC_IP];
 			unset($SUSPECT_HITS[$SRC_IP]);
 
 			$CATEGORY   = "Blackhole";
 			$TYPE       = "Suspect";
 			$PARENT     = "";
+
+			$QUERY = <<<END
+				SELECT id AS hits FROM information
+				WHERE category LIKE "{$CATEGORY}"
+				AND type LIKE "{$TYPE}"
+				AND stringfield1 = "{$SRC_IP}"
+				AND active = 1
+				AND modifiedwhen >= DATE_SUB(NOW(),INTERVAL 1 MINUTE);
+END;
+			$DB->query($QUERY);
+			try {
+				$DB->execute();
+				$RESULTS = $DB->results();
+			} catch (Exception $E) {
+				$MESSAGE = "Exception: {$E->getMessage()}";
+				trigger_error($MESSAGE);
+				die("Database Query Error!\n");
+			}
+			$COUNT = count($RESULTS);
+
+			if ( $COUNT >= 10 )
+			{
+				print "SUSPECT {$SRC_IP} has {$HITCOUNT} hits, but {$COUNT} {$TYPE} records in the last minute, skipping...\n";
+				continue;
+			}
+			print "SUSPECT {$SRC_IP} has {$HITCOUNT} hits in this time interval! resetting...\n";
 
 			$INFOBJECT = Information::create($TYPE,$CATEGORY,$PARENT);
 			$ID = $INFOBJECT->insert();
@@ -121,7 +147,7 @@ ERROR: DID NOT MATCH LINE: 11:14:07.710408 IP 37.139.14.86 > 123.456.72.9: ICMP 
 
 	}else{
 		// Ignore the line, arp/non-ip/etc.
-		//print "ERROR: DID NOT MATCH LINE: {$LINE}\n";
+//		print "ERROR: DID NOT MATCH LINE: {$LINE}";
 	}
 
 	// Process rotation of the suspect hits for each time interval
@@ -135,6 +161,7 @@ ERROR: DID NOT MATCH LINE: 11:14:07.710408 IP 37.139.14.86 > 123.456.72.9: ICMP 
 		$SUSPECT_HITS = array();
 	}
 
+	ob_flush();	// Hopefully clear out some unused memory to prevent crapping?
 }
 
 fclose(STDIN);

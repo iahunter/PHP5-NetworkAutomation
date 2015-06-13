@@ -74,6 +74,9 @@ print $HTML->header("BGP Update Monitor");
 				<li>
 					<a href="/reports/prefix-instability.php">Prefix Instability Report</a>
 				</li>
+				<li>
+					<a href="/monitoring/bgpgraph.php">BGP ASN Adjacency Graph</a>
+				</li>
 			</ul>
 		</td>
 	</tr>

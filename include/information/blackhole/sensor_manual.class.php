@@ -51,42 +51,24 @@ class Blackhole_Sensor_Manual	extends Blackhole_Sensor
 
 	public function get_hostile()
 	{
-//		$this->data["hostiles"] = array();
 		$SUSPECTIPS = explode("\n", $this->data["hostileiplist"] );
 
 		$HOSTILES = array();
 		foreach ($SUSPECTIPS as $SUSPECTIP)
 		{
 			$SUSPECTIP = trim($SUSPECTIP);
+			if ( !$SUSPECTIP ) { continue; }	// Skip empty lines in the list
 			// Only use suspects that are valid IPv4 addresses!
 			if( $SUSPECTIP && filter_var($SUSPECTIP, FILTER_VALIDATE_IP) )
 			{
 				array_push($HOSTILES,$SUSPECTIP);
+			}else{
+				print "MANUAL IP FAILED VALIDATION: {$SUSPECTIP}\n";
 			}
 		}
 		// Make sure none of the new hostiles are in the whitelist!
 		$HOSTILES = $this->filter_addresses($HOSTILES);
 
-		// This was a workaround, I dont know if we still need it...
-		/*
-		foreach ($HOSTILES as $HOSTILEIP)
-		{
-			$SEARCH = array(    // Search existing hostile information with this IP
-				"category"      => $this->category,
-				"type"          => "Hostile",
-				"stringfield1"  => $HOSTILEIP,
-				"active"        => "%",     // Include inactive records in search results!
-			);
-			$RESULTS = Information::search($SEARCH);
-			$HOSTILEOBJECTS = $this->ids_to_objs($RESULTS);
-			foreach ($HOSTILEOBJECTS as $HOSTILEOBJ)
-			{
-				$HOSTILEOBJ->data["active"] = 1;	// Make sure our fucking hostiles are ACTIVE!
-				$HOSTILEOBJ->data["bantime"] = 9999999999999;
-				$HOSTILEOBJ->update();
-				unset($HOSTILEOBJ);
-			}
-		}/**/
 		return $HOSTILES;
 	}
 
@@ -113,14 +95,14 @@ class Blackhole_Sensor_Manual	extends Blackhole_Sensor
 		// This only removes them from the hostiles array, NOT the hostile IP list manually specified
 		// The result of this is that the IP will be immediately re-added on the next scan, with bantime doubled...
 
-		foreach ($DEL as $IP)                                                       // Loop through the list of IPs to clear
+		foreach ($DEL as $IP)														// Loop through the list of IPs to clear
 		{
 			print "\t\tDELETING {$IP} FROM SENSOR ID {$this->data["id"]}\n";
-			while( array_search($IP, $this->data["hostiles"]) )                     // Loop through our list of hostiles in this sensor
+			while( is_int( array_search($IP, $this->data["hostiles"]) ) )			// Loop through our list of hostiles in this sensor
 			{
-				$POSITION = array_search($IP, $this->data["hostiles"]);             // Find the position of the ip in our hostile list
+				$POSITION = array_search($IP, $this->data["hostiles"]);				// Find the position of the ip in our hostile list
 				print "\t\t\tLOCATED {$IP} @ POSITION {$POSITION} IN HOSTILES, REMOVING...\n";
-				unset($this->data["hostiles"][$POSITION]);                          // Remove this IP from our hostiles in this sensor
+				unset($this->data["hostiles"][$POSITION]);							// Remove this IP from our hostiles in this sensor
 			}
 		}
 

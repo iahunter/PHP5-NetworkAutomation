@@ -23,12 +23,15 @@ if (isset($_GET['id']))
 	$DETAILQUERY = "";
 }
 
+if ( isset($_GET["limit"]) && is_numeric($_GET["limit"]) )
+{ $LIMIT = $_GET["limit"]; }else{ $LIMIT = 100; }
+
 $QUERY = <<<END
 	SELECT * FROM bgpmon
 	WHERE bgpxml LIKE '%UPDATE%'
 	{$DETAILQUERY}
 	ORDER BY id
-	DESC LIMIT 100
+	DESC LIMIT {$LIMIT}
 END;
 
 global $DB;
