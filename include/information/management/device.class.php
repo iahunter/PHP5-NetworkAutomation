@@ -109,7 +109,7 @@ END;
 		$WIDTH = $this->html_width;
 
 		$columns = count($WIDTH)-1;	$i = 1;
-		$datadump = dumper_to_string($this->data);
+		$datadump = \metaclassing\Utility::dumperToString($this->data);
 		$OUTPUT .= <<<END
 
 				<tr class="{$rowclass}">
@@ -137,7 +137,7 @@ END;
 		$OUTPUT .= $this->html_list_header_template("Information Detail",$COLUMNS);
 
 		$columns = count($this->html_width)-1;
-		$datadump = dumper_to_string($this->data);
+		$datadump = \metaclassing\Utility::dumperToString($this->data);
 		$OUTPUT .= <<<END
 
 			<tbody class="report">
@@ -194,5 +194,3 @@ END;
 	}
 
 }
-
-?>

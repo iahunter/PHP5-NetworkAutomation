@@ -28,9 +28,9 @@
 
 require_once "information/management/device_network.class.php";
 
-class Management_Device_Network_Cisco	extends Management_Device_Network
+class Management_Device_Network_Aruba	extends Management_Device_Network
 {
-	public $type = "Management_Device_Network_Cisco";
+	public $type = "Management_Device_Network_Aruba";
 
 	public function customdata()	// This function is ONLY required if you are using stringfields!
 	{
@@ -87,7 +87,14 @@ class Management_Device_Network_Cisco	extends Management_Device_Network
 		unset($PING);
 
 		// Then try to get the CLI via any means necessary
-		$COMMAND = new Command($this->data);
+//		$COMMAND = new Command($this->data);
+		// This is a filthy hack...
+		$NEWDATA = array_merge($this->data, array(
+												"username" => LDAP_USER,
+												"password" => LDAP_PASS,
+												)
+							);
+		$COMMAND = new Command($NEWDATA);
 		$this->jprint(" Connection:");
 		$OUTPUT .= " Connection:";
 		$CLI = $COMMAND->getcli();
@@ -123,18 +130,21 @@ class Management_Device_Network_Cisco	extends Management_Device_Network
 		$this->jprint("Firewall detection: ");
 		$OUTPUT .= "Firewall detection: ";
 		$FUNCTION = "";
-		$CLI->exec("terminal length 0");
-		$SHOW_INVENTORY = $CLI->exec("show inventory | I PID");
+//		$CLI->exec("terminal length 0");
+		$CLI->exec("no paging");
+		$SHOW_INVENTORY = $CLI->exec("show inventory");
 		$MODEL = \metaclassing\Cisco::inventoryToModel($SHOW_INVENTORY);
 		if ($MODEL == "Unknown")
 		{
-			$SHOW_VERSION = $CLI->exec("show version | I C");
+			$SHOW_VERSION = $CLI->exec("show version");
 			$MODEL = \metaclassing\Cisco::versionToModel($SHOW_VERSION);
 		}
 		if ($MODEL == "Unknown")
 		{
 			$this->jprint(" Could not detect device type/model! Aborting!\n");
 			$OUTPUT .= " Could not detect device type/model! Aborting!\n";
+			$OUTPUT .= \metaclassing\Utility::dumperToString($SHOW_INVENTORY);
+			$OUTPUT .= \metaclassing\Utility::dumperToString($SHOW_VERSION);
 			$this->update();
 			return $OUTPUT;
 		}

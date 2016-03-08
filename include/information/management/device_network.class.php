@@ -110,5 +110,3 @@ class Management_Device_Network	extends Management_Device
 	}
 
 }
-
-?>
