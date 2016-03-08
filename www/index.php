@@ -6,8 +6,7 @@ print $HTML->header("Network Engineering Tools");
 
 $BLOCKS = array();
 
-if (PERMISSION_CHECK("tool.apache"))
-{
+if (PERMISSION_CHECK("tool.apache")) {
 	array_push($BLOCKS,$HTML->featureblock(
 		"Apache",
 		"/server-status",
@@ -18,8 +17,7 @@ if (PERMISSION_CHECK("tool.apache"))
 	));
 }
 
-if (PERMISSION_CHECK("tool.supervisor"))
-{
+if (PERMISSION_CHECK("tool.supervisor")) {
 	array_push($BLOCKS,$HTML->featureblock(
 		"Supervisor",
 		"http://netman:9001/",
@@ -30,8 +28,7 @@ if (PERMISSION_CHECK("tool.supervisor"))
 	));
 }
 
-if (PERMISSION_CHECK("tool.gearman"))
-{
+if (PERMISSION_CHECK("tool.gearman")) {
 	array_push($BLOCKS,$HTML->featureblock(
 		"Gearman",
 		"/gearman",
@@ -54,8 +51,7 @@ if (PERMISSION_CHECK("tool.log"))
 	));
 }
 
-if (PERMISSION_CHECK("debug"))
-{
+if (PERMISSION_CHECK("debug")) {
 	array_push($BLOCKS,$HTML->featureblock(
 		"Toggle Debug",
 		"/debug.php",
@@ -67,8 +63,7 @@ if (PERMISSION_CHECK("debug"))
 	));
 }
 
-if (PERMISSION_CHECK("tool.ldap"))
-{
+if (PERMISSION_CHECK("tool.ldap")) {
 	array_push($BLOCKS,$HTML->featureblock(
 		"LDAP Tool",
 		"/tools/ldap.php",
@@ -79,8 +74,7 @@ if (PERMISSION_CHECK("tool.ldap"))
 	));
 }
 
-if (PERMISSION_CHECK("tool.template"))
-{
+if (PERMISSION_CHECK("tool.template")) {
 	array_push($BLOCKS,$HTML->featureblock(
 		"Template Tool",
 		"/tools/template.php",
@@ -92,8 +86,7 @@ if (PERMISSION_CHECK("tool.template"))
 	));
 }
 
-if (PERMISSION_CHECK("tool.switch.view"))
-{
+if (PERMISSION_CHECK("tool.switch.view")) {
 	array_push($BLOCKS,$HTML->featureblock(
 		"Switch Viewer",
 		"/tools/switch-viewer.php",
@@ -105,8 +98,7 @@ if (PERMISSION_CHECK("tool.switch.view"))
 	));
 }
 
-if (PERMISSION_CHECK("tool.racktables"))
-{
+if (PERMISSION_CHECK("tool.racktables")) {
 	array_push($BLOCKS,$HTML->featureblock(
 		"RackTables",
 		"/racktables",
@@ -118,8 +110,7 @@ if (PERMISSION_CHECK("tool.racktables"))
 	));
 }
 
-if (PERMISSION_CHECK("tool.search"))
-{
+if (PERMISSION_CHECK("tool.search")) {
 	array_push($BLOCKS,$HTML->featureblock(
 		"Network Search",
 		"/tools/search.php",
@@ -132,8 +123,7 @@ if (PERMISSION_CHECK("tool.search"))
 	));
 }
 
-if (PERMISSION_CHECK("report.iosversion"))
-{
+if (PERMISSION_CHECK("report.iosversion")) {
 	array_push($BLOCKS,$HTML->featureblock(
 		"IOS Version Report",
 		"/reports/ios-version-report.php",
@@ -145,8 +135,7 @@ if (PERMISSION_CHECK("report.iosversion"))
 	));
 }
 
-if (PERMISSION_CHECK("tool.diff"))
-{
+if (PERMISSION_CHECK("tool.diff")) {
 	array_push($BLOCKS,$HTML->featureblock(
 		"Config Comparison",
 		"/tools/diff.php",
@@ -158,8 +147,7 @@ if (PERMISSION_CHECK("tool.diff"))
 	));
 }
 
-if (PERMISSION_CHECK("report.siteservice"))
-{
+if (PERMISSION_CHECK("report.siteservice")) {
 	array_push($BLOCKS,$HTML->featureblock(
 		"Site Service Report",
 		"/reports/site-service-report.php",
@@ -171,8 +159,7 @@ if (PERMISSION_CHECK("report.siteservice"))
 	));
 }
 
-if (PERMISSION_CHECK("information.management.device"))
-{
+if (PERMISSION_CHECK("information.management.device")) {
 	array_push($BLOCKS,$HTML->featureblock(
 		"Inaccessible Device Report",
 		"/reports/inaccessible-devices.php",
@@ -183,8 +170,7 @@ if (PERMISSION_CHECK("information.management.device"))
 	));
 }
 
-if (PERMISSION_CHECK("information.mpls.vpn.view"))
-{
+if (PERMISSION_CHECK("information.mpls.vpn.view")) {
 	array_push($BLOCKS,$HTML->featureblock(
 		"MPLS VPN Information",
 		"/information/information-list.php?category=MPLS&type=VPN",
@@ -196,8 +182,7 @@ if (PERMISSION_CHECK("information.mpls.vpn.view"))
 	));
 }
 
-if (PERMISSION_CHECK("information.bgp.asn.view"))
-{
+if (PERMISSION_CHECK("information.bgp.asn.view")) {
 	array_push($BLOCKS,$HTML->featureblock(
 		"BGP Autonomous Systems",
 		"/information/information-list.php?category=BGP&type=ASN",
@@ -209,8 +194,7 @@ if (PERMISSION_CHECK("information.bgp.asn.view"))
 	));
 }
 
-if (PERMISSION_CHECK("monitoring.bgp"))
-{
+if (PERMISSION_CHECK("monitoring.bgp")) {
 	array_push($BLOCKS,$HTML->featureblock(
 		"BGP Update Monitor",
 		"/monitoring/bgp.php",
@@ -222,22 +206,31 @@ if (PERMISSION_CHECK("monitoring.bgp"))
 	));
 }
 
-if (PERMISSION_CHECK("information.ipplan.block.view"))
-{
+if (PERMISSION_CHECK("information.ipplan.block.view")) {
 	array_push($BLOCKS,$HTML->featureblock(
 		"IPv4 Planning Information",
 		"/information/information-view.php?id=45",
 		"/images/ipv4plan.png",
 		array(
-				"Address space hierarchy planning",
+				" Address space hierarchy planning",
 				"Tracking blocks, networks, addresses",
-				"for upcoming provisioning automation"
 		)
 	));
 }
 
-if (PERMISSION_CHECK("tool.ipv6plan"))
-{
+if (PERMISSION_CHECK("information.ipplan.block6.view")) {
+	array_push($BLOCKS,$HTML->featureblock(
+		"IPv6 Planning Information",
+		"/information/information-view.php?id=891682",
+		"/images/ipv6plan.png",
+		array(
+				"Address space hierarchy planning",
+				"Tracking blocks, networks, addresses",
+		)
+	));
+}
+
+if (PERMISSION_CHECK("tool.ipv6plan")) {
 	array_push($BLOCKS,$HTML->featureblock(
 		"IPv6 Subnet Planning Tool",
 		"/tools/ipv6-plan.php",
@@ -249,8 +242,7 @@ if (PERMISSION_CHECK("tool.ipv6plan"))
 	));
 }
 
-if (PERMISSION_CHECK("websvn.configrepo"))
-{
+if (PERMISSION_CHECK("websvn.configrepo")) {
 	array_push($BLOCKS,$HTML->featureblock(
 		"Configuration Repository",
 		"/websvn/",
@@ -263,8 +255,7 @@ if (PERMISSION_CHECK("websvn.configrepo"))
 	));
 }
 
-if (PERMISSION_CHECK("information.datacenter.site.view"))
-{
+if (PERMISSION_CHECK("information.datacenter.site.view")) {
 	array_push($BLOCKS,$HTML->featureblock(
 		"Datacenter VLAN Usage",
 		"/information/information-list.php?category=Datacenter&type=Site",
@@ -274,22 +265,8 @@ if (PERMISSION_CHECK("information.datacenter.site.view"))
 		)
 	));
 }
-/*
-if (PERMISSION_CHECK("tool.dns"))
-{
-	array_push($BLOCKS,$HTML->featureblock(
-		"DNS Record Generator",
-		"/tools/dns.php",
-		"/images/dns.png",
-		array(
-				"Generate windows DNS forward",
-				"and reverse zone records"
-		)
-	));
-}
 
-if (PERMISSION_CHECK("information.provisioning.site.view"))
-{
+if (PERMISSION_CHECK("information.provisioning.site.view")) {
 	array_push($BLOCKS,$HTML->featureblock(
 		"Network Provisioning",
 		"/information/information-list.php?category=Provisioning&type=Site",
@@ -301,8 +278,7 @@ if (PERMISSION_CHECK("information.provisioning.site.view"))
 	));
 }
 
-if (PERMISSION_CHECK("information.security..view"))
-{
+if (PERMISSION_CHECK("information.security..view")) {
 	array_push($BLOCKS,$HTML->featureblock(
 		"Security Provisioning",
 		"/information/information-list.php?category=Security&type=Index",
@@ -314,8 +290,7 @@ if (PERMISSION_CHECK("information.security..view"))
 	));
 }
 
-if (PERMISSION_CHECK("information.equipment.terminalserver.view"))
-{
+if (PERMISSION_CHECK("information.equipment.terminalserver.view")) {
 	array_push($BLOCKS,$HTML->featureblock(
 		"Serial Terminal Servers",
 		"/information/information-list.php?category=Equipment&type=TerminalServer",
@@ -327,8 +302,7 @@ if (PERMISSION_CHECK("information.equipment.terminalserver.view"))
 	));
 }
 
-if (PERMISSION_CHECK("monitoring.honeypot"))
-{
+if (PERMISSION_CHECK("monitoring.honeypot")) {
 	array_push($BLOCKS,$HTML->featureblock(
 		"Honeypot Monitor",
 		"/monitoring/honeypot.php",
@@ -339,59 +313,8 @@ if (PERMISSION_CHECK("monitoring.honeypot"))
 	));
 }
 
-/*
-if (PERMISSION_CHECK("information..tasklist.view"))
-{
-	array_push($BLOCKS,$HTML->featureblock(
-		"Task Lists",
-		"/information/information-list.php?category=&type=TaskList",
-		"/images/tasklist.png",
-		array(
-				"Individual To Do and Task Lists",
-				"Work and Issue Tracking"
-		)
-	));
-}
-/**/
-/*
-if (PERMISSION_CHECK("information.checklist.server.view"))
-{
-	array_push($BLOCKS,$HTML->featureblock(
-		"Server Checklist",
-		"/information/information-list.php?category=Checklist&type=Index",
-		"/images/serverchecklist.png",
-		array(
-				"Server build process checklists",
-				"Server decom process checklists",
-				"Completion and QA tracking"
-		)
-	));
-}
-/**/
-if ($_SESSION["AAA"]["username"] == "some.jerk"	||
-	$_SESSION["AAA"]["username"] == "short.round"	)
-{
-	array_push($BLOCKS,$HTML->featureblock(
-		"Random Error Message",
-		"",
-		"/images/bofh.png",
-		array(
-			bofh_quote(),
-			"<br>",
-			"{$_SESSION["AAA"]["realname"]} is a " . insult(),
-		)
-	));
-
-	array_push($BLOCKS,$HTML->featureblock(
-		"Futurama Quote",
-		"",
-		"/images/bender.png",
-		array(
-			futurama_quote(),
-		)
-	));
-}
-
+// Let anybody run the speedtest
+if (true) {
 	array_push($BLOCKS,$HTML->featureblock(
 		"Speed Test",
 		"/speedtest/",
@@ -402,12 +325,21 @@ if ($_SESSION["AAA"]["username"] == "some.jerk"	||
 			"This test may not accurately reflect available bandwidth due to browser and computer settings"
 		)
 	));
+}
 
 //	<b>All is well. Nothing is broke.</b><br><br>
 print <<<END
 	<div style="table; width: 900px;">
 		<div style="display: table-row;">
 END;
+
+print "<h3>Certificate based authentication is now active for this website!</h3>\n";
+if ($_SESSION["AAA"]["authenticated"] == "PKI")
+{
+	print "You were authenticated automagically by public key cryptography!<br><br>\n";
+}else{
+	print "Your browser did not present a user certificate, enroll <a href=\"https://knecasiwp001/certsrv/\">here</a> to enjoy automated password-free authentication!<br><br>\n";
+}
 if (count($BLOCKS) == 1)
 {
 	print "<h3>You are not currently a member of any active directory groups that grant permissions to this system</h3>\n";
@@ -436,7 +368,7 @@ print <<<END
 		<div style="display: table-row">
 			<div style="display: table-cell; padding: 5px;">
 				<div>
-					<a href="mailto:some.jerk@company.com?subject=Tool Bug Report"><img src="/images/bug.gif"></a>
+					<a href="mailto:the.admin@company.com?subject=Tool Bug Report"><img src="/images/bug.gif"></a>
 				</div>
 			</div>
 		</div>
@@ -446,7 +378,7 @@ if ($_SESSION["DEBUG"] > 3)
 {
 	$DEBUGOUTPUT .= $HTML->hr();
 	$DEBUGOUTPUT .= "You have been granted the following permissions:<br>";
-	$DEBUGOUTPUT .= dumper_to_string($_SESSION["AAA"]["permission"] );
+	$DEBUGOUTPUT .= \metaclassing\Utility::dumperToString($_SESSION["AAA"]["permission"] );
 //	$DEBUGOUTPUT .= $SESSION->garbage(3600);
 	print $DEBUGOUTPUT;
 }
