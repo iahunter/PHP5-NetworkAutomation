@@ -141,7 +141,7 @@ END;
 		$PROVIDERASN["CenturyLink"]	= "209";
 		$PROVIDERASN["Telus"]		= "852";
 		$PROVIDERASN["Telus65001"]	= "65001";
-		$PROVIDERASN["KieBone"]		= "12345";
+		$PROVIDERASN["KieBone"]		= "1234";
 		$this->data['peer_asn'] = $PROVIDERASN[$this->data['provider']];
 
 		$OUTPUT .= "router bgp {$ASN}\n";

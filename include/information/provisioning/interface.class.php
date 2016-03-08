@@ -151,7 +151,7 @@ END;
 END;
 		$OUTPUT .= $this->html_list_row($i++);
 
-		$datadump = dumper_to_string($this->data);
+		$datadump = \metaclassing\Utility::dumperToString($this->data);
 
 		$rowclass = "row".(($i % 2)+1); $i++;
 		$OUTPUT .= <<<END
@@ -230,7 +230,7 @@ END;
 					</select>
 				</td></tr>
 END;
-		$SELECT = array(""=>"None") + Utility::assoc_range(1,22) + Utility::assoc_range(101,109);
+		$SELECT = array(""=>"None") + \metaclassing\Utility::assocRange(1,22) + \metaclassing\Utility::assocRange(101,109);
 		$OUTPUT .= $this->html_form_field_select("lag"	,"LAG Group",$SELECT);
 
 		$OUTPUT .= <<<END
@@ -337,5 +337,3 @@ END;
 	}
 
 }
-
-?>

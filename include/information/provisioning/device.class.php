@@ -100,7 +100,7 @@ END;
 		$COLUMNCOUNT = count($this->html_width)-1;	$i = 0;
 		$OUTPUT .= $this->html_list_header_template("Provisioning Device Details",$COLUMNS);
 		$OUTPUT .= $this->html_list_row($i++);
-		$DUMP = trim(dumper_to_string($this->data));
+		$DUMP = trim(\metaclassing\Utility::dumperToString($this->data));
 		$ASN = $this->parent()->get_asn();
 		if ($ASN < 1 || $ASN > 65535) { $ASN = "Warning: No Linked ASN Found! $ASN"; }
 		$IPV4BLOCK = $this->parent()->get_ipv4block();
@@ -212,6 +212,7 @@ END;
 		{
 			$SELECT = array(
 				"Device_IOS_RTR_WANRR_2900"			=> "2951 WAN Router",
+				//"Device_IOS_RTR_WANSS_1900"			=> "1921 WAN Router",
 				"Device_IOS_MLS_DIST_3560X"			=> "Catalyst 3560x Distribution Switch",
 				"Device_IOS_SWI_ACC_2960X_24"		=> "Catalyst 2960x 24 Port Access Switch",
 				"Device_IOS_SWI_ACC_2960X_48"		=> "Catalyst 2960x 48 Port Access Switch",
@@ -475,8 +476,8 @@ END;
 
 			$STRUCTURE_MANAGED		= $this->parse_nested_list_to_array( $this->filter_config($CONFIG_MANAGED) );
 
-			$MISSING= array_diff_assoc_recursive($STRUCTURE_PROVISIONED	,$STRUCTURE_MANAGED		);
-			$EXTRA	= array_diff_assoc_recursive($STRUCTURE_MANAGED		,$STRUCTURE_PROVISIONED	);
+			$MISSING= \metaclassing\Utility::recursiveArrayDiffAssoc($STRUCTURE_PROVISIONED	,$STRUCTURE_MANAGED		);
+			$EXTRA	= \metaclassing\Utility::recursiveArrayDiffAssoc($STRUCTURE_MANAGED		,$STRUCTURE_PROVISIONED	);
 
 			$OUTPUT .= "
 				<table>
@@ -488,7 +489,7 @@ END;
 					</tr>
 					<tr>
 						<td colspan=2>\n";
-			$OUTPUT .= dBug_to_string($MISSING);
+			$OUTPUT .= \metaclassing\Utility::dBugToString($MISSING);
 //					new dBug($MISSING);
 			$OUTPUT .= "<br><hr size=1><br>
 					</tr>
@@ -497,7 +498,7 @@ END;
 					</tr>
 					<tr>
 						<td colspan=2>\n";
-			$OUTPUT .= dBug_to_string($EXTRA);
+			$OUTPUT .= \metaclassing\Utility::dBugToString($EXTRA);
 //					new dBug($EXTRA);
 			$OUTPUT .= "<br><hr size=1><br>
 					</tr>
@@ -507,8 +508,8 @@ END;
 						<th>Managed Config</th>
 					</tr>
 					<tr>
-						<td valign=top>" . dumper_to_string($STRUCTURE_PROVISIONED) . "</td>
-						<td valign=top>" . dumper_to_string($STRUCTURE_MANAGED)     . "</td>
+						<td valign=top>" . \metaclassing\Utility::dumperToString($STRUCTURE_PROVISIONED) . "</td>
+						<td valign=top>" . \metaclassing\Utility::dumperToString($STRUCTURE_MANAGED)     . "</td>
 					</tr>
 			</table>\n";	/**/
 
@@ -520,5 +521,3 @@ END;
 	}
 
 }
-
-?>

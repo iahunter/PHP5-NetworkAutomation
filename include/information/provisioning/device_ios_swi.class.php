@@ -35,7 +35,7 @@ class Provisioning_Device_IOS_SWI	extends Provisioning_Device_IOS_MLS
 	public function config_interface($INTERFACE)
 	{
 		$OUTPUT = "";
-		$OUTPUT .= Utility::last_stack_call(new Exception);
+		$OUTPUT .= \metaclassing\Utility::lastStackCall(new Exception);
 
 		$DEVICEID		= $this->data['id'];
 		$DEV_NAME		= $this->data['name'];
@@ -205,5 +205,3 @@ class Provisioning_Device_IOS_SWI	extends Provisioning_Device_IOS_MLS
 	}
 
 }
-
-?>

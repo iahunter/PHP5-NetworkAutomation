@@ -28,9 +28,9 @@
 
 require_once "information/provisioning/device_iosxe_rtr.class.php";
 
-class Provisioning_Device_IOSXE_RTR_VPNRR	extends Provisioning_Device_IOSXE_RTR
+class Provisioning_Device_IOSXE_RTR_PE	extends Provisioning_Device_IOSXE_RTR
 {
-	public $type = "Provisioning_Device_IOSXE_RTR_WANRR";
+	public $type = "Provisioning_Device_IOSXE_RTR_PE";
 
 	public function config()
 	{
@@ -53,21 +53,29 @@ class Provisioning_Device_IOSXE_RTR_VPNRR	extends Provisioning_Device_IOSXE_RTR
 
 		$OUTPUT .= "hostname $DEV_NAME\n";
 
-		$OUTPUT .= $this->config_loopback();
+		$OUTPUT .= "ip routing\n";
+
+		$OUTPUT .= "ip cef\n";
 
 		$OUTPUT .= $this->config_management();
 
+		$OUTPUT .= $this->config_loopback();
+
 		$OUTPUT .= $this->config_motd();
 
-		$OUTPUT .= $this->config_logging();
-
 		$OUTPUT .= $this->config_dns();
+
+		$OUTPUT .= $this->config_logging();
 
 		$OUTPUT .= $this->config_aaa();
 
 		$OUTPUT .= $this->config_snmp();
 
 		$OUTPUT .= $this->config_ospf();
+
+		$OUTPUT .= $this->config_mpls();
+
+		$OUTPUT .= $this->config_multicast();
 
 		$OUTPUT .= $this->config_bgp();
 
@@ -89,7 +97,6 @@ class Provisioning_Device_IOSXE_RTR_VPNRR	extends Provisioning_Device_IOSXE_RTR
 
 		$DEV_BGPASN = $this->parent()->get_asn();
 		$DEV_LOOP4	= $this->data['loopback4'];
-		$SITE_IP4BLOCK	= $this->parent()->get_ipv4block();
 
 		$OUTPUT .= "
 ip bgp-community new-format
@@ -100,37 +107,60 @@ router bgp $DEV_BGPASN
   bgp log-neighbor-changes
   bgp deterministic-med
 
-  template peer-policy PEER_POLICY_VPNV4_RR_CLIENT
-    route-reflector-client
+  template peer-policy PEER_POLICY_VPNV4_RR
     send-community both
    exit-peer-policy
-  template peer-session PEER_SESSION_VPNV4_RR_CLIENT
+  template peer-session PEER_SESSION_VPNV4_RR
     remote-as $DEV_BGPASN
     update-source Loopback0
    exit-peer-session
+
+  template peer-policy PEER_POLICY_VPNV6_RR
+    send-community both
+   exit-peer-policy
+  template peer-session PEER_SESSION_VPNV6_RR
+    remote-as $DEV_BGPASN
+    update-source Loopback0
+   exit-peer-session
+
 ";
 		$ASN_DEVICES = $this->get_devices_by_asn($DEV_BGPASN);
-		$RR_COUNT = count($ASN_DEVICES) - 1; // Subtract myself
-		$OUTPUT .= "\n! Found $RR_COUNT other BGP devices in this ASN.\n";
+		$RR_COUNT = count($ASN_DEVICES);
+		$OUTPUT .= "\n! Found $RR_COUNT layer 3 devices in this ASN.\n";
+		// Loop through VPNv4 route reflectors
 		foreach ($ASN_DEVICES as $L3DEVICE)
 		{
-			$REGEX = "/PE_/";
-			if ( preg_match($REGEX,$L3DEVICE->data['type'],$REG) ) // only peer with PE's in this ASN!
+			$REGEX = "/VPNRR_/";
+			if (preg_match($REGEX,$L3DEVICE->data['type'],$REG))
 			{
 				$RR_LOOP4 = $L3DEVICE->data['loopback4'];
-				$OUTPUT .= "  neighbor $RR_LOOP4 inherit peer-session PEER_SESSION_VPNV4_RR_CLIENT
+				$OUTPUT .= "  neighbor $RR_LOOP4 inherit peer-session PEER_SESSION_VPNV4_RR
   address-family vpnv4
     neighbor $RR_LOOP4 activate
-    neighbor $RR_LOOP4 inherit peer-policy PEER_POLICY_VPNV4_RR_CLIENT
+    neighbor $RR_LOOP4 inherit peer-policy PEER_POLICY_VPNV4_RR
    exit
   address-family ipv4 mdt
     neighbor $RR_LOOP4 activate
-    neighbor $RR_LOOP4 inherit peer-policy PEER_POLICY_VPNV4_RR_CLIENT
+    neighbor $RR_LOOP4 inherit peer-policy PEER_POLICY_VPNV4_RR
    exit
 ";
 			}
 		}
-		$OUTPUT .= " exit\n";
+		// Loop through VPNv6 route reflectors
+		foreach ($ASN_DEVICES as $L3DEVICE)
+		{
+			$REGEX = "/VPN6RR_/";
+			if (preg_match($REGEX,$L3DEVICE->data['type'],$REG))
+			{
+				$RR_LOOP4 = $L3DEVICE->data['loopback4'];
+				$OUTPUT .= "  neighbor $RR_LOOP4 inherit peer-session PEER_SESSION_VPNV6_RR
+  address-family vpnv6
+    neighbor $RR_LOOP4 activate
+    neighbor $RR_LOOP4 inherit peer-policy PEER_POLICY_VPNV6_RR
+   exit
+";
+			}
+		}
 
 		return $OUTPUT;
 	}

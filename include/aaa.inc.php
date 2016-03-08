@@ -59,7 +59,7 @@
 			$LDAP->user()->inGroup($USERNAME,"IMServerAdminCore",1)						||		// Server Admin Core Team
 			$LDAP->user()->inGroup($USERNAME,"ClientTechnologyServices",1)				||		// Citrix VDI Admins and desktop guys
 			$LDAP->user()->inGroup($USERNAME,"IM.SecurityAnalyst",1)					||		// Infosec dudes!
-			$_SESSION["AAA"]["username"] == "russell.holiday"							)		// Rusty Hook (Honorary Engineer)
+			$_SESSION["AAA"]["username"] == "rusty.hook"							)		// Rusty Hook (Honorary Engineer)
 		{
 			$_SESSION["AAA"]["permission"]["tool.racktables"]							= 1;		// RackTables DCIM
 			$_SESSION["AAA"]["permission"]["tool.rescan"]								= 1;		// Rescan devices
@@ -103,7 +103,7 @@
 			$_SESSION["AAA"]["permission"]["information.blackhole.hostile.view"]		= 1;		// Permit view blackhole
 		}
 		if ($LDAP->user()->inGroup($USERNAME,"IMAppAdmin",1)							||
-			$LDAP->user()->inGroup($USERNAME,"KieCoreTeam",1)							)		// DCO IM Application Admins and solution designers
+			$LDAP->user()->inGroup($USERNAME,"AppCoreTeam",1)							)		// DCO IM Application Admins and solution designers
 		{
 			$_SESSION["AAA"]["permission"]["information.ipplan.*.view"]					= 1;		// Permit view on ipplan.* information
 			$_SESSION["AAA"]["permission"]["information.security.*.view"]				= 1;		// Permit view of any security provisioning stuffs

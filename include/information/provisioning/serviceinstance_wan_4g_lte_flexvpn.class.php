@@ -28,9 +28,9 @@
 
 require_once "information/provisioning/serviceinstance.class.php";
 
-class Provisioning_ServiceInstance_WAN_FlexVPN	extends Provisioning_ServiceInstance
+class Provisioning_ServiceInstance_WAN_4G_LTE_FlexVPN	extends Provisioning_ServiceInstance
 {
-	public $type = "Provisioning_ServiceInstance_WAN_FlexVPN";
+	public $type = "Provisioning_ServiceInstance_WAN_4G_LTE_FlexVPN";
 
 	public function html_form_extended()
 	{
@@ -38,14 +38,12 @@ class Provisioning_ServiceInstance_WAN_FlexVPN	extends Provisioning_ServiceInsta
 		$OUTPUT .= $this->html_form_field_text	("circuitid"	,"Internet Circuit ID"								);
 		$OUTPUT .= $this->html_form_field_text	("speed"		,"Internet Service Speed (Mbps)"					);
 		$SELECT = array(
-			"GigabitEthernet0/2"		=> "GigabitEthernet0/2",
-			"GigabitEthernet0/1"		=> "GigabitEthernet0/1",
-			"GigabitEthernet0/1/0"		=> "GigabitEthernet0/1/0",
-			"GigabitEthernet0/3/0"		=> "GigabitEthernet0/3/0",
+			"Cellular0/0/0"			=> "Cellular0/0/0",
+			"Cellular0/3/0"			=> "Cellular0/3/0",
 		);
 		$OUTPUT .= $this->html_form_field_select("interface"	,"Internet Interface",$SELECT						);
-		$OUTPUT .= $this->html_form_field_text	("ceipaddress"	,"Internet IP Address/Prefix (1.2.3.6/30 OR dhcp)"	);
-		$OUTPUT .= $this->html_form_field_text	("peipaddress"	,"Next-hop IP Address (1.2.3.5 OR dhcp)"			);
+		//$OUTPUT .= $this->html_form_field_text	("ceipaddress"	,"Internet IP Address/Prefix (1.2.3.6/30 OR dhcp)"	);
+		//$OUTPUT .= $this->html_form_field_text	("peipaddress"	,"Next-hop IP Address (1.2.3.5 OR dhcp)"			);
 		$OUTPUT .= $this->html_form_field_textarea("comments"	,"Comments"											);
 		$OUTPUT .= $this->html_form_field_hidden("routemap_in"	,"RM_PERMIT_ANY"									);
 		$OUTPUT .= $this->html_form_field_hidden("routemap_out"	,"RM_PERMIT_LOCAL"									);
@@ -69,6 +67,41 @@ class Provisioning_ServiceInstance_WAN_FlexVPN	extends Provisioning_ServiceInsta
 			$NEXTHOP = $this->data['peipaddress'];
 		}
 		$OUTPUT .= <<<END
+		
+
+do cellular 0/0/0 lte technology auto
+
+do cellular 0/0/0 lte profile create 1 10791.mcs none
+
+
+
+interface cellular0/0/0
+ shut
+interface cellular0/0/1
+ shut
+interface cellular0/0/2
+ shut
+interface cellular0/0/3
+ shut
+interface cellular0/0/4
+ shut
+interface cellular0/0/5
+ shut
+
+
+controller cellular 0/0
+  lte sim profile 1 ims 1
+  !for 1921, use "lte sim data-profile 1 attach-profile 1"
+  lte gps mode standalone
+  lte gps nmea
+ exit
+ 
+chat-script lte "" "AT!CALL" TIMEOUT 60 "OK" 
+
+dialer watch-list 1 ip 5.6.7.8 0.0.0.0
+dialer watch-list 1 delay route-check initial 60
+dialer watch-list 1 delay connect 1
+
 vrf definition V999:INTERNET
   address-family ipv4
    exit-address-family
@@ -76,15 +109,28 @@ vrf definition V999:INTERNET
 
 interface {$this->data['interface']}
   vrf forwarding V999:INTERNET
-  ip address {$IP} {$NETMASK}
-  duplex auto
-  speed auto
-  no ip redirects
-  no ip proxy-arp
-  no ip directed-broadcast
-  hold-queue 4096 in
-  hold-queue 4096 out
+  ip address negotiated
+  ip nat outside
+  ip virtual-reassembly in
+  encapsulation slip
+  dialer in-band
+  dialer string lte
+  dialer watch-group 1
+  async mode interactive
+  routing dynamic
+  no shutdown
  exit
+ 
+ 
+ip access-list extended NATALLOWED
+ deny   ip any 10.0.0.0 0.255.255.255
+ deny   ip any 172.16.0.0 0.15.255.255
+ deny   ip any 192.168.0.0 0.0.255.255
+ permit ip 10.0.0.0 0.255.255.255 any
+ permit ip 172.16.0.0 0.15.255.255 any
+ permit ip 192.168.0.0 0.0.255.255 any
+
+ip nat inside source list NATALLOWED interface {$this->data['interface']} overload
 
 ip route vrf V999:INTERNET 0.0.0.0 0.0.0.0 {$this->data['interface']} {$NEXTHOP} name InternetFlexVPNFrontDoor
 
@@ -93,7 +139,7 @@ aaa authorization network AAA_FLEX_AUTH local
 crypto ikev2 keyring FLEX_IKEV2_KEYRING
   peer FLEXVPN
     address 0.0.0.0 0.0.0.0
-    pre-shared-key T0pS3cretKeyzomglulz
+    pre-shared-key awesomesauce123
    exit
  exit
 
@@ -135,7 +181,6 @@ interface Tunnel2
   tunnel vrf V999:INTERNET
   tunnel protection ipsec profile FLEX_IPSEC_PROFILE
  exit
-
 
 END;
 		// Flex BGP Configuration

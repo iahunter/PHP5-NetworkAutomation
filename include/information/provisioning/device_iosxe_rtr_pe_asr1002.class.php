@@ -26,11 +26,11 @@
  * @license   http://www.gnu.org/copyleft/lesser.html The GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
  */
 
-require_once "information/provisioning/device_iosxe_rtr_vpnrr.class.php";
+require_once "information/provisioning/device_iosxe_rtr_pe.class.php";
 
-class Provisioning_Device_IOSXE_RTR_VPNRR_asr1001	extends Provisioning_Device_IOSXE_RTR_VPNRR
+class Provisioning_Device_IOSXE_RTR_PE_asr1002	extends Provisioning_Device_IOSXE_RTR_PE
 {
-	public $type = "Provisioning_Device_IOSXE_RTR_VPNRR_asr1001";
+	public $type = "Provisioning_Device_IOSXE_RTR_PE_asr1002";
 	public $customfunction = "Config";
 
 	public function html_form_extended()

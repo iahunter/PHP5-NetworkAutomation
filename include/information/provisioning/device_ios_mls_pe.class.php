@@ -35,7 +35,7 @@ class Provisioning_Device_IOS_MLS_PE	extends Provisioning_Device_IOS_MLS
 	public function config()
 	{
 		$OUTPUT = "<pre>\n";
-		$OUTPUT .= Utility::last_stack_call(new Exception);
+		$OUTPUT .= \metaclassing\Utility::lastStackCall(new Exception);
 
 		$OUTPUT .= "! Found Device ID ".$this->data['id']." of type ".get_class($this)."\n\n";
 
@@ -82,6 +82,10 @@ class Provisioning_Device_IOS_MLS_PE	extends Provisioning_Device_IOS_MLS
 		$OUTPUT .= $this->config_bgp();
 
 		$OUTPUT .= <<<END
+		
+no logging host 10.0.192.130
+
+logging host 10.0.192.130 vrf management
 
 mac-address-table aging-time 14400
 
@@ -102,7 +106,7 @@ END;
 	public function config_bgp()
 	{
 		$OUTPUT = "";
-		$OUTPUT .= Utility::last_stack_call(new Exception);
+		$OUTPUT .= \metaclassing\Utility::lastStackCall(new Exception);
 
 		$DEV_BGPASN = $this->parent()->get_asn();
 		$DEV_LOOP4	= $this->data['loopback4'];
@@ -178,7 +182,7 @@ router bgp $DEV_BGPASN
 	public function config_interface($INTERFACE)
 	{
 		$OUTPUT = "";
-		$OUTPUT .= Utility::last_stack_call(new Exception);
+		$OUTPUT .= \metaclassing\Utility::lastStackCall(new Exception);
 
 		$DEVICEID		= $this->data['id'];
 		$DEV_NAME		= $this->data['name'];
@@ -341,5 +345,3 @@ router bgp $DEV_BGPASN
 	}
 	
 }
-
-?>

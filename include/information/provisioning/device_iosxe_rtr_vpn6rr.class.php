@@ -28,7 +28,7 @@
 
 require_once "information/provisioning/device_iosxe_rtr.class.php";
 
-class Provisioning_Device_IOSXE_RTR_VPNRR	extends Provisioning_Device_IOSXE_RTR
+class Provisioning_Device_IOSXE_RTR_VPN6RR	extends Provisioning_Device_IOSXE_RTR
 {
 	public $type = "Provisioning_Device_IOSXE_RTR_WANRR";
 
@@ -100,11 +100,11 @@ router bgp $DEV_BGPASN
   bgp log-neighbor-changes
   bgp deterministic-med
 
-  template peer-policy PEER_POLICY_VPNV4_RR_CLIENT
+  template peer-policy PEER_POLICY_VPNV6_RR_CLIENT
     route-reflector-client
     send-community both
    exit-peer-policy
-  template peer-session PEER_SESSION_VPNV4_RR_CLIENT
+  template peer-session PEER_SESSION_VPNV6_RR_CLIENT
     remote-as $DEV_BGPASN
     update-source Loopback0
    exit-peer-session
@@ -118,14 +118,10 @@ router bgp $DEV_BGPASN
 			if ( preg_match($REGEX,$L3DEVICE->data['type'],$REG) ) // only peer with PE's in this ASN!
 			{
 				$RR_LOOP4 = $L3DEVICE->data['loopback4'];
-				$OUTPUT .= "  neighbor $RR_LOOP4 inherit peer-session PEER_SESSION_VPNV4_RR_CLIENT
-  address-family vpnv4
+				$OUTPUT .= "  neighbor $RR_LOOP4 inherit peer-session PEER_SESSION_VPNV6_RR_CLIENT
+  address-family vpnv6
     neighbor $RR_LOOP4 activate
-    neighbor $RR_LOOP4 inherit peer-policy PEER_POLICY_VPNV4_RR_CLIENT
-   exit
-  address-family ipv4 mdt
-    neighbor $RR_LOOP4 activate
-    neighbor $RR_LOOP4 inherit peer-policy PEER_POLICY_VPNV4_RR_CLIENT
+    neighbor $RR_LOOP4 inherit peer-policy PEER_POLICY_VPNV6_RR_CLIENT
    exit
 ";
 			}

@@ -26,23 +26,14 @@
  * @license   http://www.gnu.org/copyleft/lesser.html The GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
  */
 
-require_once "information/provisioning/device_ios_swi_acc.class.php";
+require_once "information/provisioning/device_arubaos_wlc_campus.class.php";
 
-class Provisioning_Device_IOS_SWI_ACC_2960X	extends Provisioning_Device_IOS_SWI_ACC
+class Provisioning_Device_ArubaOS_WLC_Campus_7000	extends Provisioning_Device_ArubaOS_WLC_Campus
 {
-	public $type = "Provisioning_Device_IOS_SWI_ACC_2960X";
+	public $type = "Provisioning_Device_ArubaOS_WLC_Campus_7000";
+	public $customfunction = "Config";
 
-	public function html_form_extended()
-	{
-		$OUTPUT .= $this->html_form_field_text("mgmtgw"			,"Management IPv4 Gateway (A.B.C.1)"	);
-		$OUTPUT .= $this->html_form_field_text("mgmtint"		,"Management Interface (Vlan1)"			);
-		return $OUTPUT;
-	}
-
-	public function initialize()
-	{
-		// Add 48 ports?
-		return 1;
-	}
-
+	// Nothing hardware specific to do here yet,
+	// Maybe add initialize function later for custom child object creation? interfaces?
+	// Could make a call to activate.arubanetworks.com and populate WLCs from a PO?
 }

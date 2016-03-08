@@ -43,7 +43,7 @@ class Provisioning_Device_UPS_APC	extends Provisioning_Device
 	public function config()
 	{
 		$OUTPUT = "<pre>\n";
-		$OUTPUT .= Utility::last_stack_call(new Exception);
+		$OUTPUT .= \metaclassing\Utility::lastStackCall(new Exception);
 
 		$OUTPUT .= "! Found Device ID ".$this->data['id']." of type ".get_class($this)."\n\n";
 
@@ -116,5 +116,3 @@ END;
 	}
 
 }
-
-?>

@@ -26,11 +26,11 @@
  * @license   http://www.gnu.org/copyleft/lesser.html The GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
  */
 
-require_once "information/provisioning/device_iosxe_rtr.class.php";
+require_once "information/provisioning/device_ios_rtr.class.php";
 
-class Provisioning_Device_IOSXE_RTR_VPNRR	extends Provisioning_Device_IOSXE_RTR
+class Provisioning_Device_IOS_RTR_WANSS	extends Provisioning_Device_IOS_RTR
 {
-	public $type = "Provisioning_Device_IOSXE_RTR_WANRR";
+	public $type = "Provisioning_Device_IOS_RTR_WANSS";
 
 	public function config()
 	{
@@ -55,7 +55,7 @@ class Provisioning_Device_IOSXE_RTR_VPNRR	extends Provisioning_Device_IOSXE_RTR
 
 		$OUTPUT .= $this->config_loopback();
 
-		$OUTPUT .= $this->config_management();
+//		$OUTPUT .= $this->config_management();	// On wanrr devices we dont use dedicated mgmt interfaces, mgmt networks, mgmt vrfs, etc.
 
 		$OUTPUT .= $this->config_motd();
 
@@ -66,6 +66,8 @@ class Provisioning_Device_IOSXE_RTR_VPNRR	extends Provisioning_Device_IOSXE_RTR
 		$OUTPUT .= $this->config_aaa();
 
 		$OUTPUT .= $this->config_snmp();
+
+		$OUTPUT .= $this->config_netflow();
 
 		$OUTPUT .= $this->config_ospf();
 
@@ -100,36 +102,41 @@ router bgp $DEV_BGPASN
   bgp log-neighbor-changes
   bgp deterministic-med
 
-  template peer-policy PEER_POLICY_VPNV4_RR_CLIENT
+  template peer-policy PEER_POLICY_IPV4_WANRR_CLIENT
     route-reflector-client
+    next-hop-self
     send-community both
    exit-peer-policy
-  template peer-session PEER_SESSION_VPNV4_RR_CLIENT
+  template peer-session PEER_SESSION_IPV4_WANRR_CLIENT
     remote-as $DEV_BGPASN
     update-source Loopback0
+    fall-over
    exit-peer-session
 ";
-		$ASN_DEVICES = $this->get_devices_by_asn($DEV_BGPASN);
+/*		$ASN_DEVICES = $this->get_devices_by_asn($DEV_BGPASN);
 		$RR_COUNT = count($ASN_DEVICES) - 1; // Subtract myself
 		$OUTPUT .= "\n! Found $RR_COUNT other BGP devices in this ASN.\n";
 		foreach ($ASN_DEVICES as $L3DEVICE)
 		{
-			$REGEX = "/PE_/";
-			if ( preg_match($REGEX,$L3DEVICE->data['type'],$REG) ) // only peer with PE's in this ASN!
+			if ($L3DEVICE->data['id'] != $this->data['id'])
 			{
 				$RR_LOOP4 = $L3DEVICE->data['loopback4'];
-				$OUTPUT .= "  neighbor $RR_LOOP4 inherit peer-session PEER_SESSION_VPNV4_RR_CLIENT
-  address-family vpnv4
+				$OUTPUT .= "  neighbor $RR_LOOP4 inherit peer-session PEER_SESSION_IPV4_WANRR_CLIENT
+  address-family ipv4
     neighbor $RR_LOOP4 activate
-    neighbor $RR_LOOP4 inherit peer-policy PEER_POLICY_VPNV4_RR_CLIENT
-   exit
-  address-family ipv4 mdt
-    neighbor $RR_LOOP4 activate
-    neighbor $RR_LOOP4 inherit peer-policy PEER_POLICY_VPNV4_RR_CLIENT
+    neighbor $RR_LOOP4 inherit peer-policy PEER_POLICY_IPV4_WANRR_CLIENT
    exit
 ";
 			}
 		}
+/**/
+		$SITE_IP4BLOCK_ADDR = Net_IPv4::parseAddress($SITE_IP4BLOCK)->ip;
+		$SITE_IP4BLOCK_MASK = Net_IPv4::parseAddress($SITE_IP4BLOCK)->netmask;
+		$OUTPUT .= "  address-family ipv4
+!   network $DEV_LOOP4 mask 255.255.255.255
+    aggregate-address $SITE_IP4BLOCK_ADDR $SITE_IP4BLOCK_MASK summary-only
+";
+		$OUTPUT .= "   exit\n";
 		$OUTPUT .= " exit\n";
 
 		return $OUTPUT;

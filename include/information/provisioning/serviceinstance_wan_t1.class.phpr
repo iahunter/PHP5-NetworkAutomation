@@ -28,9 +28,9 @@
 
 require_once "information/provisioning/serviceinstance.class.php";
 
-class Provisioning_ServiceInstance_WAN_Ethernet	extends Provisioning_ServiceInstance
+class Provisioning_ServiceInstance_WAN_T1	extends Provisioning_ServiceInstance
 {
-	public $type = "Provisioning_ServiceInstance_WAN_Ethernet";
+	public $type = "Provisioning_ServiceInstance_WAN_T1";
 
 	public function html_form_extended()
 	{
@@ -41,24 +41,24 @@ class Provisioning_ServiceInstance_WAN_Ethernet	extends Provisioning_ServiceInst
 			"CenturyLink"	=> "CenturyLink",
 			"Telus"			=> "Telus",
 			"Telus65001"	=> "Telus65001",
-			"KieBone"		=> "KieBone",
 		);
-		$OUTPUT .= $this->html_form_field_select("provider"		,"Service Provider",$SELECT	);
+		$OUTPUT .= $this->html_form_field_select("provider"		,"Service Provider",$SELECT);
 		$OUTPUT .= $this->html_form_field_text	("circuitid"	,"Carrier Circuit ID"		);
-		$OUTPUT .= $this->html_form_field_text	("speed"		,"Circuit Speed (Mbps)"		);
-		$OUTPUT .= $this->html_form_field_text	("ceipaddress"	,"CE IP Address (1.2.3.4)"	);
+		$OUTPUT .= $this->html_form_field_text	("ceipaddress"	,"CE IP Address (1.2.3.4)");
 		$SELECT = array(
-			"GigabitEthernet0/2"		=> "GigabitEthernet0/2",
-			"GigabitEthernet0/1"		=> "GigabitEthernet0/1",
-			"GigabitEthernet0/0/0"		=> "GigabitEthernet0/0/0",
-			"GigabitEthernet0/1/0"		=> "GigabitEthernet0/1/0",
-			"GigabitEthernet0/3/0"		=> "GigabitEthernet0/3/0",
+			"1"	=> "1",
+			"2"	=> "2",
+			"3"	=> "3",
+			"4" => "4",
+			"5" => "5",
+			"6" => "6",
+			"7" => "7",
+			"8" => "8",
 		);
-		$OUTPUT .= $this->html_form_field_select("interface"	,"WAN Interface",$SELECT	);
-		$OUTPUT .= $this->html_form_field_text	("vlan"			,"VLAN (blank for none)"	);
-		$OUTPUT .= $this->html_form_field_textarea("comments"	,"Comments"					);
-		$OUTPUT .= $this->html_form_field_hidden("routemap_in"	,"RM_PERMIT_ANY"			);
-		$OUTPUT .= $this->html_form_field_hidden("routemap_out"	,"RM_PERMIT_LOCAL"			);
+		$OUTPUT .= $this->html_form_field_select("t1count"		,"T1 Count",$SELECT);
+		$OUTPUT .= $this->html_form_field_textarea("comments"	,"Comments");
+		$OUTPUT .= $this->html_form_field_hidden("routemap_in"	,"RM_PERMIT_ANY");
+		$OUTPUT .= $this->html_form_field_hidden("routemap_out"	,"RM_PERMIT_LOCAL");
 		return $OUTPUT;
 	}
 
@@ -66,43 +66,97 @@ class Provisioning_ServiceInstance_WAN_Ethernet	extends Provisioning_ServiceInst
 	{
 		$OUTPUT = "";
 		$ASN = $this->parent()->parent()->get_asn();
+		$MBPS = 1.5  * $this->data['t1count'];
+		$KBPS = 1536 * $this->data['t1count'];
 
-		// Configure Ethernet Interface
-		if ($this->data['vlan'])	// If we have a VLAN, configure the base interface and subinterface with dot1q encapsulation
+		// Configure T1 cards, controllers, and channel groups
+		$T1RANGE = range(0,$this->data['t1count'] - 1);
+		foreach($T1RANGE as $T1)
 		{
-			$KBPS = 850 * $this->data['speed'];	// There is a sizeable ethernet overhead!
-			$MBPS = $KBPS / 1000;
-			$OUTPUT .= <<<END
-interface {$this->data['interface']}
-  description WAN_MPLS_{$this->data['provider']}_{$MBPS}Mbps_{$this->data['circuitid']}
+			$CARD = floor($T1 / 2);
+			$PORT = floor($T1 % 2);
+			if(!$PORT)	// if this is the first port on a new card, print out the card type
+			{
+				$OUTPUT .= "card type t1 0 {$CARD}\n";
+			}
+			$OUTPUT .= "controller T1 0/{$CARD}/{$PORT}\n";
+			$OUTPUT .= "  channel-group 0 timeslots 1-24\n";
+		}
+
+		// Configure T1 interfaces
+		$OUTPUT .= "\n";
+		if ($this->data['t1count'] == 1)	// For exactly ONE T1, we just configure a serial interface and put our IP there
+		{
+			$this->data["interface"] = "Serial0/0/0:0";
+			if ($this->data['provider'] == "Verizon")		// For verizon, we always run frame-relay
+			{
+				$OUTPUT .= <<<END
+interface Serial0/0/0:0
+  no ip address
+  encapsulation frame-relay IETF
   no shutdown
  exit
 
- interface {$this->data['interface']}.{$this->data['vlan']}
-  description WAN_MPLS_{$this->data['provider']}_{$MBPS}Mbps_{$this->data['circuitid']}
-  encapsulation dot1q {$this->data['vlan']}
-  bandwidth {$KBPS}
+interface Serial0/0/0:0.100 point-to-point
+  description WAN_MPLS_$MPLSPROVIDER_{$MBPS}Mbps_$CIRCUITID
   ip address {$this->data['ceipaddress']} 255.255.255.252
+  bandwidth {$KBPS}
   no ip redirects
-  no ip proxy-arp
+  snmp trap link-status
+  frame-relay interface-dlci 100 IETF
   no shutdown
  exit
 
 END;
-		}else{						// If we are UNTAGGED use the base interface for everything
-			$KBPS = 900 * $this->data['speed'];	// There is a sizeable ethernet overhead!
-			$MBPS = $KBPS / 1000;
-			$OUTPUT .= <<<END
-interface {$this->data['interface']}
+			}
+			if ($this->data['provider'] == "CenturyLink")	// For CenturyLink, we always run HDLC
+			{
+				$OUTPUT .= <<<END
+interface Serial0/0/0:0
   description WAN_MPLS_{$this->data['provider']}_{$MBPS}Mbps_{$this->data['circuitid']}
+  bandwidth {$KBPS}
   ip address {$this->data['ceipaddress']} 255.255.255.252
   bandwidth {$KBPS}
   no ip redirects
-  no ip proxy-arp
   no shutdown
  exit
 
 END;
+			}
+		}else{	// For MULTIPLE T1 interfaces, we need to create a multilink bundle and put our IP there
+			$this->data["interface"] = "Multilink1";
+			$OUTPUT .= <<<END
+interface Multilink1
+  description WAN_MPLS_{$this->data['provider']}_{$MBPS}Mbps_{$this->data['circuitid']}
+  ip address {$this->data['ceipaddress']} 255.255.255.252
+  bandwidth {$KBPS}
+  no ip redirects
+  ppp multilink
+  ppp multilink group 1
+  ppp multilink fragment disable
+  no shutdown
+  ppp chap hostname {$this->data['circuitid']}
+ exit
+
+END;
+			// Configure member serial interfaces
+			$T1RANGE = range(0,$this->data['t1count'] - 1);
+			foreach($T1RANGE as $T1)
+			{
+				$CARD = floor($T1 / 2);
+				$PORT = floor($T1 % 2);
+				$OUTPUT .= <<<END
+interface Serial0/{$CARD}/{$PORT}:0
+  no ip address
+  encapsulation ppp
+  ppp multilink
+  ppp multilink group 1
+  no shutdown
+  ppp chap hostname {$this->data['circuitid']}
+ exit
+
+END;
+			}
 		}
 
 		// Configure BGP
@@ -141,7 +195,6 @@ END;
 		$PROVIDERASN["CenturyLink"]	= "209";
 		$PROVIDERASN["Telus"]		= "852";
 		$PROVIDERASN["Telus65001"]	= "65001";
-		$PROVIDERASN["KieBone"]		= "12345";
 		$this->data['peer_asn'] = $PROVIDERASN[$this->data['provider']];
 
 		$OUTPUT .= "router bgp {$ASN}\n";
@@ -161,12 +214,7 @@ END;
 		if (isset($this->data['vrf'])) { $OUTPUT .= "   exit\n"; }
 		$OUTPUT .= " exit\n";
 
-		if ($this->data['vlan'])
-		{
-			$OUTPUT .= $this->parent()->config_qos($MBPS,$this->data["interface"] . "." . $this->data['vlan']);
-		}else{
-			$OUTPUT .= $this->parent()->config_qos($MBPS,$this->data["interface"]);
-		}
+		$OUTPUT .= $this->parent()->config_qos($MBPS,$this->data["interface"]);
 
 		return $OUTPUT;
 	}

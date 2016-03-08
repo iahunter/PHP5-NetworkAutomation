@@ -35,7 +35,7 @@ class Provisioning_Device_IOS_RTR_WANRR	extends Provisioning_Device_IOS_RTR
 	public function config()
 	{
 		$OUTPUT = "<pre>\n";
-		$OUTPUT .= Utility::last_stack_call(new Exception);
+		$OUTPUT .= \metaclassing\Utility::lastStackCall(new Exception);
 
 		$OUTPUT .= "! Found Device ID ".$this->data['id']." of type ".get_class($this)."\n\n";
 
@@ -87,7 +87,7 @@ class Provisioning_Device_IOS_RTR_WANRR	extends Provisioning_Device_IOS_RTR
 	public function config_bgp()
 	{
 		$OUTPUT = "";
-		$OUTPUT .= Utility::last_stack_call(new Exception);
+		$OUTPUT .= \metaclassing\Utility::lastStackCall(new Exception);
 
 		$DEV_BGPASN = $this->parent()->get_asn();
 		$DEV_LOOP4	= $this->data['loopback4'];
@@ -110,6 +110,7 @@ router bgp $DEV_BGPASN
   template peer-session PEER_SESSION_IPV4_WANRR_CLIENT
     remote-as $DEV_BGPASN
     update-source Loopback0
+    fall-over
    exit-peer-session
 ";
 		$ASN_DEVICES = $this->get_devices_by_asn($DEV_BGPASN);
@@ -141,5 +142,3 @@ router bgp $DEV_BGPASN
 	}
 
 }
-
-?>

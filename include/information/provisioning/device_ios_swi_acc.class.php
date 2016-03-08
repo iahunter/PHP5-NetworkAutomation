@@ -35,7 +35,7 @@ class Provisioning_Device_IOS_SWI_ACC	extends Provisioning_Device_IOS_SWI
 	public function config()
 	{
 		$OUTPUT = "<pre>\n";
-		$OUTPUT .= Utility::last_stack_call(new Exception);
+		$OUTPUT .= \metaclassing\Utility::lastStackCall(new Exception);
 
 		$OUTPUT .= "! Found Device ID ".$this->data['id']." of type ".get_class($this)."\n\n";
 
@@ -92,7 +92,7 @@ class Provisioning_Device_IOS_SWI_ACC	extends Provisioning_Device_IOS_SWI
 	public function config_management()
 	{
 		$OUTPUT = "";
-		$OUTPUT .= Utility::last_stack_call(new Exception);
+		$OUTPUT .= \metaclassing\Utility::lastStackCall(new Exception);
 
 		$DEV_MGMTIP4    = $this->data['mgmtip4'];
 		$DEV_MGMTGW     = $this->data['mgmtgw'];
@@ -131,5 +131,3 @@ ip default-gateway $DEV_MGMTGW
 	}
 
 }
-
-?>

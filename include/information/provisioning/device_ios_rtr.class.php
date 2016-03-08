@@ -198,7 +198,7 @@ class Provisioning_Device_IOS_RTR	extends Provisioning_Device_IOS
 	public function config_dns()
 	{
         $OUTPUT = "";
-        $OUTPUT .= Utility::last_stack_call(new Exception);
+        $OUTPUT .= \metaclassing\Utility::lastStackCall(new Exception);
         $OUTPUT .= "
 ip domain-lookup
 ip domain retry 0
@@ -327,5 +327,3 @@ ip name-server 10.252.26.5
 		return $CONFIG;
 	}
 }
-
-?>

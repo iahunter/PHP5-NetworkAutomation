@@ -167,7 +167,7 @@ END;
 		$OUTPUT .= <<<END
 router bgp {$ASN}
   address-family ipv4
-    neighbor 10.251.248.1 remote-as 12345
+    neighbor 10.251.248.1 remote-as 1234
     neighbor 10.251.248.1 local-as 64998
     neighbor 10.251.248.1 description FLEX_MDC_HUB
     neighbor 10.251.248.1 send-community both
@@ -175,7 +175,7 @@ router bgp {$ASN}
     neighbor 10.251.248.1 route-map {$this->data['routemap_in' ]} in
     neighbor 10.251.248.1 route-map {$this->data['routemap_out']} out
 
-    neighbor 10.252.248.1 remote-as 12345
+    neighbor 10.252.248.1 remote-as 1234
     neighbor 10.252.248.1 local-as 64999
     neighbor 10.252.248.1 description FLEX_SDC_HUB
     neighbor 10.252.248.1 send-community both

@@ -35,7 +35,7 @@ class Provisioning_Device_IOS	extends Provisioning_Device
 	public function config_logging()
 	{
 		$OUTPUT = "";
-		$OUTPUT .= Utility::last_stack_call(new Exception);
+		$OUTPUT .= \metaclassing\Utility::lastStackCall(new Exception);
 
 		$OUTPUT .= "
 service timestamps debug datetime msec
@@ -99,21 +99,21 @@ no clock timezone
 	public function config_aaa()
 	{
 		$OUTPUT = "";
-		$OUTPUT .= Utility::last_stack_call(new Exception);
+		$OUTPUT .= \metaclassing\Utility::lastStackCall(new Exception);
 
 		$DEV_MGMTVRF = $this->data['mgmtvrf'];
 
 		$OUTPUT .= '
 aaa new-model
-username console privilege 15 secret 5 $1$Glk1$nope
-username telecom privilege 15 secret 5 $1$4XCK$lol
-enable secret 5 $1$fPpm$Z0mLG/kthx
+username console privilege 15 secret 5 $1$Glk1$lol
+username telecom privilege 15 secret 5 $1$4XCK$nope
+enable secret 5 $1$fPpm$secret
 ';
 		$OUTPUT .= "
 no enable password
 !
 aaa group server tacacs+ AAA_GROUP_ADMIN
-  server-private 10.252.40.75 timeout 3 key topsecret
+  server-private 10.252.40.75 timeout 3 key abc123lolol
   ip tacacs source-interface {$this->data['mgmtint']}
 ";
 		if ($DEV_MGMTVRF != "") { $OUTPUT .= "ip vrf forwarding {$this->data['mgmtvrf']}"; }
@@ -195,7 +195,7 @@ ip tcp path-mtu-discovery
 	public function config_management()
 	{
 		$OUTPUT = "";
-		$OUTPUT .= Utility::last_stack_call(new Exception);
+		$OUTPUT .= \metaclassing\Utility::lastStackCall(new Exception);
 
 		$DEV_MGMTIP4    = $this->data['mgmtip4'];
 		$DEV_MGMTGW     = $this->data['mgmtgw'];
@@ -237,7 +237,7 @@ ip route 0.0.0.0 0.0.0.0 $DEV_MGMTGW
 	public function config_snmp()
 	{
 		$OUTPUT = "";
-		$OUTPUT .= Utility::last_stack_call(new Exception);
+		$OUTPUT .= \metaclassing\Utility::lastStackCall(new Exception);
 
 		$SITENAME = $this->parent()->data['name'];
 		$DEV_MGMTVRF = $this->data['mgmtvrf'];
@@ -246,17 +246,19 @@ ip route 0.0.0.0 0.0.0.0 $DEV_MGMTGW
 snmp-server location {$SITENAME}
 snmp-server contact Network Operations
 ip access-list standard ACL_SNMP_RW
-  permit 172.30.0.246
   permit 10.123.0.0 0.0.255.255
  exit
 ip access-list standard ACL_SNMP_RO
-  permit 10.0.112.0 0.0.15.255
-  permit 10.0.210.0 0.0.1.255
-  permit 10.202.0.0 0.0.255.255
-  permit 10.250.224.0 0.0.15.255
-  permit 172.17.251.0 0.0.0.255
   permit 172.30.0.0 0.0.255.255
- exit
+  permit 10.123.0.0 0.0.255.255
+  permit 10.202.0.0 0.0.255.255
+  permit 10.242.0.0 0.0.255.255
+  permit 10.243.0.0 0.0.255.255
+  permit 10.245.0.0 0.0.255.255
+  permit 10.246.0.0 0.0.255.255
+  permit 10.247.0.0 0.0.255.255
+  permit 10.248.0.0 0.0.255.255
+  exit
 snmp-server community NetworkRO RO ACL_SNMP_RO
 snmp-server community NetworkRW RW ACL_SNMP_RW
 snmp-server trap-source {$this->data['mgmtint']}
@@ -279,7 +281,7 @@ snmp-server ifindex persist
 	public function config_netflow()
 	{
 		$OUTPUT = "";
-		$OUTPUT .= Utility::last_stack_call(new Exception);
+		$OUTPUT .= \metaclassing\Utility::lastStackCall(new Exception);
 
 		$OUTPUT .= <<<END
 ip flow-cache timeout active 1
@@ -299,7 +301,7 @@ END;
 	public function config_ospf()
 	{
 		$OUTPUT = "";
-		$OUTPUT .= Utility::last_stack_call(new Exception);
+		$OUTPUT .= \metaclassing\Utility::lastStackCall(new Exception);
 
 		$OUTPUT .= "
 ip routing
@@ -322,7 +324,7 @@ interface Loopback0
 	public function config_mpls()
 	{
 		$OUTPUT = "";
-		$OUTPUT .= Utility::last_stack_call(new Exception);
+		$OUTPUT .= \metaclassing\Utility::lastStackCall(new Exception);
 
 		$OUTPUT .= "
 ip cef
@@ -342,7 +344,7 @@ mpls ldp session protection
 	public function config_multicast()
 	{
 		$OUTPUT = "";
-		$OUTPUT .= Utility::last_stack_call(new Exception);
+		$OUTPUT .= \metaclassing\Utility::lastStackCall(new Exception);
 
 		$OUTPUT .= "
 ip multicast-routing
@@ -360,7 +362,7 @@ int loopback0
 	public function config_bgp()
 	{
 		$OUTPUT = "";
-		$OUTPUT .= Utility::last_stack_call(new Exception);
+		$OUTPUT .= \metaclassing\Utility::lastStackCall(new Exception);
 
 		$DEV_BGPASN = $this->parent()->get_asn();
 
@@ -383,7 +385,7 @@ router bgp $DEV_BGPASN
 		$VPN = $this->get_vpn_by_vpnid($VPNID);
 
 		$OUTPUT = "";
-		$OUTPUT .= Utility::last_stack_call(new Exception);
+		$OUTPUT .= \metaclassing\Utility::lastStackCall(new Exception);
 
 		// Only do work if we find the VPN ID specified.
 		if ($VPN)
@@ -412,7 +414,14 @@ router bgp $DEV_BGPASN
 				        $OUTPUT .= "    route-target import $DEV_BGPASN:$VRF_RT\n";
 				        $OUTPUT .= "    route-target export $DEV_BGPASN:$VRF_RT\n";
 				}/**/
-				$OUTPUT .= "    maximum routes 10000 80\n";
+//				if ($VPNID >= 100 && $VPNID <= 199)
+//				{
+//					$OUTPUT .= "    maximum routes 10000 80\n";
+//				}else{
+//					$OUTPUT .= "    maximum routes 100 80\n";
+//				}
+		        $OUTPUT .= "    maximum routes 10000 80\n";
+
 				$OUTPUT .= "   exit\n";
 				$OUTPUT .= " exit\n";
 				$OUTPUT .= "router bgp $DEV_BGPASN\n";
@@ -429,7 +438,7 @@ router bgp $DEV_BGPASN
 	public function config_vlan($VLANID, $VLANNAME = "")
 	{
 		$OUTPUT = "";
-		$OUTPUT .= Utility::last_stack_call(new Exception);
+		$OUTPUT .= \metaclassing\Utility::lastStackCall(new Exception);
 
 //TODO FIXME!
 		// Only configure the VLAN if it hasnt been configured!
@@ -449,7 +458,7 @@ router bgp $DEV_BGPASN
 	public function config_spanningtree()
 	{
 		$OUTPUT = "";
-		$OUTPUT .= Utility::last_stack_call(new Exception);
+		$OUTPUT .= \metaclassing\Utility::lastStackCall(new Exception);
 		$OUTPUT .= "spanning-tree mode rapid-pvst\n";
 		if (preg_match("/.*swd0\d*[13579]$/i",$this->data['name'],$MATCH))
 		{
@@ -494,7 +503,7 @@ may provide the evidence gathered to law enforcement officials.
 	public function config_loopback()
 	{
 		$OUTPUT = "";
-		$OUTPUT .= Utility::last_stack_call(new Exception);
+		$OUTPUT .= \metaclassing\Utility::lastStackCall(new Exception);
 
 		$DEV_LOOP4      = $this->data['loopback4'];
 		$OUTPUT .= "
@@ -510,7 +519,7 @@ interface Loopback0
 	public function config_dns()
 	{
 		$OUTPUT = "";
-		$OUTPUT .= Utility::last_stack_call(new Exception);
+		$OUTPUT .= \metaclassing\Utility::lastStackCall(new Exception);
 		$OUTPUT .= "
 ip domain-lookup
 
@@ -607,7 +616,7 @@ ip name-server 10.252.26.5
 
 	public function config_qos($SPEED,$INTERFACE)
 	{
-		$OUTPUT .= Utility::last_stack_call(new Exception);
+		$OUTPUT .= \metaclassing\Utility::lastStackCall(new Exception);
 		$SPEEDM = intval($SPEED);
 		$SPEEDK = floatval($SPEED) * 1024;
 		if ($SPEEDM < 1 || $SPEEDM > 10000) { $OUTPUT .= "ERROR: QOS requested but no policy available for {$SPEEDM}mbps!\n"; return $OUTPUT; }
@@ -702,4 +711,3 @@ interface {$INTERFACE}
 
 }
 
-?>

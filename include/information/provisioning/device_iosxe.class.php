@@ -35,7 +35,7 @@ class Provisioning_Device_IOSXE	extends Provisioning_Device_IOS
 	public function config_multicast()
 	{
 		$OUTPUT = "";
-		$OUTPUT .= Utility::last_stack_call(new Exception);
+		$OUTPUT .= \metaclassing\Utility::lastStackCall(new Exception);
 
 		$OUTPUT .= "
 ip multicast-routing distributed
@@ -53,7 +53,7 @@ int loopback0
 	public function config_qos($SPEED,$INTERFACE)
 	{
 		$OUTPUT = "";
-		$OUTPUT .= Utility::last_stack_call(new Exception);
+		$OUTPUT .= \metaclassing\Utility::lastStackCall(new Exception);
 		$SPEEDM = intval($SPEED);
 		$SPEEDK = floatval($SPEED) * 1024;
 		if ($SPEEDM < 1 || $SPEEDM > 10000) { $OUTPUT .= "ERROR: QOS requested but no policy available for {$SPEEDM}mbps!\n"; return $OUTPUT; }
@@ -148,5 +148,3 @@ interface {$INTERFACE}
 	}
 
 }
-
-?>
