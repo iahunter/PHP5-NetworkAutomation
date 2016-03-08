@@ -61,7 +61,7 @@ class Information
 		if (!$ID)
 		{
 			$MESSAGE = "ERROR: Information::retrieve called with no ID:\"{$ID}\"!";
-			$MESSAGE .= "STACK TRACE: " . Utility::last_stack_call(new Exception);
+			$MESSAGE .= "STACK TRACE: " . \metaclassing\Utility::lastStackCall(new Exception);
 			$DB->log($MESSAGE);
 			global $HTML; if (is_object($HTML)) { $MESSAGE .= $HTML->footer(); }
 			die($MESSAGE);
@@ -73,9 +73,9 @@ class Information
 			global $CACHE;
 			$PREFIX = "InfoID:";
 			$KEY = "{$PREFIX}{$ID}";
-			$BASETIME = Utility::microtime_ticks();
+			$BASETIME = \metaclassing\Utility::microtimeTicks();
 			$data = unserialize($CACHE->get($KEY));
-			$DIFFTIME = Utility::microtime_ticks() - $BASETIME;
+			$DIFFTIME = \metaclassing\Utility::microtimeTicks() - $BASETIME;
 			$DB->CACHETIME += $DIFFTIME;
 		}
 		if ( $data == "" ) // IF we didnt get any data out of the cache
@@ -272,7 +272,61 @@ class Information
 			}
 		}
 		$QUERY .= " ORDER BY {$ORDER}";
-		//dumper($QUERY);
+		//\metaclassing\Utility::dumper($QUERY);
+		global $DB;
+		$DB->query($QUERY);
+		try {
+			foreach ($SEARCH as $KEY => $VALUE)
+			{
+				if ( is_array($VALUE) && count($VALUE) )        // If they pass us an array WITH content
+				{
+					foreach($VALUE as $INDEX => $ORVALUE)
+					{
+						$DB->bind($KEY."ITEM".$INDEX, $ORVALUE);
+					}
+				}else{
+					$DB->bind($KEY, $VALUE);
+				}
+			}
+			$DB->execute();
+			$RESULTS = array_values($DB->results());
+		} catch (Exception $E) {
+			$MESSAGE = "Exception: {$E->getMessage()}";
+			trigger_error($MESSAGE);
+			global $HTML;
+			die($MESSAGE . $HTML->footer());
+		}
+		foreach ($RESULTS as $RESULT)
+		{
+			array_push($RETURN, $RESULT['id']);
+		}
+		return $RETURN;
+	}
+
+	public static function search2( $SEARCH = array() , $ORDER = "ID" )
+	{
+		$RETURN = array();
+		$QUERY = "SELECT id FROM information WHERE ";	// By default passing no search criteria will result in all record ID's being returned
+		if (!isset($SEARCH['active'])) { $SEARCH['active'] = 1; } // By default, only search ACTIVE information. This can be overridden abnormally
+		$CRITERIA = array();
+		foreach ($SEARCH as $KEY => $VALUE)
+		{
+/*			if ( is_array($VALUE) && count($VALUE) )		// If they pass us an array WITH content
+			{
+				$QUERY .= " AND ( ";
+				foreach($VALUE as $INDEX => $ORVALUE)
+				{
+					if ($INDEX > 0) { $QUERY .= " OR "; }
+					$QUERY .= "{$KEY} LIKE :{$KEY}ITEM{$INDEX}";
+				}
+				$QUERY .= " )";
+			}else{/**/
+				array_push($CRITERIA,"{$KEY} = :{$KEY}");
+			//}
+		}
+		$QUERY .= implode(" AND ",$CRITERIA);
+		$QUERY .= " ORDER BY {$ORDER}";
+		//\metaclassing\Utility::dumper($QUERY);
 		global $DB;
 		$DB->query($QUERY);
 		try {
@@ -313,7 +367,7 @@ class Information
 				$RETURN = array_merge($RETURN,Information::search($SEARCH));
 				$RETURN = array_unique($RETURN); // remove duplicate values
 /*print "SEARCHED FOR:\n";
-dumper($SEARCH);
+\metaclassing\Utility::dumper($SEARCH);
 print "RETURN NOW CONTAINS " . count($RETURN) . " RECORDS!\n";/**/
 			}
 		}
@@ -783,7 +837,7 @@ END;
 				{
 					$OUTPUT .= $TASKINFO["output"];
 				}else{
-					$OUTPUT .= "ERROR! " . dumper_to_string($TASKINFO);
+					$OUTPUT .= "ERROR! " . \metaclassing\Utility::dumperToString($TASKINFO);
 				}
 			}
 			$OUTPUT .= $FIRSTOBJECT->html_list_footer();
@@ -930,7 +984,7 @@ END;
 		$rowclass = "row".(($i % 2)+1);
 
 		$columns = count($this->html_width)-1;	$i = 1;
-		$datadump = dumper_to_string($this->data);
+		$datadump = \metaclassing\Utility::dumperToString($this->data);
 		$OUTPUT .= <<<END
 
 				<tr class="{$rowclass}">
@@ -968,7 +1022,7 @@ END;
 		$OUTPUT .= $this->html_list_header_template("Information Detail",$COLUMNS);
 
 		$columns = count($this->html_width)-1;
-		$datadump = dumper_to_string($this->data);
+		$datadump = \metaclassing\Utility::dumperToString($this->data);
 		$OUTPUT .= <<<END
 
 			<tbody class="report">
@@ -1192,6 +1246,9 @@ END;
 
 	public function html_form_field_select($FIELD,$TEXT,$KEYVALUE)
 	{
+		// Hack, testing the new form select function!
+		return $this->html_form_field_select2($FIELD,$TEXT,$KEYVALUE);
+
 		$OUTPUT = "";
 		$OUTPUT .= <<<END
 
@@ -1211,6 +1268,44 @@ END;
 			$OUTPUT .= <<<END
 
 					<option value="{$KEY}">{$VALUE}</option>
+END;
+		}
+		$OUTPUT .= <<<END
+				</td></tr>
+END;
+		return $OUTPUT;
+	}
+
+	public function html_form_field_select2($FIELD,$TEXT,$KEYVALUE)
+	{
+		$OUTPUT = "";
+		$OUTPUT .= <<<END
+
+				<tr><td>
+					<strong>{$TEXT}:</strong>
+					<select name="{$FIELD}" size="1">
+END;
+		$SELECTHIT = 0;
+		foreach($KEYVALUE as $KEY => $VALUE)
+		{
+			$SELECTED = "";
+			if ( isset($this->data[$FIELD])		&&
+				 $this->data[$FIELD] == $KEY	)
+			{
+				$SELECTED = "selected";
+				$SELECTHIT++;
+			}
+			$OUTPUT .= <<<END
+
+					<option value="{$KEY}" {$SELECTED}>{$VALUE}</option>
+END;
+		}
+		if ( $SELECTHIT == 0			&&
+			 isset($this->data[$FIELD])	)
+		{
+			$OUTPUT .= <<<END
+
+					<option value="{$this->data[$FIELD]}" selected>{$this->data[$FIELD]}</option>
 END;
 		}
 		$OUTPUT .= <<<END
@@ -1329,10 +1424,10 @@ END;
 				$this->data[$KEY] = file_get_contents($FILE['tmp_name']);
 				$this->data[$KEY."type"] = $FILE['type'];
 				$OUTPUT .= "Uploaded file to {$KEY}";
-//				$OUTPUT .= dumper_to_string($FILE);
+//				$OUTPUT .= \metaclassing\Utility::dumperToString($FILE);
 			}else{
 				$OUTPUT .= "{$UPLOAD_ERROR[$FILE['error']]}";
-				$OUTPUT .= dumper_to_string($FILE);
+				$OUTPUT .= \metaclassing\Utility::dumperToString($FILE);
 			}
 		}
 		return $OUTPUT;
@@ -1402,45 +1497,6 @@ END;
 		return $OUTPUT;
 	}
 
-	public function png_graph_simple($POINTS,$LABEL)
-	{
-		// Graphing inclusions
-		include("pChart/pData.class");
-		include("pChart/pChart.class");
-
-		// Dataset definition
-		$DataSet = new pData;
-
-		$AXIS = "AXIS1";
-		$DataSet->AddPoint($POINTS,$AXIS);
-		$DataSet->AddSerie($AXIS);
-		$DataSet->SetSerieName($LABEL,$AXIS);
-
-		// Initialise the graph
-		$Test = new pChart(900,500);
-
-		$FONT = BASEDIR . "/font/tahoma.ttf";
-		$Test->setFontProperties($FONT,13); // Font size for the X and Y axis count/date numbers
-		$Test->setGraphArea(50,10,860,440);
-		$Test->drawGraphArea(255,255,255,TRUE);
-		//$Test->setLineStyle(1,0);
-		$Test->drawScale($DataSet->GetData(),$DataSet->GetDataDescription(),SCALE_NORMAL,150,150,150,TRUE,45,2); // 45 is text rotation angle for date!
-		$Test->drawGrid(5,TRUE,230,230,230,50); // 5 is dotted line width on background 230 is grey and 50 is alternating gradient transparency
-
-		// Draw the line graph
-		$Test->setLineStyle(2,0);
-		$Test->setColorPalette(0,   0   ,   0   ,   255 );  // Make our first line blue
-		$Test->setColorPalette(1,   255 ,   120 ,   0   );  // Make our second line orange
-		$Test->drawLineGraph($DataSet->GetData(),$DataSet->GetDataDescription());
-		$Test->drawPlotGraph($DataSet->GetData(),$DataSet->GetDataDescription(),5,2,255,255,255); // 5 is dot size on the line, 3 is dot background
-
-		// Finish the graph
-		$Test->setFontProperties($FONT,14); // Font size of the axis labels
-		$Test->drawLegend(60,20,$DataSet->GetDataDescription(),255,255,255);
-		$Test->stroke();
-
-	}
-
 	public function assoc_select_name($OBJECTIDARRAY)
 	{
 		$ASSOC_OBJECTS = array();
@@ -1453,6 +1509,16 @@ END;
 			}
 		}
 		return $ASSOC_OBJECTS;
+	}
+
+	public function array_to_assoc($ARRAY)
+	{
+		$ASSOC = array();
+		foreach($ARRAY as $ELEMENT)
+		{
+			$ASSOC[$ELEMENT] = $ELEMENT;
+		}
+		return $ASSOC;
 	}
 
 	public function parse_nested_list_to_array($LIST, $INDENTATION = " ")
@@ -1486,11 +1552,9 @@ END;
 				$PARENT =& $PARENT[$KEY];
 			}
 		}
-		$RESULT = recursive_remove_empty_array($RESULT);
+		$RESULT = \metaclassing\Utility::recursiveRemoveEmptyArray($RESULT);
 		//ksort($RESULT);	// Sort our keys in the array for comparison ease // Do we really need this?
 		return $RESULT;
 	}
 
 }
-
-?>
