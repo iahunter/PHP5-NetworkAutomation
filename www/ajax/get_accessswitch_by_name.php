@@ -61,13 +61,13 @@ $JSON = json_encode($RETURN);
 
 if ($DEBUG)
 {
-	dumper($_REQUEST);
-	dumper($RETURN);
-	dumper($JSON);
+	\metaclassing\Utility::dumper($_REQUEST);
+	\metaclassing\Utility::dumper($RETURN);
+	\metaclassing\Utility::dumper($JSON);
 }else{
 	print "$JSON";
 }
 
-john_flush();
+\metaclassing\Utility::flush();
 
 ?>

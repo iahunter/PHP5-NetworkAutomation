@@ -47,7 +47,7 @@ if ($PORT)	// If they gave us a port, do a TCP probe
 {
 	$TEXT = "tcp {$PORT}";
 	$DEBUGOUTPUT .= $HTML->timer_diff() . "Probing TCP/{$PORT}\n";
-	if (!Utility::tcp_probe($HOST,$PORT))
+	if (!\metaclassing\Utility::tcpProbe($HOST,$PORT))
 	{
 	    $COLOR = "red";
 		$DEBUGOUTPUT .= $HTML->timer_diff() . "Probe Failed!\n";
@@ -57,7 +57,7 @@ if ($PORT)	// If they gave us a port, do a TCP probe
 	}
 }else{		// Otherwise, just do ICMP
 	$DEBUGOUTPUT .= $HTML->timer_diff() . "Probing ICMP\n";
-	$PING = new Ping($HOST);
+	$PING = new \JJG\Ping($HOST);
 	$LATENCY = $PING->ping("exec");
 	if (!$LATENCY)
 	{
@@ -81,7 +81,7 @@ if ( isset($_GET["debug"]) )
 	print "<pre>{$DEBUGOUTPUT}</pre>";
 }else{
 	header("Content-type: image/png");
-	print Utility::draw_small_status($TEXT,$COLOR);
+	print \metaclassing\Utility::drawSmallStatus($TEXT,$COLOR);
 }
 
 ?>

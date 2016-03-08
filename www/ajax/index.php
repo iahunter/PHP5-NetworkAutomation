@@ -7,7 +7,7 @@ print $HTML->header("jQuery AJAX Test");
 ?>
 
 <?php
-	$js = new JS;
+	$js = new \metaclassing\JS;
 
 		print "<div id='dialog' style='display: none'>\n";
 		print "<div id='message' style='font-size: 14px;'></div><br>\n";
@@ -24,24 +24,24 @@ print $HTML->header("jQuery AJAX Test");
 
 		print $js->html('message','Doing work...');
 		print $js->progressbar('progressbar','animateprogress',array('value' => 25,'duration' => 2000));
-		john_flush();
+		\metaclassing\Utility::flush();
 		sleep(3);  //do work
 
 		print $js->html('message','Doing HARD work...');
 		print $js->progressbar('progressbar','animateprogress',array('value' => 50,'duration' => 4000));
-		john_flush();
+		\metaclassing\Utility::flush();
 		sleep(4);  //do hard work
 
 		print $js->html('message','Doing easy work...');
 		print $js->progressbar('progressbar','animateprogress',array('value' => 75,'duration' => 500));
-		john_flush();
+		\metaclassing\Utility::flush();
 		sleep(2); //do easy work
 
 		// Successful deployment of changes
 		//=================================
 		print $js->html('message','Work Complete');
 		print $js->progressbar('progressbar','animateprogress',array('value' => 100,'duration' => 1000));
-		john_flush();
+		\metaclassing\Utility::flush();
 		sleep(1);
 
 		print $js->dialog('dialog','overlay',array('overlay.color' => '009900'));

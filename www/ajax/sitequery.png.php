@@ -7,7 +7,7 @@ if (isset($_GET['site']))
 }else{
 	header("Content-type: image/png");
 	$TEXT = "ERROR: NO SITE NAME"; $COLOR = "red";
-	print Utility::draw_small_status($TEXT,$COLOR);
+	print \metaclassing\Utility::drawSmallStatus($TEXT,$COLOR);
 	die();
 }
 
@@ -26,7 +26,7 @@ if (isset($_GET['service']))
 }else{
 	header("Content-type: image/png");
 	$TEXT = "ERROR: NO SERVICE"; $COLOR = "red";
-	print Utility::draw_small_status($TEXT,$COLOR);
+	print \metaclassing\Utility::drawSmallStatus($TEXT,$COLOR);
 	die();
 }
 
@@ -34,7 +34,7 @@ if (!isset($SERVICEQUERY[$SERVICE]))
 {
 	header("Content-type: image/png");
 	$TEXT = "ERROR: UNKNOWN SERVICE $SERVICE"; $COLOR = "red";
-	print Utility::draw_small_status($TEXT,$COLOR);
+	print \metaclassing\Utility::drawSmallStatus($TEXT,$COLOR);
 	die();
 }
 
@@ -56,6 +56,6 @@ if ($COUNT)
 if (!isset($_GET['detail'])) { $TEXT = ""; }	// If we dont want details, null out the text field before printing the image.
 
 header("Content-type: image/png");
-print Utility::draw_small_status($TEXT,$COLOR)
+print \metaclassing\Utility::drawSmallStatus($TEXT,$COLOR)
 
 ?>
