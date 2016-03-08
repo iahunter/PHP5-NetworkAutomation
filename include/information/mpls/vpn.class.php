@@ -125,7 +125,7 @@ END;
 		$WIDTH = $this->html_width;
 
 		$columns = count($WIDTH)-1;	$i = 1;
-		$datadump = dumper_to_string($this->data);
+		$datadump = \metaclassing\Utility::dumperToString($this->data);
 		$OUTPUT .= <<<END
 
 				<tr class="{$rowclass}">
@@ -251,5 +251,3 @@ END;
 	}
 
 }
-
-?>

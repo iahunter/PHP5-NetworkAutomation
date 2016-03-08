@@ -26,13 +26,13 @@
  * @license   http://www.gnu.org/copyleft/lesser.html The GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
  */
 
-require_once "information/ipplan/block.class.php";
+require_once "information/ipplan/block6.class.php";
 
-class IPPlan_Network	extends IPPlan_Block
+class IPPlan_Network6	extends IPPlan_Block6
 {
 	public $data;
 	public $category = "IPPlan";
-	public $type = "IPPlan_Network";
+	public $type = "IPPlan_Network6";
 	public $customfunction = "";
 
 	public function html_list_header()
@@ -128,7 +128,7 @@ END;
 		$OUTPUT .= $this->html_list_footer();
 
 		// All the different types of child objects for estimating, in order.
-		$CHILDTYPES = array("Address");
+		$CHILDTYPES = [];
 		foreach ($CHILDTYPES as $CHILDTYPE)
 		{
 			$OUTPUT .= <<<END
@@ -183,21 +183,9 @@ END;
 				<tr><td>
 					<strong>Prefix Length:</strong>
 					<select name="length" size="1">
+					<option value="64">64</option>
+				</td></tr>
 END;
-		if ($this->data['length'])
-		{
-			$OUTPUT .= <<<END
-					<option value="{$this->data['length']}">{$this->data['length']}</option>
-END;
-		}else{
-			$PARENT = $this->parent();
-			$PARENTLENGTH = intval($PARENT->data['length']) + 1;
-			if ($PARENTLENGTH < 22) { $PARENTLENGTH = 22; }
-			$range = range($PARENTLENGTH,30);
-			foreach($range as $length) { $OUTPUT .= "<option value=\"{$length}\">{$length}</option>"; }
-			$OUTPUT .= "
-				</td></tr>";
-		}
 
 //////////////////////////////////////////////////////END OF FIELDS//////////////////////////////////////////////////////////////
 		if($this->data['id'])

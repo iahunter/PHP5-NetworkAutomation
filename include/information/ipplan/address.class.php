@@ -82,7 +82,7 @@ END;
 END;
 		$OUTPUT .= $this->html_list_row($i++);
 		$rowclass = "row".(($i % 2)+1);
-		$datadump = dumper_to_string($this->data);
+		$datadump = \metaclassing\Utility::dumperToString($this->data);
 		if ($_SESSION["DEBUG"])
 		{
 			$OUTPUT .= <<<END
@@ -149,5 +149,3 @@ END;
 	}
 
 }
-
-?>
