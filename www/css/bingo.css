@@ -1,0 +1,4 @@
+/* Bingo div - make it clickable on iphones */
+div.bingo {
+	cursor: pointer;
+}

@@ -1,0 +1,30 @@
+/* Differential Comparison Formatting */
+.diff td{
+	vertical-align:top;
+	white-space:pre;
+	white-space:pre-wrap;
+	font-family:'Courier New',Courier,monospace;
+	line-height:1;
+}
+.diff span{
+	display:block;
+	margin-top:-1px;
+	padding:0 3px;
+}
+* html .diff span{
+	height:1.333em;
+}
+.diff span:first-child{
+	margin-top:0;
+}
+.diffDeleted span{
+	border:1px solid rgb(255,192,192);
+	background:rgb(255,224,224);
+}
+.diffInserted span{
+	border:1px solid rgb(192,255,192);
+	background:rgb(224,255,224);
+}
+#toStringOutput{
+	margin:0 2em 2em;
+}
