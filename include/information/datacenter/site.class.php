@@ -175,21 +175,8 @@ END;
 		$OUTPUT .= $this->html_form_header();
 		//$OUTPUT .= $this->html_toggle_active_button();	// Permit the user to deactivate any devices and children
 
-		if ( !isset($this->data["id"]) )    // If this is a NEW record being added, NOT an edit
-		{
-			$WSDL = "https://portal.company.com/sites/imclientengag/logistics/_vti_bin/Lists.asmx?WSDL"; // Site Code Register list
-			require_once "PHP-SharePoint-Lists-API/SharePointAPI.php";
-			$SP = new SharePointAPI(LDAP_USER, LDAP_PASS, $WSDL, TRUE);
-			$SITEREGLIST = $SP->read("{6EECFAF1-2D97-4DC9-A34B-AD9A29498E29}", NULL, NULL, "{850F94A7-849B-44EE-89AE-731AFBBF1D81}");   // Site Code Register list, view is for ALL items (default is not!)
-			$SELECT = array();
-			// Enforce only 8 characters per site name
-			foreach($SITEREGLIST as $SITEREGITEM) { $SELECT[substr($SITEREGITEM["title"],0,8)] = substr($SITEREGITEM["title"],0,8); }
-			//foreach($SITEREGLIST as $SITEREGITEM) { $SELECT[$SITEREGITEM["title"]] = $SITEREGITEM["title"]; }
-			ksort($SELECT);
-			$OUTPUT .= $this->html_form_field_select("sitecode" ,"Site Code (From Sharepoint)",$SELECT  );
-		}else{
-			$OUTPUT .= $this->html_form_field_comment("sitecode"    ,"Site Code (Pulled from sharepoint)");
-		}
+		$OUTPUT .= $this->html_form_field_comment("sitecode"    ,"Site Code (Pulled from sharepoint)");
+
 		$OUTPUT .= $this->html_form_field_text	("name"			,"Site Name"							);
 		$OUTPUT .= $this->html_form_extended();
 		$OUTPUT .= $this->html_form_footer();
@@ -198,5 +185,3 @@ END;
 	}
 
 }
-
-?>

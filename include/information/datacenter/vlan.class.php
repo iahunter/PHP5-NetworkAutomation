@@ -187,7 +187,7 @@ END;
 		$OUTPUT .= $this->html_form_header();
 		$OUTPUT .= $this->html_toggle_active_button();	// Permit the user to deactivate any devices and children
 		if (!$this->data["vlan"]) { unset($this->data["vlan"]); }
-		$SELECT = Utility::assoc_range(1,4094);
+		$SELECT = \metaclassing\Utility::assocRange(1,4094);
 		$OUTPUT .= $this->html_form_field_select("vlan"			,"Vlan"			,$SELECT	);
 		$OUTPUT .= $this->html_form_field_text	("name"			,"VLAN Name"				);
 		$OUTPUT .= $this->html_form_field_text	("description"	,"Description"				);
@@ -204,5 +204,3 @@ END;
 	}
 
 }
-
-?>

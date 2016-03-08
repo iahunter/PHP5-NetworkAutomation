@@ -178,7 +178,7 @@ END;
 
 	public function html_form()
 	{
-		$OUTPUT = "";dumper($this);
+		$OUTPUT = "";\metaclassing\Utility::dumper($this);
 		$OUTPUT .= $this->html_form_header();
 		//$OUTPUT .= $this->html_toggle_active_button();	// Permit the user to deactivate any devices and children
 		$SELECT = array(
@@ -197,5 +197,3 @@ END;
 	}
 
 }
-
-?>
