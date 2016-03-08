@@ -25,10 +25,9 @@
  * @copyright 2009-2014 @authors
  * @license   http://www.gnu.org/copyleft/lesser.html The GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
  */
- 
+
 require_once "command.class.php";
 
-require_once "phpseclib/Net/SSH1.php";
 //define('NET_SSH1_LOGGING', NET_SSH1_LOG_COMPLEX);
 
 class command_ssh1	extends command
@@ -39,7 +38,7 @@ class command_ssh1	extends command
 	{
 		if ($this->connected)	{ return $this->connected; }
 
-		$this->ssh = new Net_SSH1($this->data['hostname']);
+		$this->ssh = new \phpseclib\Net\SSH1($this->data['hostname']);
 		$this->settimeout(5);
 
 		$this->connected = $this->ssh->login($this->data['username'], $this->data['password']);
@@ -94,7 +93,7 @@ class command_ssh1	extends command
 
 
 
-		return $this->ssh->read($expect, NET_SSH1_READ_REGEX);
+		return $this->ssh->read($expect, \phpseclib\Net\SSH1::READ_REGEX);
 	}
 
 	public function settimeout($timeout)
@@ -114,5 +113,3 @@ class command_ssh1	extends command
 		return;
 	}
 }
-
-?>

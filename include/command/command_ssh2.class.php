@@ -28,7 +28,6 @@
 
 require_once "command.class.php";
 
-require_once "phpseclib/Net/SSH2.php";
 //define('NET_SSH2_LOGGING', NET_SSH2_LOG_COMPLEX);
 
 class command_ssh2	extends command
@@ -39,7 +38,7 @@ class command_ssh2	extends command
 	{
 		if ($this->connected)	{ return $this->connected; }
 
-		$this->ssh = new Net_SSH2($this->data['hostname']);
+		$this->ssh = new \phpseclib\Net\SSH2($this->data['hostname']);
 		$this->settimeout(5);
 
 		$this->connected = $this->ssh->login($this->data['username'], $this->data['password']);
@@ -94,7 +93,7 @@ class command_ssh2	extends command
 
 
 
-		return $this->ssh->read2($expect, NET_SSH2_READ_REGEX);
+		return $this->ssh->read($expect, \phpseclib\Net\SSH1::READ_REGEX);
 	}
 
 	public function settimeout($timeout)
@@ -114,5 +113,3 @@ class command_ssh2	extends command
 		return;
 	}
 }
-
-?>

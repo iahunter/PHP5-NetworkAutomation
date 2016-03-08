@@ -168,7 +168,7 @@ class Command {
 	protected function findprompt()
 	{
 		global $DEBUGPROMPT;
-if ($DEBUGPROMPT) { print "<pre>entering find prompt()</pre>\n"; john_flush; }
+if ($DEBUGPROMPT) { print "<pre>entering find prompt()</pre>\n"; \metaclassing\Utility::flush; }
 		if (!$this->connected)	{ return 0; }
 		if (!$this->patterns)	{ return 0; }
 		$this->settimeout(5);
@@ -177,7 +177,7 @@ if ($DEBUGPROMPT) { print "<pre>entering find prompt()</pre>\n"; john_flush; }
 		$try = 0;
 		while ($try++ < 5)
 		{
-if ($DEBUGPROMPT) { print "<pre>looking for prompt try $try</pre>\n"; john_flush; }
+if ($DEBUGPROMPT) { print "<pre>looking for prompt try $try</pre>\n"; \metaclassing\Utility::flush; }
 			$DATA = $this->read("/.*[>|#]/");
 			$LINES = explode("\n", $DATA);
 			foreach ($LINES as $LINE)
@@ -189,17 +189,17 @@ if ($DEBUGPROMPT) { print "<pre>looking for prompt try $try</pre>\n"; john_flush
 						$this->prompt = $MATCH[1];		// I think we found the prompt.
 						$this->pattern = $PATTERN;		// Use this pattern for matching
 if ($DEBUGPROMPT) {
-print "<pre>I think I found a prompt $this->prompt</pre>\n"; john_flush;
-print "<pre>Escaped prompt is:" . preg_quote($this->prompt,"/") . "</pre>\n"; john_flush;
-print "<pre>Testing to see if $this->prompt is really a prompt</pre>\n"; john_flush;
+print "<pre>I think I found a prompt $this->prompt</pre>\n"; \metaclassing\Utility::flush;
+print "<pre>Escaped prompt is:" . preg_quote($this->prompt,"/") . "</pre>\n"; \metaclassing\Utility::flush;
+print "<pre>Testing to see if $this->prompt is really a prompt</pre>\n"; \metaclassing\Utility::flush;
 } /**/
 						$this->write("\n");				// So lets send a new line and check.
 						if ( $this->read( sprintf( $this->pattern['match'],preg_quote($this->prompt,"/") ) ) )
 						{
 if ($DEBUGPROMPT) {
-print "<pre>Success! I believe $this->prompt is really a prompt!</pre>\n"; john_flush;
-print "<pre>Escaped prompt is:" . sprintf($this->pattern['match'],preg_quote($this->prompt,"/")) . "</pre>\n"; john_flush;
-dumper($this->pattern); john_flush();
+print "<pre>Success! I believe $this->prompt is really a prompt!</pre>\n"; \metaclassing\Utility::flush;
+print "<pre>Escaped prompt is:" . sprintf($this->pattern['match'],preg_quote($this->prompt,"/")) . "</pre>\n"; \metaclassing\Utility::flush;
+\metaclassing\Utility::dumper($this->pattern); \metaclassing\Utility::flush();
 } /**/
 							return $this->prompt;
 						}
@@ -257,5 +257,3 @@ print "<pre>Line did not match pattern {$PATTERN['detect']}: {$LINE}</pre>\n";
 
 // END OF OBJECT
 }
-
-?>

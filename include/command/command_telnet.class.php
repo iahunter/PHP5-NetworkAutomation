@@ -30,7 +30,6 @@ require_once "command.class.php";
 
 
 
-
 class command_telnet	extends command
 {
 	private $telnet;
@@ -65,7 +64,7 @@ class command_telnet	extends command
 			}
 			else
 			{
-//				dumper($CHALLENGE);
+//				\metaclassing\Utility::dumper($CHALLENGE);
 			}
 		}
 
@@ -111,5 +110,3 @@ class command_telnet	extends command
 		return;
 	}
 }
-
-?>
