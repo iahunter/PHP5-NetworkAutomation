@@ -11,20 +11,20 @@ PERMISSION_REQUIRE("tool.switch.edit");
 	$DEVICEID		= $_GET['device'];
 	$DEBUG			= $_SESSION["DEBUG"];	if ($DEBUG>0) { print "<h2>TOOL RUNNING IN DEBUG MODE, NO CONFIGURATION CHANGES WILL BE MADE!</h2>\n"; }
 
-	$SNMPLOCATION	= strip($_GET['snmplocation']);
-	$STEP			= strip($_GET['step']);
+	$SNMPLOCATION	= \metaclassing\Utility::strip($_GET['snmplocation']);
+	$STEP			= \metaclassing\Utility::strip($_GET['step']);
 
 	if ($DEVICEID == "")
 	{
 		print "The switch snmp location configuration tool was not correctly passed a switch to configure.<br>\n";
 		print "Please go <a href=/tools/switch-viewer.php>back</a> and try again.\n";
-		dumper($_GET);
+		\metaclassing\Utility::dumper($_GET);
 		$MESSAGE = "ERROR: Failed to pass variables DEVICEID: $DEVICEID";
 		$DB->log($MESSAGE);
 		exit;
 	}
 
-	$js = new JS;
+	$js = new \metaclassing\JS;
 
 	print "<div id='dialog' style='display: none;'>\n";
 	print "<div id='message' style='font-size: 14px;'></div><br>\n";
@@ -39,12 +39,12 @@ PERMISSION_REQUIRE("tool.switch.edit");
 	$progress = 0;
 
 	print $js->html('message','Creating Device Object');    $progress = 5;
-	print $js->progressbar('progressbar','animateprogress',array('value' => $progress,'duration' => 0));    john_flush();
+	print $js->progressbar('progressbar','animateprogress',array('value' => $progress,'duration' => 0));    \metaclassing\Utility::flush();
 
 	$command = new command($DEVICEID);
 
 	print $js->html('message',"Connecting to device " . $HTML->timer_diff());               $progress = 10;
-	print $js->progressbar('progressbar','animateprogress',array('value' => $progress,'duration' => 3000)); john_flush();
+	print $js->progressbar('progressbar','animateprogress',array('value' => $progress,'duration' => 3000)); \metaclassing\Utility::flush();
 
 	$cli = $command->getcli();
 
@@ -53,7 +53,7 @@ PERMISSION_REQUIRE("tool.switch.edit");
 		print $js->dialog('dialog','overlay',array('overlay.color' => '990000'));
 		print $js->dialog('dialog','title',array('title' => 'Failure', 'title.color' => 'ffffff', 'title.bg.color' => '009900'));
 		print $js->progressbar('progressbar','hide');
-		print $js->show('confirm'); john_flush();
+		print $js->show('confirm'); \metaclassing\Utility::flush();
 		print "The switch snmp location configuration tool could not connect to this device.<br>\n";
 		$MESSAGE = "ERROR: Could not connect to DEVICEID: $DEVICEID";
 		$DB->log($MESSAGE);
@@ -63,7 +63,7 @@ PERMISSION_REQUIRE("tool.switch.edit");
 	$PROMPT = $cli->prompt;
 
 	print $js->html('message',"Connected to $PROMPT " . $HTML->timer_diff());               $progress = 30;
-	print $js->progressbar('progressbar','animateprogress',array('value' => $progress,'duration' => 0));    john_flush();
+	print $js->progressbar('progressbar','animateprogress',array('value' => $progress,'duration' => 0));    \metaclassing\Utility::flush();
 
 	// Begin running commands on each device
 	//======================================
@@ -75,14 +75,14 @@ PERMISSION_REQUIRE("tool.switch.edit");
 	if($STEP == 2)
 	{
 		print $js->html('message',"Entering Configuration Mode! " . $HTML->timer_diff());$progress = 35;
-		print $js->progressbar('progressbar','animateprogress',array('value' => $progress,'duration' => 3000)); john_flush();
+		print $js->progressbar('progressbar','animateprogress',array('value' => $progress,'duration' => 3000)); \metaclassing\Utility::flush();
 
 		$COMMAND = "configure terminal";				($DEBUG > 0) ? print "$COMMAND<br>\n" : $OUTPUT = $cli->exec($COMMAND);
 		$COMMAND = "snmp-server location $SNMPLOCATION";($DEBUG > 0) ? print "$COMMAND<br>\n" : $OUTPUT = $cli->exec($COMMAND);
 		$COMMAND = "end";								($DEBUG > 0) ? print "$COMMAND<br>\n" : $OUTPUT = $cli->exec($COMMAND);
 
 		print $js->html('message',"Done Making Changes. Saving Config! " . $HTML->timer_diff());$progress = 70;
-		print $js->progressbar('progressbar','animateprogress',array('value' => $progress,'duration' => 10000)); john_flush();
+		print $js->progressbar('progressbar','animateprogress',array('value' => $progress,'duration' => 10000)); \metaclassing\Utility::flush();
 		$cli->settimeout(30);
 		$COMMAND = "copy run start\n";					($DEBUG > 0) ? print "$COMMAND<br>\n" : $OUTPUT = $cli->exec($COMMAND);
 		$cli->settimeout(15);
@@ -93,27 +93,27 @@ PERMISSION_REQUIRE("tool.switch.edit");
 	//END of danger.
 
 	print $js->html('message',"Gathering $prompt configuration " . $HTML->timer_diff());$progress = 80;
-	print $js->progressbar('progressbar','animateprogress',array('value' => $progress,'duration' => 4000)); john_flush();
+	print $js->progressbar('progressbar','animateprogress',array('value' => $progress,'duration' => 4000)); \metaclassing\Utility::flush();
 	$COMMAND = "show running";
 	$SWITCHINFO[$PROMPT]['showrun']         = $cli->exec($COMMAND);
 
 	$cli->disconnect();
 
 	print $js->html('message',"Work Complete! " . $HTML->timer_diff());     $progress = 100;
-	print $js->progressbar('progressbar','animateprogress',array('value' => $progress,'duration' => 0));    john_flush();
+	print $js->progressbar('progressbar','animateprogress',array('value' => $progress,'duration' => 0));    \metaclassing\Utility::flush();
 
 	print $js->dialog('dialog','overlay',array('overlay.color' => '009900'));
 	print $js->dialog('dialog','title',array('title' => 'Success', 'title.color' => 'ffffff', 'title.bg.color' => '009900'));
 
 	print $js->progressbar('progressbar','hide');
-	print $js->show('confirm'); john_flush();
+	print $js->show('confirm'); \metaclassing\Utility::flush();
 
 	// Parse and generate output
 	//============================================
 
         foreach ($SWITCHINFO as $SWITCH)
         {
-			$CISCO = new Cisco();
+			$CISCO = new \metaclassing\Cisco();
 
 			$CISCO->parse_config(explode("\n",$SWITCH['showrun']));
 			$LOCATION = "";

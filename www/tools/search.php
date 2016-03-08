@@ -47,7 +47,7 @@ $SEARCHES = array(
 				);
 $RESULTS = Information::multisearch($SEARCHES);
 
-//dumper($RESULTS);
+//\metaclassing\Utility::dumper($RESULTS);
 
 $RECORDCOUNT = count($RESULTS);
 print "Found {$RECORDCOUNT} matching devices (Max {$STEPSIZE} Displayed)";

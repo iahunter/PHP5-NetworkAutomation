@@ -174,21 +174,9 @@ print $HTML->header("Access Switch Viewer");
 			<p>Welcome to the new switch viewer tool, please begin by typing the name of a switch in the box above.</p>
 			<p>Reminder: If the switch you are looking for is not in the database, it is either not currently managable<br>
 			(The tool cant access it via ssh with tacacs credentials) or has never had its configuration successfully audited.</p>
-			<p><b>NEW: Check out the new utilization statistics graph:</b><br>
-			<img src="/reports/switch-tool-report.png.php">
 		</div>
         </div>
 <?php
-/**
-			<li><a href="#tabs-1">Switch Viewer 3.0</a><span class='ui-icon ui-icon-close'>Remove Tab</span></li>
-
-	<br>
-	<hr style="border: 0; color: #ccc; background-color: #aaa; height: 1px;">
-	<div class="ui-widget" style="margin-top: 2em; font-family: Arial;">
-	    Debug Output:
-	    <div id="log" style="height: 200px; width: 300px; overflow: auto;" class="ui-widget-content"></div>
-	</div>
-/**/
 print $HTML->footer();
 ?>
 

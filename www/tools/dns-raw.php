@@ -25,7 +25,7 @@ foreach ($RESULTS as $DEVICEID)
 	$RUN = $DEVICE->data["run"];
 	$RUN_LINES = explode("\n",$RUN);
 
-	$CISCO = new Cisco();
+	$CISCO = new \metaclassing\Cisco();
 	$CISCO->parse_config($RUN_LINES);
 
 	$INTERFACES = $CISCO->config('interface');
@@ -59,7 +59,7 @@ foreach ($RESULTS as $DEVICEID)
 			}
 		}
 	}
-	$MGMTINT = $CISCO->dnsabbreviate(cisco_find_management_interface($RUN_LINES));
+	$MGMTINT = $CISCO->dnsabbreviate(\metaclassing\Cisco::findManagementInterface($RUN_LINES));
 	if ($MGMTINT == "") { $MGMTINT = $FIRSTINT; } // Last ditch effort, if we cant find a mgmt interface in the config, use first interface with an IP!
 
 	$MGMTDEL = "DNSCMD $SERVER /RecordDelete $DOMAINNAME $HOSTNAME CNAME /f\n";
@@ -69,7 +69,7 @@ foreach ($RESULTS as $DEVICEID)
 	print $MGMTADD;
 	print "\n";
 
-	john_flush();
+	\metaclassing\Utility::flush();
 	unset($DEVICE); // save memory!
 }
 ?>

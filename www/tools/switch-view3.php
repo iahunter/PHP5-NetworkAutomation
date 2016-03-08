@@ -52,7 +52,7 @@ require_once "/etc/networkautomation/networkautomation.inc.php";
 
 	foreach ($SWITCHINFO as $SWITCH)
 	{
-		$CISCO = new Cisco();
+		$CISCO = new \metaclassing\Cisco();
 
 		$CISCO->parse_config(explode("\n",$SWITCH['showrun']));
 

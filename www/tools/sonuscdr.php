@@ -532,7 +532,7 @@ $CDRFIELDS["ATTEMPT"]	= array(
 	"PSX Call Type",
 	"Outgoing Route Trunk Group ID",
 	"Outgoing Route Message ID",
-	" Incoming Route ID",
+	"Incoming Route ID",
 	"Calling Name",
 	"Calling Name Type",
 	"Incoming Calling Party Numbering Plan",
@@ -637,7 +637,7 @@ foreach ($LOGPARSED as $PARSED)					// Loop through parsed CSV data and map to t
 			$VALUE = $PARSED[$i++];				// Get the value for this field
 			if (strpos($VALUE,",") !== false)	// IF our final parsed value contains commas, it is a SUB RECORD!!!
 			{
-				$VALUE = dumper_to_string(str_getcsv($VALUE) );	// FOR NOW! v1.0 just parse it into dumpered output for display!
+				$VALUE = \metaclassing\Utility::dumperToString(str_getcsv($VALUE) );	// FOR NOW! v1.0 just parse it into dumpered output for display!
 			}
 			$CDR[$FIELD] = $VALUE;				// assign the new CDR field a value and increment our position in the parsed array
 		}
@@ -647,7 +647,7 @@ foreach ($LOGPARSED as $PARSED)					// Loop through parsed CSV data and map to t
 	}
 }
 
-//dumper($CDRS); die("CROAK!\n");	// Debugging
+//\metaclassing\Utility::dumper($CDRS); die("CROAK!\n");	// Debugging
 
 // Some basic html formatting for an output table
 $WIDTH = array();	$i = 1;
