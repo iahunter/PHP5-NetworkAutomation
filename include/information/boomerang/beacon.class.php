@@ -167,7 +167,7 @@ END;
 				<tr class="{$rowclass}"><td colspan="{$columns}">Modified by {$this->data['modifiedby']} on {$this->data['modifiedwhen']}</td></tr>
 END;
 		$rowclass = "row".(($i++ % 2)+1);
-		$DATADUMP = dumper_to_string($this->data);
+		$DATADUMP = \metaclassing\Utility::dumperToString($this->data);
 		$OUTPUT .= <<<END
 				<tr class="{$rowclass}"><td colspan="{$columns}">{$DATADUMP}</td></tr>
 END;
@@ -266,5 +266,3 @@ END;
 	}
 
 }
-
-?>

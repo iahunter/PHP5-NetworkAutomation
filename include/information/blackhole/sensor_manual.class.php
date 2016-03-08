@@ -110,5 +110,3 @@ class Blackhole_Sensor_Manual	extends Blackhole_Sensor
 	}
 
 }
-
-?>

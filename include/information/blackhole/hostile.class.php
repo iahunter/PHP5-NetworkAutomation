@@ -86,7 +86,7 @@ END;
 		$this->html_width();
 		$rowclass = "row".(($i % 2)+1);
 		$columns = count($this->html_width)-1;	$i = 1;
-		$datadump = dumper_to_string($this->data);
+		$datadump = \metaclassing\Utility::dumperToString($this->data);
 		$OUTPUT .= <<<END
 
 				<tr class="{$rowclass}">
@@ -134,7 +134,7 @@ END;
 				<tr class="{$rowclass}"><td colspan="{$columns}">Modified by {$this->data['modifiedby']} on {$this->data['modifiedwhen']}</td></tr>
 END;
 		$rowclass = "row".(($i++ % 2)+1);
-		$DATADUMP = dumper_to_string($this->data);
+		$DATADUMP = \metaclassing\Utility::dumperToString($this->data);
 		$OUTPUT .= <<<END
 				<tr class="{$rowclass}"><td colspan="{$columns}">{$DATADUMP}</td></tr>
 END;
@@ -185,11 +185,9 @@ END;
 
 		$OUTPUT .= "FOUND HOSTILE {$this->data["ip"]}:\n";
 		$OUTPUT .= "BAN TIME STARTED AT {$this->data["banstart"]} LASTING {$this->data["bantime"]} REMAINING: {$REMAINING}\n";
-		$OUTPUT .= dBug_to_string($this->data);
+		$OUTPUT .= \metaclassing\Utility::dBugToString($this->data);
 
 		return $OUTPUT;
 	}
 
 }
-
-?>

@@ -96,7 +96,7 @@ END;
 		$this->html_width();
 		$rowclass = "row".(($i % 2)+1);
 		$columns = count($this->html_width)-1;	$i = 1;
-		$datadump = dumper_to_string($this->data);
+		$datadump = \metaclassing\Utility::dumperToString($this->data);
 		$OUTPUT .= <<<END
 
 				<tr class="{$rowclass}">
@@ -146,7 +146,7 @@ END;
 				<tr class="{$rowclass}"><td colspan="{$columns}">Modified by {$this->data['modifiedby']} on {$this->data['modifiedwhen']}</td></tr>
 END;
 		$rowclass = "row".(($i++ % 2)+1);
-		$DATADUMP = dumper_to_string($this->data);
+		$DATADUMP = \metaclassing\Utility::dumperToString($this->data);
 		$OUTPUT .= <<<END
 				<tr class="{$rowclass}"><td colspan="{$columns}">{$DATADUMP}</td></tr>
 END;
@@ -288,7 +288,7 @@ END;
 				$HOSTILE->data["lastseen"]	= time();	// Set the last time we saw him to NOW
 				$HOSTILE->data["bantime"]	*= 2;		// Double ban time previously assigned
 				$HOSTILE->update();
-				print "\t264 FOUND DB HOSTILE ID {$HOSTILE->data["id"]}\n";	//dumper($HOSTILE);
+				print "\t264 FOUND DB HOSTILE ID {$HOSTILE->data["id"]}\n";	//\metaclassing\Utility::dumper($HOSTILE);
 			}else{
 				$HOSTILE = Information::create("Hostile",$this->category);
 				$HOSTILE->data["ip"]		= $IP;
@@ -302,13 +302,13 @@ END;
 				$DB->log($MESSAGE,2);
 				$HOSTILE = Information::retrieve($ID);
 				$HOSTILE->update();
-				print "\tCREATED NEW HOSTILE ID {$ID}\n";	//dumper($HOSTILE);
+				print "\tCREATED NEW HOSTILE ID {$ID}\n";	//\metaclassing\Utility::dumper($HOSTILE);
 			}
 			$RESULTS = Information::search($SEARCH);
 			if ( count($RESULTS) > 1 )
 			{
 				print "ERROR: FOUND >1 RECORD WITH IP {$IP}\n";
-				foreach ($RESULTS as $RESULT) { dumper( Information::retrieve($RESULT) ); }
+				foreach ($RESULTS as $RESULT) { \metaclassing\Utility::dumper( Information::retrieve($RESULT) ); }
 			}
 			global $DB;
 			$DB->log("Blackhole ADD {$IP} ID {$HOSTILE->data["id"]}",2);
@@ -340,17 +340,17 @@ END;
 					$HOSTILE = Information::retrieve( $RESULT );					// Get the information object out of the store
 					print "\t" . __LINE__ . " FOUND DB HOSTILE ID {$HOSTILE->data["id"]}\n";
 					$HOSTILE->set_active(0);										// Deactivate this information
-//					dumper($HOSTILE);
+//					\metaclassing\Utility::dumper($HOSTILE);
 					global $DB;
 					$DB->log("Blackhole DEL {$IP} ID {$HOSTILE->data["id"]}",2);
 				}
 			}else{
-				print "WARNING: COULD NOT LOCATE HOSTILE WITH IP {$IP} USING QUERY: "; dumper($SEARCH);
+				print "WARNING: COULD NOT LOCATE HOSTILE WITH IP {$IP} USING QUERY: "; \metaclassing\Utility::dumper($SEARCH);
 			}
 			if ( count($RESULTS) > 1)												// This is used to detect the bug for duplicate hostile info
 			{
 				print "\t" . __LINE__ . " ERROR: FOUND >1 RECORD WITH IP {$IP}\n";
-				foreach ($RESULTS as $RESULT) { dumper( Information::retrieve($RESULT) ); }
+				foreach ($RESULTS as $RESULT) { \metaclassing\Utility::dumper( Information::retrieve($RESULT) ); }
 			}
 		}
 
@@ -512,16 +512,16 @@ END;
 		}
 
 		$OUTPUT .= "Database Hostile IPs:\n";
-		$OUTPUT .= dBug_to_string($this->data["hostiles"]);
+		$OUTPUT .= \metaclassing\Utility::dBugToString($this->data["hostiles"]);
 		$OUTPUT .= "<hr size=1>";
 		$OUTPUT .= "Sensor Hostile IPs:\n";
-		$OUTPUT .= dBug_to_string($HOSTILES);
+		$OUTPUT .= \metaclassing\Utility::dBugToString($HOSTILES);
 		$OUTPUT .= "<hr size=1>";
 		$OUTPUT .= "ADD Hostile IPs:\n";
-		$OUTPUT .= dBug_to_string($ADD);
+		$OUTPUT .= \metaclassing\Utility::dBugToString($ADD);
 		$OUTPUT .= "<hr size=1>";
 		$OUTPUT .= "DEL Hostile IPs:\n";
-		$OUTPUT .= dBug_to_string($DEL);
+		$OUTPUT .= \metaclassing\Utility::dBugToString($DEL);
 		$OUTPUT .= "<hr size=1>";
 		$OUTPUT .= $HOSTILE_OUTPUT;
 
@@ -529,5 +529,3 @@ END;
 	}
 
 }
-
-?>

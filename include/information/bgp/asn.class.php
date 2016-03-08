@@ -66,7 +66,7 @@ class BGP_ASN	extends Information
 			if ( $ASOBJ->data["id"] != $this->data["id"] )
 			{
 				$this->data['error'] .= "ERROR: {$ASN} is already linked with the following information record:";
-				$this->data['error'] .= dumper_to_string($ASOBJ);
+				$this->data['error'] .= \metaclassing\Utility::dumperToString($ASOBJ);
 				return 0;
 			}
 		}
@@ -149,7 +149,7 @@ END;
 		$WIDTH = $this->html_width;
 
 		$columns = count($WIDTH)-1;	$i = 1;
-		$datadump = dumper_to_string($this->data);
+		$datadump = \metaclassing\Utility::dumperToString($this->data);
 		$OUTPUT .= <<<END
 
 				<tr class="{$rowclass}">
@@ -362,5 +362,3 @@ END;
 	}
 
 }
-
-?>

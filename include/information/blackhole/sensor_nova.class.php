@@ -181,5 +181,3 @@ class Blackhole_Sensor	extends Information
 	}
 
 }
-
-?>
