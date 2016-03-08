@@ -22,7 +22,7 @@
  * @category  default
  * @package   none
  * @author    John Lavoie
- * @copyright 2009-2015 @authors
+ * @copyright 2009-2016 @authors
  * @license   http://www.gnu.org/copyleft/lesser.html The GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
  */
 
@@ -32,8 +32,9 @@ class Cache
 
 	public function __construct( $PARAMS, $OPTIONS )
 	{
-		require_once("predis/Autoloader.php");
-		Predis\Autoloader::register();
+/*		require_once("predis/Autoloader.php");
+		Predis\Autoloader::register();/**/
+		require_once "/opt/networkautomation/vendor/autoload.php";
 		$this->REDIS = new Predis\Client($PARAMS,$OPTIONS);
 	}
 
@@ -57,5 +58,3 @@ class Cache
 		return $this->REDIS->del($KEY);
 	}
 }
-
-?>

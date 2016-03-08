@@ -22,7 +22,7 @@
  * @category  default
  * @package   none
  * @author    John Lavoie
- * @copyright 2009-2014 @authors
+ * @copyright 2009-2016 @authors
  * @license   http://www.gnu.org/copyleft/lesser.html The GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
  */
 
@@ -135,5 +135,3 @@ END;
 	$HTML->set("LOGOUT_LINK","");
 	exit($HTML->footer());
 }
-
-?>

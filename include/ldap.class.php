@@ -22,11 +22,12 @@
  * @category  default
  * @package   none
  * @author    John Lavoie
- * @copyright 2009-2014 @authors
+ * @copyright 2009-2016 @authors
  * @license   http://www.gnu.org/copyleft/lesser.html The GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
  */
 
-require_once("adLDAP/adLDAP.php");
+//require_once("adLDAP/adLDAP.php");
+require_once( BASEDIR . "/vendor/adldap/adldap/src/adLDAP.php");
 
 // Extend the base adLDAP class with our unlock function
 class LDAP extends adLDAP\adLDAP
@@ -90,5 +91,3 @@ class LDAP extends adLDAP\adLDAP
 	}
 
 }
-
-?>

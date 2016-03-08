@@ -22,13 +22,14 @@
  * @category  default
  * @package   none
  * @author    John Lavoie
- * @copyright 2009-2014 @authors
+ * @copyright 2009-2016 @authors
  * @license   http://www.gnu.org/copyleft/lesser.html The GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
  */
 
 class Database
 {
 	public $QUERIES;
+	public $BINDS;
 	public $QUERYTIME;
 	public $CACHETIME;
 	public $RECORDCOUNT;
@@ -98,21 +99,27 @@ class Database
 			if	(is_string	($VALUE))	{ $TYPE = PDO::PARAM_STR;	}
 		}
 		$this->DB_STATEMENT->bindValue(":".$PARAMETER, $VALUE, $TYPE);
+		$this->BINDS[$PARAMETER] = $VALUE;
 	}
 
 	public function execute()
 	{
 //		array_push($this->QUERIES,$this->DB_STATEMENT->queryString);
-		$BASETIME = Utility::microtime_ticks();
+		$BASETIME = \metaclassing\Utility::microtimeTicks();
 		$this->DB_STATEMENT->execute();
-		$DIFFTIME = Utility::microtime_ticks() - $BASETIME;
+		$DIFFTIME = \metaclassing\Utility::microtimeTicks() - $BASETIME;
 
 		$QUERY = array();
 		$QUERY["query"] = $this->DB_STATEMENT->queryString;
 		$QUERY["time"] = $DIFFTIME;
+		if ( $DIFFTIME > 4 )	// If a query takes longer than 4 seconds to run, lets log an event with it!
+		{
+			$this->log("SLOW QUERY DETECTED:" . \metaclassing\Utility::dumperToString($QUERY) . \metaclassing\Utility::dumperToString($this->BINDS), 1);
+		}
 		array_push($this->QUERIES,$QUERY);
 		$this->QUERYTIME += $DIFFTIME;
 		$this->RECORDCOUNT += intval($this->DB_STATEMENT->rowCount());
+		$this->BINDS = [];
 	}
 
 	public function results()
@@ -146,7 +153,7 @@ class Database
 		} catch (Exception $E) {
 		    $MESSAGE = "Exception: {$E->getMessage()}";
 			trigger_error($MESSAGE);
-			dumper($E);
+			\metaclassing\Utility::dumper($E);
 			$this->DB_STATEMENT->debugDumpParams();
 			global $HTML;
 			die($HTML->footer());
@@ -154,5 +161,3 @@ class Database
 	}
 
 }
-
-?>
