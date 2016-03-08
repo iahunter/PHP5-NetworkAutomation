@@ -36,7 +36,7 @@ $RECORDCOUNT = count($RESULTS);
 
 foreach ($RESULTS as $SUSPECT)
 {
-//	dumper($SUSPECT);
+//	\metaclassing\Utility::dumper($SUSPECT);
 	// Only print out suspects that are valid IPv4 addresses!
 	if( $SUSPECT["ip"] && filter_var($SUSPECT["ip"], FILTER_VALIDATE_IP) )
 	{

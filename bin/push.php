@@ -23,6 +23,7 @@ snmp-server community NetworkRW RW ACL_SNMP_RW
 snmp-server enable traps config
 
 ip access-list standard ACL_REMOTE_MGMT
+  permit 123.456.72.0 0.0.7.255
   permit 10.0.0.0 0.255.255.255
   permit 172.16.0.0 0.15.255.255
   permit 192.168.0.0 0.0.255.255
@@ -69,7 +70,7 @@ if ($COUNT)
 		print "PUSH DEVICE ID {$DEVICE->data['id']} PROMPT {$DEVICE->data['prompt']} IP {$DEVICE->data['ip']}\t";
 
 		// Start with a ping test, see if we can ping the IP
-		$PING = new Ping($DEVICE->data['ip']);
+		$PING = new \JJG\Ping($DEVICE->data['ip']);
 		$LATENCY = $PING->ping("exec");
 		if (!$LATENCY)
 		{
@@ -105,11 +106,11 @@ if ($COUNT)
 		$FUNCTION = "";
 		$CLI->exec("terminal length 0");
 		$SHOW_INVENTORY = $CLI->exec("show inventory | I PID");
-		$MODEL = inventory_to_model($SHOW_INVENTORY);
+		$MODEL = \metaclassing\Cisco::inventoryToModel($SHOW_INVENTORY);
 		if ($MODEL == "Unknown")
 		{
 			$SHOW_VERSION = $CLI->exec("show version | I C");
-			$MODEL = version_to_model($SHOW_VERSION);
+			$MODEL = \metaclassing\Cisco::versionToModel($SHOW_VERSION);
 		}
 		if ($MODEL == "Unknown")
 		{
@@ -134,7 +135,7 @@ if ($COUNT)
 			$COMMAND = "terminal pager 0";			$OUTPUT = $CLI->exec($COMMAND);
 			$TERMINAL_PAGER_OUTPUT = $OUTPUT;
 			print " Pager disabled";
-			if (cisco_check_input_error($TERMINAL_PAGER_OUTPUT))
+			if (\metaclassing\Cisco::checkInputError($TERMINAL_PAGER_OUTPUT))
 			{
 				print " Enabled Successfully!";
 			}else{
@@ -156,7 +157,7 @@ if ($COUNT)
 		//array_push($PUSH,"copy run start\n"		);
 
 		// Debugging before actually running this to make live config changes
-		//dumper($PUSH);	die("CROAK!\n");	// Comment me out
+		//\metaclassing\Utility::dumper($PUSH);	die("CROAK!\n");	// Comment me out
 
 		// Perform the config push
 		foreach($PUSH as $COMMAND)
@@ -182,5 +183,3 @@ if ($COUNT)
 	print "No devices found!\n";
 }
 print "ALL PUSHES COMPLETE!\n";
-
-?>

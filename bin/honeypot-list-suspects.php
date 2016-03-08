@@ -35,7 +35,7 @@ $RECORDCOUNT = count($RESULTS);
 print "SUSPECT TARGET PORT\n";
 foreach ($RESULTS as $SUSPECT)
 {
-//	dumper($SUSPECT);
+//	\metaclassing\Utility::dumper($SUSPECT);
 	print "{$SUSPECT["id"]}\t{$SUSPECT["ip"]}\t{$SUSPECT["target"]}\t{$SUSPECT["port"]}\n";
 }
 

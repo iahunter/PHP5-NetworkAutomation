@@ -20,7 +20,7 @@ FLUSH PRIVILEGES;
 
 /**/
 define("DB_BACKUP_USERNAME"	,"backup"		);	// SQL username
-define("DB_BACKUP_PASSWORD"	,"changeme"	);	// SQL password
+define("DB_BACKUP_PASSWORD"	,"changeme"		);	// SQL password
 
 $TEMPFOLDER = "/tmp/";		// Location to put the LOCAL backup before we move it to network storage.
 $BACKUPFOLDER = "/backup/";	// NFS mount location to store our ultimate SQL dump.

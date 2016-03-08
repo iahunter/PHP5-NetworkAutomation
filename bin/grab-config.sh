@@ -14,6 +14,6 @@ cd /opt/networkautomation/config
 
 svn add * 2>&1 | grep -v already
 svn status
-svn commit --username svnuser --password svnpass -m "autoupdated"
+svn commit --username company --password changeme -m "autoupdated"
 /opt/networkautomation/bin/poller-log.php --log="config grab done"
 /opt/networkautomation/bin/scan-hourly.sh

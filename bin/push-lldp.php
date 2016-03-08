@@ -32,7 +32,7 @@ $COUNT = count($RESULTS);
 print "Found {$COUNT} devices matching search criteria\n";
 
 // Debugging
-//dumper($RESULTS);
+//\metaclassing\Utility::dumper($RESULTS);
 
 // Loop through all the ID numbers we get back from the search
 foreach($RESULTS as $OBJECTID)
@@ -42,7 +42,7 @@ foreach($RESULTS as $OBJECTID)
 
 	print "DEVICE ID {$OBJECTID}\tNAME {$DEVICE->data["name"]}\tIP {$DEVICE->data["ip"]}   \tPROTO {$DEVICE->data["protocol"]}\tMODEL {$DEVICE->data["model"]}";
 	// debugging
-	//die( dumper($DEVICE) );
+	//die( \metaclassing\Utility::dumper($DEVICE) );
 
 	// Lets search the running config to see if it contains something
 	$PATTERN = "/lldp run/";

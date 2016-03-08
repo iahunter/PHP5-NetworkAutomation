@@ -44,7 +44,7 @@ function information_action_worker($JOB)
 {
 	global $WORKERDATA;	// The pass by reference is not ^--worker readable as of 11/08/2014...
 	$JOBDATA = $JOB->workload(); $JOBDATA = json_decode($JOBDATA,true); // Decode JSON job data into an array
-//	dumper($JOBDATA);
+//	\metaclassing\Utility::dumper($JOBDATA);
 	if ( !isset($JOBDATA["id"]) || !intval($JOBDATA["id"]) || !isset($JOBDATA["method"]) )
 	{
 		$WORKERDATA["status"]	= "failure"; $WORKERDATA["error"]	= "Info Object ID & Method Not Passed!";

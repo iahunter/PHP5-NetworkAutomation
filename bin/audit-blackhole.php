@@ -37,6 +37,7 @@ foreach ($RESULTS as $SENSORID)
 /**/
 	unset($SENSOR);
 }
+$SENSOR = Information::retrieve(8632);	// Get the one and only Hon3ypot sensor...
 
 //print "LIVE SENSOR\t"	. count($SENSOR_SUSPECTS)								. "\tTOTAL SUSPECTS\n";
 //print "LIVE SENSOR\t"	. (count($SENSOR_SUSPECTS) - count($SENSOR_HOSTILES))	. "\tBENIGN SUSPECTS (CALCULATED)\n";
@@ -92,16 +93,16 @@ print "LIVE SENSOR\t"	. count($SENSOR_HOSTILES)								. "\tHOSTILE SUSPECTS\t!-
 	sort($SENSOR_HOSTILES);
 	sort($ACTIVE_HOSTILE_IPS);
 
-//	print "LIVE SENSOR HOSTILES:\n"	; dumper($SENSOR_HOSTILES);
+//	print "LIVE SENSOR HOSTILES:\n"	; \metaclassing\Utility::dumper($SENSOR_HOSTILES);
 //	print "DB   SENSOR HOSTILES:\n"	; foreach($SENSOR->data["hostiles"]	as $IP) { print "{$IP}\n"; }
 //	print "DB   HOSTILE OBJECTS:\n"	; foreach($ACTIVE_HOSTILE_IPS		as $IP) { print "{$IP}\n"; }
-//	print "BLACKHOLE ROUTES:\n"		; dumper($ROUTES_MANAGED);
+//	print "BLACKHOLE ROUTES:\n"		; \metaclassing\Utility::dumper($ROUTES_MANAGED);
 
 // This will find hostiles in the sensor that ARE in the DB but NOT active and re-activate them.
 
 	print "Hostiles in hostile list but NOT pulled from database:\n";
-//	$ASDF = array_diff($SENSOR->data["hostiles"],$ACTIVE_HOSTILE_IPS); dumper($ASDF);
-	$ASDF = array_diff($SENSOR_HOSTILES,$ACTIVE_HOSTILE_IPS); dumper($ASDF);
+//	$ASDF = array_diff($SENSOR->data["hostiles"],$ACTIVE_HOSTILE_IPS); \metaclassing\Utility::dumper($ASDF);
+	$ASDF = array_diff($SENSOR_HOSTILES,$ACTIVE_HOSTILE_IPS); \metaclassing\Utility::dumper($ASDF);
 
 //	$SENSOR->ban_del($ASDF);
 //	die("fix it yourself.\n");
@@ -135,22 +136,23 @@ print "LIVE SENSOR\t"	. count($SENSOR_HOSTILES)								. "\tHOSTILE SUSPECTS\t!-
 
 /*
 	print "Hostiles in the live sensor but NOT the object hostile list:\n";
-	$ASDF	= array_diff($SENSOR_HOSTILES,$SENSOR->data["hostiles"]);	dumper($ASDF);
+	$ASDF	= array_diff($SENSOR_HOSTILES,$SENSOR->data["hostiles"]);	\metaclassing\Utility::dumper($ASDF);
 /*
 	print "Hostiles in the object hostile list but NOT the live sensor:\n";
 	$ASDF	= array_diff($SENSOR->data["hostiles"],$SENSOR_HOSTILES);
 /*
 	print "Hostile IPs in LIVE sensor but NOT the database (hostile records):\n";
-	$ASDF	= array_diff($SENSOR_HOSTILES,$ACTIVE_HOSTILE_IPS); dumper($ASDF);
+	$ASDF	= array_diff($SENSOR_HOSTILES,$ACTIVE_HOSTILE_IPS); \metaclassing\Utility::dumper($ASDF);
 /*
 	print "Hostile IPs in database but NOT the live sensor:\n";
-	$ASDF	= array_diff($ACTIVE_HOSTILE_IPS,$SENSOR_HOSTILES); dumper($ASDF);
+	$ASDF	= array_diff($ACTIVE_HOSTILE_IPS,$SENSOR_HOSTILES); \metaclassing\Utility::dumper($ASDF);
 /*
 	print "Hostiles in the blackhole router but NOT the hostile list:\n";
-	$ASDF	= array_diff($ROUTES_MANAGED,$SENSOR_HOSTILES);	dumper($ASDF);
+	$ASDF	= array_diff($ROUTES_MANAGED,$SENSOR_HOSTILES);	\metaclassing\Utility::dumper($ASDF);
+	$SENSOR->ban_del($ASDF);
 /*
 	print "Hostiles in the hostile list but NOT the blackhole router:\n";
-	$ASDF	= array_diff($SENSOR_HOSTILES,$ROUTES_MANAGED);	dumper($ASDF);
+	$ASDF	= array_diff($SENSOR_HOSTILES,$ROUTES_MANAGED);	\metaclassing\Utility::dumper($ASDF);
 
 	// This is old code to remediate the data after a bug that failed to delete hostiles from nova cli when deactivated
 /*

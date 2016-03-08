@@ -28,8 +28,8 @@ foreach ($RESULTS as $SENSORID)
 	$OUTPUT = $SENSOR->scan();
 	unset($SENSOR);
 /*
-	$LOGTO   = "mr.admin@domain.com";
-	$LOGFROM = "network.auto@domain.com";
+	$LOGTO   = "that.guy@company.com";
+	$LOGFROM = "netman@company.com";
 	$LOGHEADER = "From: NetworkTool <{$LOGFROM}>\r\nX-Mailer: php";
 	$LOGSUB  = "Blackhole";
 	$LOGBODY = $OUTPUT;

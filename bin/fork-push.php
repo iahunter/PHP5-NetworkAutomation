@@ -99,7 +99,7 @@ foreach ($RESULTS as $DEVICE)
 //		print "STARTING WORK {$PID}: Device ID {$DEVICE['id']} PROMPT {$DEVICE['prompt']} IP {$DEVICE['ip']}\n";
 
 		// Execute config download in FORKED memory space
-//		$SUCCESS = cisco_download_config($DEVICE); /**/
+//		$SUCCESS = \metaclassing\Cisco::downloadConfig($DEVICE); /**/
 
 		// Execute config download in NEW memory space (more resource intensive)
 		$COMMAND = "timeout 1m ".BASEDIR."/bin/push.php --id={$DEVICE['id']}";

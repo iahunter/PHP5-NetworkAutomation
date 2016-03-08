@@ -60,7 +60,7 @@ if ( $COUNT < 10 )
 	$INFOBJECT->data["port"]	= $SERVICE;
 
 	$INFOBJECT->update();
-	//dumper($INFOBJECT);
+	//\metaclassing\Utility::dumper($INFOBJECT);
 }
 
 sleep(3);

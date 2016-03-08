@@ -85,7 +85,7 @@ if (count($RESULTS) > 0)
 		{
 			print "{$TASKINFO["output"]}";
 		}else{
-			print "ERROR! " . dumper_to_string($TASKINFO) . "\n";
+			print "ERROR! " . \metaclassing\Utility::dumperToString($TASKINFO) . "\n";
 		}
 	}
 }

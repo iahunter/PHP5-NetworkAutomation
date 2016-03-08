@@ -23,7 +23,7 @@ if ( defined("PROBE_ID") )					// Using a forced probe ID overrides all other di
 	{
 		$ID = reset($RESULTS);
 		$PROBE = Information::retrieve($ID);
-		if( $PROBE->heartbeat() ) { $PROBE->update(); }		dumper($PROBE);
+		if( $PROBE->heartbeat() ) { $PROBE->update(); }		\metaclassing\Utility::dumper($PROBE);
 		unset($PROBE);
 	}else{									// Otherwise chuck an error
 		print "ERROR: Got {$COUNT} results for search:\n"; var_dump($SEARCH); var_dump($RESULTS);

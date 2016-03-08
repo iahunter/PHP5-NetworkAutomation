@@ -82,7 +82,7 @@ ERROR: DID NOT MATCH LINE: 11:14:07.710408 IP 37.139.14.86 > 123.456.72.9: ICMP 
 	if ( preg_match($REGEX,$LINE,$MATCH) )
 	{
 		// process the output:
-		//dumper($MATCH);
+		//\metaclassing\Utility::dumper($MATCH);
 		//$TIME		= $MATCH[1];	// Who cares?
 		$SRC_IP		= $MATCH[2];
 		//$SRC_PORT	= $MATCH[3];	// Who cares?
@@ -155,7 +155,7 @@ END;
 	if ($NOW > $TIME + 60)	// If we are outside the 60 second time interval, rotate the SUSPECT_HITS array!
 	{
 		print "TIME INTERVAL EXPIRED! {$NOW} > {$TIME} + 60\n";
-		dumper($SUSPECT_HITS);
+		\metaclassing\Utility::dumper($SUSPECT_HITS);
 		$TIME = $NOW;
 		unset($SUSPECT_HITS);
 		$SUSPECT_HITS = array();

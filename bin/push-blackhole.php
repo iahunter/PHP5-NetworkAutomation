@@ -47,7 +47,7 @@ foreach ($RESULTS as $RESULT)
 			array_push($ROUTES_MANAGED,$LINE);
 		}
 	}
-	//dumper($ROUTES_PROVISIONED);
+	//\metaclassing\Utility::dumper($ROUTES_PROVISIONED);
 	$ADD = array_diff($ROUTES_PROVISIONED	,$ROUTES_MANAGED		);
 	$DEL = array_diff($ROUTES_MANAGED		,$ROUTES_PROVISIONED	);
 	foreach ($DEL as $KEY => $VALUE)
@@ -55,18 +55,18 @@ foreach ($RESULTS as $RESULT)
 
 	$OUTPUT .= "BLACKHOLE ROUTER ID {$ROUTER->data["id"]} NAME {$ROUTER->data["name"]}\n";
 	$OUTPUT .= "PROVISIONED ". count($ROUTES_PROVISIONED	) . " ROUTES:\n";
-//	$OUTPUT .= dumper_to_string($ROUTES_PROVISIONED);
+//	$OUTPUT .= \metaclassing\Utility::dumperToString($ROUTES_PROVISIONED);
 	$OUTPUT .= "MANAGED "	. count($ROUTES_MANAGED		) . " ROUTES:\n";
-//	$OUTPUT .= dumper_to_string($ROUTES_MANAGED);
+//	$OUTPUT .= \metaclassing\Utility::dumperToString($ROUTES_MANAGED);
 	$OUTPUT .= "ADD ROUTES:\n";
-	$OUTPUT .= dumper_to_string($ADD);
+	$OUTPUT .= \metaclassing\Utility::dumperToString($ADD);
 	$OUTPUT .= "REMOVE ROUTES:\n";
-	$OUTPUT .= dumper_to_string($DEL);
+	$OUTPUT .= \metaclassing\Utility::dumperToString($DEL);
 
 	// Created a single push variable for both add and del commands!
 	$PUSH = array_merge($ADD,$DEL);
 	$OUTPUT .= "PUSHING:\n";
-	$OUTPUT .= dumper_to_string($PUSH);
+	$OUTPUT .= \metaclassing\Utility::dumperToString($PUSH);
 	// This was inefficient and slow as it resulted in 2 separate pushes!
 /*	if ( count($ADD) ) { $ROUTER->push($ADD); }
 	if ( count($DEL) ) { $ROUTER->push($DEL); }/**/
