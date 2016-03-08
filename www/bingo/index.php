@@ -97,10 +97,10 @@ $TABLEHEIGHT	= $TABLEROWS * $CELLSIZE;
 
 if ( isset($_SESSION["DEBUG"]) && $_SESSION["DEBUG"] > 1 )
 {
-	//dumper($WORD_ARRAY);
+	//\metaclassing\Utility::dumper($WORD_ARRAY);
 	$WORDCOUNT = count($WORD_ARRAY);
 	print "Count of array: $WORDCOUNT<br>\n";
-	dumper($WORDRANGE);
+	\metaclassing\Utility::dumper($WORDRANGE);
 	print "Word array: \n";
 	print "Shuffled range: \n";
 }
@@ -119,7 +119,7 @@ END;
 	foreach(range(0,$TABLECOLS - 1) as $C)
 	{
 		print <<<END
-			<div style="display: table-cell; height: {$CELLSIZE}px; width: {$CELLSIZE}px; padding: 5px; border: 1px solid; text-align: center; vertical-align: middle; font-weight: bold;">{$WORD_ARRAY[ $WORDRANGE[$i++] ]}</div>
+			<div class="bingo" style="display: table-cell; height: {$CELLSIZE}px; width: {$CELLSIZE}px; padding: 5px; border: 1px solid; text-align: center; vertical-align: middle; font-weight: bold;">{$WORD_ARRAY[ $WORDRANGE[$i++] ]}</div>
 END;
 	}
 print <<<END
@@ -128,6 +128,13 @@ END;
 }
 print <<<END
 	</div>
+
+	<script>
+		$( "div.bingo" ).click(function() {
+			$( this ).toggleClass( "purple" );
+		});
+	</script>
+
 END;
 
 
