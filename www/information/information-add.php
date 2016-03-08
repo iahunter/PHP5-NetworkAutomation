@@ -61,7 +61,7 @@ END;
 		$DB->log($MESSAGE);
 		if ($_SESSION["DEBUG"])
 		{
-			dumper($INFOBJECT);
+			\metaclassing\Utility::dumper($INFOBJECT);
 		}
 	}else{
 		print <<<END

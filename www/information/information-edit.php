@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
 
 	$INFOBJECT = Information::retrieve($ID);
 	$TYPE = $INFOBJECT->data['type'];
-dumper($TYPE);
+\metaclassing\Utility::dumper($TYPE);
 
 	if ($INFOBJECT->validate($_POST))
 	{
@@ -50,7 +50,7 @@ END;
 END;
 		if ($_SESSION["DEBUG"])
 		{
-			dumper($INFOBJECT);
+			\metaclassing\Utility::dumper($INFOBJECT);
 		}
 		if($_SESSION["DEBUG"] <= 1)
 		{
