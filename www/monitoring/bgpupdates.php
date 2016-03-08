@@ -86,7 +86,7 @@ END;
 
 $i = 0;
 $BGPINFO = BGP_ASN::array_bgp_by_asn();
-//dumper($BGPINFO);
+//\metaclassing\Utility::dumper($BGPINFO);
 
 //libxml_use_internal_errors(true);
 
@@ -158,7 +158,7 @@ END;
 	{
 		$COLUMNCOUNT = count($WIDTH) - 1;
 		$ROWCLASS = "row".(($i++ % 2)+1);
-		$BGPSTRING = dumper_to_string($BGPUPDATE);
+		$BGPSTRING = \metaclassing\Utility::dumperToString($BGPUPDATE);
 		print <<<END
 		<tr class="{$ROWCLASS}">
 			<td class="report" colspan="{$COLUMNCOUNT}">{$BGPSTRING}</td>
