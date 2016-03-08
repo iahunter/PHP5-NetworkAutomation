@@ -26,32 +26,19 @@
  * @license   http://www.gnu.org/copyleft/lesser.html The GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1
  */
 
+// Composer autoload dependencies
+require_once "/opt/networkautomation/vendor/autoload.php";
+
 /*****************************
 * Network Automation Objects *
 *****************************/
-require_once "debug.class.php";
-require_once "dBug.php";
-require_once "utility.class.php";
-require_once "libjohn.inc.php";		//TODO REWRITE ME INTO THE NEW UTILITY OBJECT
-require_once "ciscoconfig.class.php";	// SNMP cisco config grabber
-require_once "cisco.class.php";
-require_once "js.class.php";
-require_once "html.class.php";
 require_once "database.class.php";
 require_once "session.class.php";
+require_once "permission.inc.php";
 require_once "ldap.class.php";
-require_once "ping.class.php";
 require_once "gearman_client.class.php";
 require_once "information/information.class.php";
-set_include_path(get_include_path().PATH_SEPARATOR.BASEDIR."/include/command/phpseclib/"); // Make PHPSecLib happy
 require_once "command/command.class.php";
-
-/*****************
-* PEAR Libraries *
-*****************/
-set_include_path(get_include_path().PATH_SEPARATOR."/usr/share/php/");
-require_once "Net/IPv4.php";
-require_once "Net/IPv6.php";
 
 /***************
 * SQL Database *
@@ -87,36 +74,27 @@ if ( defined("CACHE_ENABLED") && CACHE_ENABLED)
 * Create our Debug object *
 **************************/
 try {
-	$DEBUG = new Debug();
+	$DEBUG = new \metaclassing\Debug();
 } catch (Exception $E) {
 	$MESSAGE = "Exception: {$E->getMessage()}";
 	trigger_error($MESSAGE);
 	die($MESSAGE);
 }
 
-/**************
-* CLI Runtime *
-**************/
-if (php_sapi_name() == "cli")
-{
-    require_once "commandline.class.php";
-}else{
-/**************
-* WWW Runtime *
-**************/
-	if ( isset($_GET) )
-	{
-		foreach ($_GET as $KEY => $VALUE)
-		{
-			if ( !is_array($VALUE) )	// Do not purify valid htmlized arrays!
-			{
-				$_GET[$KEY] = htmlspecialchars($VALUE);	// Fuck you cross site script kiddies
+// Make sure we only load www runtime stuff if we are NOT on the CLI
+if (php_sapi_name() != "cli") {
+
+	// Purify GET information we are sent
+	if ( isset($_GET) ) {
+		foreach ($_GET as $KEY => $VALUE) {
+			if ( !is_array($VALUE) ) {
+				$_GET[$KEY] = htmlspecialchars($VALUE);
 			}
 		}
 	}
 
-	if (!defined("NO_AUTHENTICATION"))	// Do not start session for CLI initiated PHP!
-	{
+	// Do not start session for apps that dont use authenticated requests
+	if (!defined("NO_AUTHENTICATION")) {
 		// Start PHP Session
 		try {
 			$SESSION = new Session();
@@ -126,8 +104,8 @@ if (php_sapi_name() == "cli")
 			die($MESSAGE);
 		}
 
-		// AAA
-		if (isset($_SESSION) && !isset($_SESSION["AAA"]))	// If we have a session AND dont have an AAA section, lets create one and ask them to log in!
+		// If we have a session AND dont have an AAA section, lets create one and ask them to log in!
+		if (isset($_SESSION) && !isset($_SESSION["AAA"]))
 		{
 			$_SESSION["AAA"] = array();
 			$_SESSION["AAA"]["authenticated"]	= 0;
@@ -138,7 +116,7 @@ if (php_sapi_name() == "cli")
 		$_SESSION["AAA"]["useragent"]			= $_SERVER["HTTP_USER_AGENT"];
 
 		// HTML Utility Object
-		$HTML = new HTML;
+		$HTML = new \metaclassing\HTML;
 		$HTML->set("AAA_USERNAME", $_SESSION["AAA"]["username"]);
 		$HTML->set("LOGOUT_LINK","<a href=\"/logout.php\">Log Out</a></font><br>\n");
 		$HTML->set("FOOTERDEBUG", "");
@@ -151,12 +129,9 @@ END;
 			$HTML->set("MONITOR_USER_EXPERIENCE",$BOOMERANG);
 		}
 
-		// Require Valid User
-		if (!$_SESSION["AAA"]["authenticated"]) // If we are NOT authenticated, and not running a CLI app, print out the form and collect the credentials!
-		{
+		// If we are NOT authenticated, and not running a CLI app, print out the form and collect the credentials!
+		if (!$_SESSION["AAA"]["authenticated"]) {
 			require_once 'login.inc.php';	// This prints the form and processes ldap login credentials!
 		}
 	}
 }
-
-?>
