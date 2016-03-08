@@ -82,7 +82,7 @@ class Security_Service	extends Information
 			}
 		}
 
-		$DEBUG = new Debug(DEBUG_EMAIL);
+		$DEBUG = new \metaclassing\Debug(DEBUG_EMAIL);
 		if (isset($this->data["name"])) { $NAME = $this->data["name"]; }else{ $NAME = $NEWDATA["name"]; }
 		$DEBUG->message("SECURITY SERVICE UPDATED! ID {$this->data["id"]}<br>\n<a href='" . BASEURL . "information/information-view.php?id={$this->data["id"]}'>Item {$NAME} : {$NEWDATA["protocol"]} / {$NEWDATA["port"]}</a>!\n",0);
 
@@ -149,7 +149,7 @@ END;
 		$this->html_width();
 		$rowclass = "row".(($i % 2)+1);
 		$columns = count($this->html_width)-1;	$i = 1;
-		$datadump = dumper_to_string($this->data);
+		$datadump = \metaclassing\Utility::dumperToString($this->data);
 		$OUTPUT .= <<<END
 
 				<tr class="{$rowclass}">
@@ -233,7 +233,7 @@ END;
 	{
 		$OUTPUT = "";
 
-		$OUTPUT .= "  " . Utility::last_stack_call(new Exception);
+		$OUTPUT .= "  " . \metaclassing\Utility::lastStackCall(new Exception);
 		$OUTPUT .= "  ! SERVICE {$this->data["id"]} CONFIGURATION: {$this->data["protocol"]}/{$this->data["port"]} {$this->data["description"]}\n";
 
 		$CISCO_PROTOCOL_XLATE = array(
@@ -291,6 +291,7 @@ END;
 			"540"	=> "uucp",
 			"43"	=> "whois",
 			"80"	=> "www",
+			"750"	=> "kerberos",
 		);
 
 		$PROTOCOL = $this->data["port"];
@@ -308,5 +309,3 @@ END;
 	}
 
 }
-
-?>

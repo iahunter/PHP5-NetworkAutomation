@@ -91,7 +91,7 @@ END;
 		$this->html_width();
 		$rowclass = "row".(($i % 2)+1);
 		$columns = count($this->html_width)-1;	$i = 1;
-		$datadump = dumper_to_string($this->data);
+		$datadump = \metaclassing\Utility::dumperToString($this->data);
 		$OUTSIDE = Information::retrieve($this->data["outsidehost"]);
 		$INSIDE = Information::retrieve($this->data["insidehost"]);
 		$OUTPUT .= <<<END
@@ -190,7 +190,7 @@ END;
 	{
 		$OUTPUT = "";
 		$OUTPUT .= $this->html_form_header();
-		//$OUTPUT .= $this->html_toggle_active_button();	// Permit the user to deactivate any devices and children
+		$OUTPUT .= $this->html_toggle_active_button();	// Permit the user to deactivate any devices and children
 		$OUTPUT .= $this->html_form_field_text("name"		,"NAT Name"							);
 		$SEARCH = array(
 					"category"		=> "Security",
@@ -211,7 +211,7 @@ END;
 	{
 		$OUTPUT = "";
 
-		$OUTPUT .= Utility::last_stack_call(new Exception);
+		$OUTPUT .= \metaclassing\Utility::lastStackCall(new Exception);
 		$OUTPUT .= "! NAT ID {$this->data["id"]} Name: {$this->data["name"]} Description: {$this->data["description"]}\n";
 
 		$OUTSIDE	= Information::retrieve($this->data["outsidehost"]);
@@ -224,5 +224,3 @@ END;
 	}
 
 }
-
-?>

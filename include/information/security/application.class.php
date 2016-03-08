@@ -73,7 +73,7 @@ class Security_Application	extends Information
 			}
 		}
 
-		$DEBUG = new Debug(DEBUG_EMAIL);
+		$DEBUG = new \metaclassing\Debug(DEBUG_EMAIL);
 		if (isset($this->data["name"])) { $NAME = $this->data["name"]; }else{ $NAME = $NEWDATA["name"]; }
 		$DEBUG->message("SECURITY APPLICATION UPDATED! ID {$this->data["id"]}<br>\n<a href='" . BASEURL . "information/information-view.php?id={$this->data["id"]}'>App {$NAME}</a>!\n",0);
 
@@ -138,7 +138,7 @@ END;
 		$this->html_width();
 		$rowclass = "row".(($i % 2)+1);
 		$columns = count($this->html_width)-1;	$i = 1;
-		$datadump = dumper_to_string($this->data);
+		$datadump = \metaclassing\Utility::dumperToString($this->data);
 		$OUTPUT .= <<<END
 
 				<tr class="{$rowclass}">
@@ -262,7 +262,7 @@ END;
 		$OUTPUT = "";
 
 		// This function should probably never be called...
-		$OUTPUT .= Utility::last_stack_call(new Exception);
+		$OUTPUT .= \metaclassing\Utility::lastStackCall(new Exception);
 		$OUTPUT .= "! Application ID {$this->data["id"]} Name: {$this->data["name"]} Description: {$this->data["description"]}\n\n";
 		$OUTPUT .= "\tTODO: Find all the children and configure them\n";
 
@@ -299,5 +299,3 @@ END;
 	}
 
 }
-
-?>

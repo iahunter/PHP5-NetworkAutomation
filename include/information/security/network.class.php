@@ -92,7 +92,7 @@ class Security_Network	extends Information
 			}
 		}
 
-		$DEBUG = new Debug(DEBUG_EMAIL);
+		$DEBUG = new \metaclassing\Debug(DEBUG_EMAIL);
 		if (isset($this->data["name"])) { $NAME = $this->data["name"]; }else{ $NAME = $NEWDATA["name"]; }
 		$DEBUG->message("SECURITY NETWORK UPDATED! ID {$this->data["id"]}<br>\n<a href='" . BASEURL . "information/information-view.php?id={$this->data["id"]}'>Net {$NAME}</a>!\n",0);
 
@@ -164,7 +164,7 @@ END;
 		$this->html_width();
 		$rowclass = "row".(($i % 2)+1);
 		$columns = count($this->html_width)-1;	$i = 1;
-		$datadump = dumper_to_string($this->data);
+		$datadump = \metaclassing\Utility::dumperToString($this->data);
 		$ZONE = Information::retrieve($this->data["zone"]);
 		$OUTPUT .= <<<END
 
@@ -253,7 +253,7 @@ END;
 	{
 		$OUTPUT = "";
 
-		$OUTPUT .= Utility::last_stack_call(new Exception);
+		$OUTPUT .= \metaclassing\Utility::lastStackCall(new Exception);
 		$OUTPUT .= "!Network {$this->data["id"]} CONFIGURATION: {$this->data["ip4"]} {$this->data["ip6"]} {$this->data["zone"]} {$this->data["description"]}\n";
 		$OUTPUT .= "object network OBJ_NET_{$this->data["id"]}\n";
 		$OUTPUT .= "  description ID {$this->data["id"]} NAME {$this->data["name"]} DESCRIPTION {$this->data["description"]}\n";
@@ -268,7 +268,7 @@ END;
 	{
 		$OUTPUT = "";
 
-		$OUTPUT .= "  " . Utility::last_stack_call(new Exception);
+		$OUTPUT .= "  " . \metaclassing\Utility::lastStackCall(new Exception);
 		$OUTPUT .= "  !Network {$this->data["id"]} CONFIGURATION: {$this->data["ip4"]} {$this->data["ip6"]} {$this->data["zone"]} {$this->data["description"]}\n";
 		$OUTPUT .= "  network-object object OBJ_NET_{$this->data["id"]}\n";
 
@@ -276,5 +276,3 @@ END;
 	}
 
 }
-
-?>

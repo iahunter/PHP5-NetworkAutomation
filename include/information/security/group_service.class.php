@@ -115,7 +115,7 @@ END;
 	{
 		$OUTPUT = "";
 
-		$OUTPUT .= Utility::last_stack_call(new Exception);
+		$OUTPUT .= \metaclassing\Utility::lastStackCall(new Exception);
 		$OUTPUT .= "! Service Group ID {$this->data["id"]} Name: {$this->data["name"]} Description: {$this->data["description"]}\n";
 		$CHILDREN = $this->children();
 		$OUTPUT .= "object-group service OBJ_SVS_{$this->data["id"]}\n";
@@ -134,5 +134,3 @@ END;
 	}
 
 }
-
-?>

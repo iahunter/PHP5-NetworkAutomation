@@ -95,7 +95,7 @@ END;
 		$this->html_width();
 		$rowclass = "row".(($i % 2)+1);
 		$columns = count($this->html_width)-1;	$i = 1;
-		$datadump = dumper_to_string($this->data);
+		$datadump = \metaclassing\Utility::dumperToString($this->data);
 		if ($this->data["srchostgroup"])
 		{
 			$SRC_HOSTGROUP	= Information::retrieve($this->data["srchostgroup"]);
@@ -214,7 +214,7 @@ END;
 		$OUTPUT = "";
 		if ( !isset($ACL) || $ACL == "" ) { return "ERROR! ACL NOT PASSED!\n"; }
 
-		$OUTPUT .= Utility::last_stack_call(new Exception);
+		$OUTPUT .= \metaclassing\Utility::lastStackCall(new Exception);
 		$OUTPUT .= "! Application Component ID {$this->data["id"]} Name: {$this->data["name"]} Description: {$this->data["description"]}\n";
 
 		// Configure our object groups for service, source, and destination
@@ -223,8 +223,10 @@ END;
 		$DSTGROUP = Information::retrieve($this->data["dsthostgroup"]);	$OUTPUT .= $DSTGROUP->config();	unset($DSTGROUP);
 
 		$REMARK .= "access-list {$ACL} remark ID {$this->data["id"]} NAME {$this->data["name"]} DESCRIPTION {$this->data["description"]}";
-		if ( strlen($REMARK) > 145 ) { $REMARK = substr($REMARK , 0 , 145) . "..."; }	// Limit remark lines to 100 total characters!
+		$MAXLEN = 143;
+		if ( strlen($REMARK) > $MAXLEN ) { $REMARK = substr($REMARK , 0 , $MAXLEN) . "..."; }	// Limit remark lines to $MAXLEN total characters!
 		/*
+		access-list ACL_V999:INTERNET_V901:DMZ
 		access-list ACL_V901:DMZ_V101:DATACENTER remark (47 characters)
 		ID 53855 NAME Cylance Syslog DMZ VIP to Flow Replicator DESCRIPTION DMZ VIP to internal flow replicator
 		1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
@@ -260,5 +262,3 @@ END;
 	}
 
 }
-
-?>

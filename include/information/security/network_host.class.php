@@ -69,11 +69,28 @@ class Security_Network_Host extends Security_Network
 				$this->data['error'] .= "ERROR: Found duplicate {$this->category}/{$this->type} ID {$DUPLICATE} with {$NEWDATA["name"]}!\n";
 				return 0;
 			}
+
+			$SEARCH = array(			// Search existing information with the same name!
+					"category"		=> $this->category,
+					"stringfield2"	=> $NEWDATA["ip4"],
+					);
+			$RESULTS = Information::search($SEARCH);
+			$COUNT = count($RESULTS);
+			if ($COUNT)
+			{
+				$DUPLICATE = reset($RESULTS);
+				$this->data['error'] .= "ERROR: Found duplicate {$this->category}/{$this->type} ID {$DUPLICATE} with {$NEWDATA["ip4"]}!\n";
+				return 0;
+			}
 		}
 
-		$DEBUG = new Debug(DEBUG_EMAIL);
-		if (isset($this->data["name"])) { $NAME = $this->data["name"]; }else{ $NAME = $NEWDATA["name"]; }
-		$DEBUG->message("SECURITY HOST UPDATED! ID {$this->data["id"]}<br>\n<a href='" . BASEURL . "information/information-view.php?id={$this->data["id"]}'>Host {$NAME} / {$NEWDATA["ip4"]}</a>!\n",0);
+		$DEBUG = new \metaclassing\Debug(DEBUG_EMAIL);
+		if (isset($this->data["id"]) && $this->data["id"]) {
+			$DEBUG->message("SECURITY HOST ADDED! Host {$NEWDATA["name"]} / {$NEWDATA["ip4"]}</a>!\n",0);
+		}else{
+			$DEBUG->message("SECURITY HOST UPDATED! ID {$this->data["id"]}<br>\n<a href='" . BASEURL .
+							"information/information-view.php?id={$this->data["id"]}'>Host {$this->data["name"]} --> {$NEWDATA["name"]} / {$this->data["ip4"]} --> {$NEWDATA["ip4"]}</a>!\n",0);
+		}
 
 		return 1;
 	}
@@ -104,7 +121,7 @@ class Security_Network_Host extends Security_Network
 	{
 		$OUTPUT = "";
 
-		$OUTPUT .= Utility::last_stack_call(new Exception);
+		$OUTPUT .= \metaclassing\Utility::lastStackCall(new Exception);
 		$OUTPUT .= "!Network {$this->data["id"]} CONFIGURATION: {$this->data["ip4"]} {$this->data["ip6"]} {$this->data["zone"]} {$this->data["description"]}\n";
 		$OUTPUT .= "object network OBJ_NET_{$this->data["id"]}\n";
 		$OUTPUT .= "  description ID {$this->data["id"]} NAME {$this->data["name"]} DESCRIPTION {$this->data["description"]}\n";
@@ -119,7 +136,7 @@ class Security_Network_Host extends Security_Network
 	{
 		$OUTPUT = "";
 
-		$OUTPUT .= "  " . Utility::last_stack_call(new Exception);
+		$OUTPUT .= "  " . \metaclassing\Utility::lastStackCall(new Exception);
 		$OUTPUT .= "  !Network {$this->data["id"]} CONFIGURATION: {$this->data["ip4"]} {$this->data["ip6"]} {$this->data["zone"]} {$this->data["description"]}\n";
 		$OUTPUT .= "  network-object object OBJ_NET_{$this->data["id"]}\n";
 
@@ -127,5 +144,3 @@ class Security_Network_Host extends Security_Network
 	}
 
 }
-
-?>

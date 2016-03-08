@@ -91,7 +91,7 @@ END;
 		$this->html_width();
 		$rowclass = "row".(($i % 2)+1);
 		$columns = count($this->html_width)-1;	$i = 1;
-		$datadump = dumper_to_string($this->data);
+		$datadump = \metaclassing\Utility::dumperToString($this->data);
 		if ( isset($this->data["zone"]) && $this->data["zone"] > 0 ) { $ZONE = Information::retrieve($this->data["zone"]); $ZONENAME = $ZONE->data["name"]; }else{ $ZONENAME = "None"; }
 		$OUTPUT .= <<<END
 
@@ -208,7 +208,7 @@ END;
 	{
 		$OUTPUT = "";
 
-		$OUTPUT .= Utility::last_stack_call(new Exception);
+		$OUTPUT .= \metaclassing\Utility::lastStackCall(new Exception);
 		$OUTPUT .= "! Service Group ID {$this->data["id"]} Name: {$this->data["name"]} Description: {$this->data["description"]}\n";
 		$CHILDREN = $this->children();
 
@@ -231,5 +231,3 @@ END;
 	}
 
 }
-
-?>

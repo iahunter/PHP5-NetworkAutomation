@@ -115,7 +115,7 @@ END;
 		$this->html_width();
 		$rowclass = "row".(($i % 2)+1);
 		$columns = count($this->html_width)-1;	$i = 1;
-		$datadump = dumper_to_string($this->data);
+		$datadump = \metaclassing\Utility::dumperToString($this->data);
 		$OUTPUT .= <<<END
 
 				<tr class="{$rowclass}">
@@ -190,12 +190,10 @@ END;
 		$OUTPUT = "";
 
 		// This function should probably NEVER be called...
-		$OUTPUT .= Utility::last_stack_call(new Exception);
+		$OUTPUT .= \metaclassing\Utility::lastStackCall(new Exception);
 		$OUTPUT .= "!ZONE {$this->data["id"]} CONFIGURATION: {$this->data["name"]} {$this->data["description"]}";
 
 		return $OUTPUT;
 	}
 
 }
-
-?>

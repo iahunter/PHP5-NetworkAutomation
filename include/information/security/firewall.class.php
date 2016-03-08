@@ -134,7 +134,7 @@ END;
 		$this->html_width();
 		$rowclass = "row".(($i % 2)+1);
 		$columns = count($this->html_width)-1;	$i = 1;
-		$datadump = dumper_to_string($this->data);
+		$datadump = \metaclassing\Utility::dumperToString($this->data);
 		$OUTPUT .= <<<END
 
 				<tr class="{$rowclass}">
@@ -268,7 +268,7 @@ END;
 		}
 
 		$OUTPUT .= "<br><pre>\n";
-		$OUTPUT .= Utility::last_stack_call(new Exception);
+		$OUTPUT .= \metaclassing\Utility::lastStackCall(new Exception);
 		$OUTPUT .= "!\n! Firewall ID {$this->data["id"]} Name: {$this->data["name"]} Description: {$this->data["description"]}\n!\n";
 
 		// Configure the NATs for this firewall first
@@ -357,7 +357,7 @@ END;
 					die($MESSAGE . $HTML->footer());
 				}
 //				$OUTPUT .= "QUERY: $QUERY\n";
-//				dumper($RESULTS);	// Hopefully this is an array of application_components with src and dest matching our interface zones!
+//				\metaclassing\Utility::dumper($RESULTS);	// Hopefully this is an array of application_components with src and dest matching our interface zones!
 				$COUNT = count($RESULTS);
 				$OUTPUT .= "! Found {$COUNT} application components requiring rules in this firewall\n";
 				/************************************************************************************************
@@ -432,7 +432,7 @@ END;
 					$OUTPUT .= "\n!\n";
 					$OUTPUT .= $TASKINFO["output"];
 				}else{
-					$OUTPUT .= "ERROR! " . dumper_to_string($TASKINFO);
+					$OUTPUT .= "ERROR! " . \metaclassing\Utility::dumperToString($TASKINFO);
 				}
 			}
 		}
@@ -652,8 +652,8 @@ END;
 		$STRUCTURE_PROVISIONED	=	$this->parse_nested_list_to_array( $this->filter_config($CONFIG_PROVISIONED));
 		$STRUCTURE_MANAGED		=	$this->parse_nested_list_to_array( $this->filter_config($CONFIG_MANAGED)	);
 
-		$MISSING	=	array_diff_assoc_recursive($STRUCTURE_PROVISIONED	,$STRUCTURE_MANAGED		);
-		$EXTRA		=	array_diff_assoc_recursive($STRUCTURE_MANAGED		,$STRUCTURE_PROVISIONED	);
+		$MISSING	=	\metaclassing\Utility::recursiveArrayDiffAssoc($STRUCTURE_PROVISIONED	,$STRUCTURE_MANAGED		);
+		$EXTRA		=	\metaclassing\Utility::recursiveArrayDiffAssoc($STRUCTURE_MANAGED		,$STRUCTURE_PROVISIONED	);
 
 			$OUTPUT .= "
 				<table>
@@ -676,7 +676,7 @@ END;
 					</ul><br>
 END;
 		}
-			$OUTPUT .= dBug_to_string($MISSING);
+			$OUTPUT .= \metaclassing\Utility::dBugToString($MISSING);
 //					new dBug($MISSING);
 
 			$OUTPUT .= "<br><hr size=1><br>
@@ -697,7 +697,7 @@ END;
 					</ul><br>
 END;
 		}
-			$OUTPUT .= dBug_to_string($EXTRA);
+			$OUTPUT .= \metaclassing\Utility::dBugToString($EXTRA);
 //					new dBug($EXTRA);
 /**/
 			$OUTPUT .= "<br><hr size=1><br>
@@ -708,8 +708,8 @@ END;
 						<th>Managed Config</th>
 					</tr>
 					<tr>
-						<td valign=top>" . dumper_to_string($STRUCTURE_PROVISIONED) . "</td>
-						<td valign=top>" . dumper_to_string($STRUCTURE_MANAGED)     . "</td>
+						<td valign=top>" . \metaclassing\Utility::dumperToString($STRUCTURE_PROVISIONED) . "</td>
+						<td valign=top>" . \metaclassing\Utility::dumperToString($STRUCTURE_MANAGED)     . "</td>
 					</tr>
 			</table>\n";
 
@@ -744,12 +744,12 @@ END;
 		$STRUCTURE_PROVISIONED	=	$this->parse_nested_list_to_array( $this->filter_config($CONFIG_PROVISIONED));
 		$STRUCTURE_MANAGED		=	$this->parse_nested_list_to_array( $this->filter_config($CONFIG_MANAGED)	);
 
-		$MISSING	=	array_diff_assoc_recursive($STRUCTURE_PROVISIONED	,$STRUCTURE_MANAGED		);
-		$EXTRA		=	array_diff_assoc_recursive($STRUCTURE_MANAGED		,$STRUCTURE_PROVISIONED	);
+		$MISSING	=	\metaclassing\Utility::recursiveArrayDiffAssoc($STRUCTURE_PROVISIONED	,$STRUCTURE_MANAGED		);
+		$EXTRA		=	\metaclassing\Utility::recursiveArrayDiffAssoc($STRUCTURE_MANAGED		,$STRUCTURE_PROVISIONED	);
 
 		// Extract keys from associative array:
 		$PUSH = $this->recursive_assoc_keys($MISSING);
-//		dumper($PUSH);
+//		\metaclassing\Utility::dumper($PUSH);
 		print "<pre>";
 		$DEVICE_MANAGED->push($PUSH);	// PUSH THE CONFIG!
 		print "</pre>";
@@ -804,12 +804,12 @@ END;
 		$STRUCTURE_PROVISIONED	=	$this->parse_nested_list_to_array( $this->filter_config($CONFIG_PROVISIONED));
 		$STRUCTURE_MANAGED		=	$this->parse_nested_list_to_array( $this->filter_config($CONFIG_MANAGED)	);
 
-		$MISSING	=	array_diff_assoc_recursive($STRUCTURE_PROVISIONED	,$STRUCTURE_MANAGED		);
-		$EXTRA		=	array_diff_assoc_recursive($STRUCTURE_MANAGED		,$STRUCTURE_PROVISIONED	);
+		$MISSING	=	\metaclassing\Utility::recursiveArrayDiffAssoc($STRUCTURE_PROVISIONED	,$STRUCTURE_MANAGED		);
+		$EXTRA		=	\metaclassing\Utility::recursiveArrayDiffAssoc($STRUCTURE_MANAGED		,$STRUCTURE_PROVISIONED	);
 
 		// Extract keys from associative array:
 		$PUSH = $this->recursive_assoc_no_keys($EXTRA);
-//		dumper($PUSH);
+//		\metaclassing\Utility::dumper($PUSH);
 		print "<pre>";
 		$DEVICE_MANAGED->push($PUSH);	// PUSH THE CONFIG!
 		print "</pre>";
@@ -839,5 +839,3 @@ END;
 	}
 
 }
-
-?>
