@@ -1,0 +1,7 @@
+archive
+axl
+composer.lock
+composer.phar
+sonar-project.properties
+.svn
+vendor
