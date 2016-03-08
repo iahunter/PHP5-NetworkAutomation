@@ -169,8 +169,8 @@ END;
 		$OUTPUT .= $this->html_list_header_template("Task List Details",$COLUMNS);
 		$OUTPUT .= $this->html_list_row();
 
-		$TASKARRAY	= cisco_parse_nested_list_to_array($this->data['tasks']);
-		$TASKDUMP	= dumper_to_string($TASKARRAY);
+		$TASKARRAY	= \metaclassing\Cisco::parseNestedListToArray($this->data['tasks']);
+		$TASKDUMP	= \metaclassing\Utility::dumperToString($TASKARRAY);
 		$TASKLIST	= $this->recursive_assoc_array_to_ordered_list($TASKARRAY);
 		$rowclass = "row1";
 		$OUTPUT .= <<<END
@@ -203,5 +203,3 @@ END;
 	}
 
 }
-
-?>

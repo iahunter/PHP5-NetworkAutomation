@@ -62,5 +62,3 @@ class Link extends Information
 	}
 
 }
-
-?>
