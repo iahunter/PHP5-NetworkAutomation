@@ -94,10 +94,10 @@ foreach ($RESULTS as $DEVICEID)
 			$PROTOCOLCOLOR = "green";
 			break;
 		case "ssh1":
-			$PROTOCOLCOLOR = "yellow";
+			$PROTOCOLCOLOR = "red";
 			break;
 		case "telnet":
-			$PROTOCOLCOLOR = "yellow";
+			$PROTOCOLCOLOR = "red";
 			break;
 		default:
 			$PROTOCOLCOLOR = "red";
@@ -157,13 +157,13 @@ print "</tbody></table>\n";
 
 print "<br>\n";
 print "<table width=600><tr><td valign=top>";
-print HTML::quicktable_report("Protocol"	,array("Protocol","Count")	,$COUNT['protocol']	) . "<br>\n";
+print \metaclassing\HTML::quicktable_report("Protocol"	,array("Protocol","Count")	,$COUNT['protocol']	) . "<br>\n";
 print "</td><td valign=top>";
-print HTML::quicktable_report("Run"			,array("Output","Count")	,$COUNT['run']		) . "<br>\n";
+print \metaclassing\HTML::quicktable_report("Run"			,array("Output","Count")	,$COUNT['run']		) . "<br>\n";
 print "</td><td valign=top>";
-print HTML::quicktable_report("Version"		,array("Output","Count")	,$COUNT['ver']		) . "<br>\n";
+print \metaclassing\HTML::quicktable_report("Version"		,array("Output","Count")	,$COUNT['ver']		) . "<br>\n";
 print "</td><td valign=top>";
-print HTML::quicktable_report("Inventory"	,array("Output","Count")	,$COUNT['inv']		) . "<br>\n";
+print \metaclassing\HTML::quicktable_report("Inventory"	,array("Output","Count")	,$COUNT['inv']		) . "<br>\n";
 print "</td></tr></table>";
 
 print $HTML->footer();

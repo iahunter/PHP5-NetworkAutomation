@@ -29,7 +29,7 @@ $SITES = array(); foreach($RESULTS as $KEY => $RESULT) { array_push($SITES,$RESU
 
 $SERVICES = array('att','verizon','centurylink','telus','internet','ezvpn','flexvpn');
 
-//dumper($SITES);
+//\metaclassing\Utility::dumper($SITES);
 
 print <<<END
 	<table class="report">

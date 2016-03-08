@@ -62,9 +62,9 @@ arsort($USER_HITS);
 arsort($TOOL_HITS);
 
 print "<table width=1000 CELLPADDING=0 CELLSPACING=0 border=0><tr><td valign=top>";
-print HTML::quicktable_report("User Statistics", array("User","Log Hits"), $USER_HITS) . "\n";
+print \metaclassing\HTML::quicktable_report("User Statistics", array("User","Log Hits"), $USER_HITS) . "\n";
 print "</td><td valign=top>";
-print HTML::quicktable_report("Tool Statistics", array("Tool","Log Hits"), $TOOL_HITS) . "\n";
+print \metaclassing\HTML::quicktable_report("Tool Statistics", array("Tool","Log Hits"), $TOOL_HITS) . "\n";
 print "</td></tr></table>";
 
 print $HTML->footer();

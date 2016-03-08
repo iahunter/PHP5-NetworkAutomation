@@ -36,7 +36,7 @@ foreach ($RESULTS as $DEVICEID)
 			array_push($networks[$network],$INFOBJECT->data["name"]);
 
 			// Super hacky testing
-			preg_match('/(\d+).(\d+).(\d+).*/',$network,$reg); // dumper($reg);
+			preg_match('/(\d+).(\d+).(\d+).*/',$network,$reg); // \metaclassing\Utility::dumper($reg);
 			$OCTET1 = intval($reg[1]);
 			$OCTET2 = intval($reg[2]);
 			$OCTET3 = intval($reg[3]);
@@ -56,7 +56,7 @@ $netcount = sizeof($networks);
 print "Found {$RECORDCOUNT} devices with $netcount unique IPv4 networks.<br>\n";
 
 print "<pre>\n";
-dumper($networks);
+\metaclassing\Utility::dumper($networks);
 print "</pre>\n";
 
 $i=0;
@@ -86,7 +86,7 @@ foreach($INTERNET as $OCTET1 => $SUBNETS1)
 print "</table>\n";
 /*
 print "<pre>\n";
-dumper($INTERNET);
+\metaclassing\Utility::dumper($INTERNET);
 print "</pre>\n";
 /**/
 print $HTML->footer();

@@ -65,7 +65,7 @@ foreach($RESULTS as $DEVICEID)
 	$DEVICE = Information::retrieve($DEVICEID);
 
 	$VERSION		= CISCO_VERSION($DEVICE->data["version"]);
-	$VERSIONCOLOR	= cisco_check_ios_version($DEVICE->data["model"], $VERSION);
+	$VERSIONCOLOR	= \metaclassing\Cisco::checkIosVersion($DEVICE->data["model"], $VERSION);
 	$PROTOCOLCOLOR	= ($DEVICE->data["protocol"] == "ssh2") ? "green" : "red";
 	$IOS_VERSION[$VERSION]++;
 	$MODEL[$DEVICE->data["model"]]++;
@@ -127,9 +127,9 @@ arsort($MODEL);
 print "<br>\n";
 print "<table width=800 CELLPADDING=0 CELLSPACING=0 border=0><tr><td valign=top>";
 
-print HTML::quicktable_report("Device Models", array("Model","Count"), $MODEL) . "\n";
+print \metaclassing\HTML::quicktable_report("Device Models", array("Model","Count"), $MODEL) . "\n";
 print "</td><td valign=top>";
-print HTML::quicktable_report("IOS Versions", array("IOS","Count"), $IOS_VERSION) . "\n";
+print \metaclassing\HTML::quicktable_report("IOS Versions", array("IOS","Count"), $IOS_VERSION) . "\n";
 print "</td></tr></table>";
 
 new dBug($RECORDS);
